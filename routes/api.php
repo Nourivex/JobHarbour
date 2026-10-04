@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\JobVacancyController;
 use App\Http\Controllers\Api\ProfileSkillController;
 use Illuminate\Support\Facades\Route;
 
@@ -20,6 +21,11 @@ use Illuminate\Support\Facades\Route;
 |    - PUT   /api/profile/skills      : Menyimpan / update data keahlian (skills) di profil
 |    - PUT   /api/users/{id}/skills   : Update keahlian pengguna berdasarkan ID
 |
+| 2. Job Catalog Service (M. FAHREN ANDREAN RANGKUTI - 23215030)
+|    - GET   /api/jobs                : Menampilkan & filter daftar lowongan kerja
+|    - GET   /api/jobs/{id}           : Menampilkan detail satu lowongan kerja
+|    - POST  /api/jobs                : Recruiter memposting lowongan kerja baru
+|
 */
 
 // =========================================================================
@@ -34,6 +40,7 @@ Route::get('/health', function () {
             'versi' => '1.0.0',
             'modul_tersedia' => [
                 'Auth & Profile Service' => ['POST /api/auth/login', 'PUT /api/profile/skills'],
+                'Job Catalog Service' => ['GET /api/jobs', 'POST /api/jobs'],
             ],
         ],
         'meta' => [
@@ -60,3 +67,13 @@ Route::middleware('jwt.auth')->group(function () {
     Route::put('/profile/skills', [ProfileSkillController::class, 'updateSkills']);
     Route::put('/users/{id}/skills', [ProfileSkillController::class, 'updateSkills']);
 });
+
+// =========================================================================
+// 3. Service 2: Job Catalog Service
+// =========================================================================
+// Method GET: Menampilkan dan memfilter lowongan (Dapat diakses publik atau terotentikasi)
+Route::get('/jobs', [JobVacancyController::class, 'index']);
+Route::get('/jobs/{id}', [JobVacancyController::class, 'show']);
+
+// Method POST: Khusus peran 'recruiter' untuk menerbitkan lowongan pekerjaan baru
+Route::post('/jobs', [JobVacancyController::class, 'store'])->middleware('jwt.auth:recruiter');
