@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\ApplicationController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\JobVacancyController;
+use App\Http\Controllers\Api\PipelineController;
 use App\Http\Controllers\Api\ProfileSkillController;
 use Illuminate\Support\Facades\Route;
 
@@ -33,6 +34,10 @@ use Illuminate\Support\Facades\Route;
 |    - POST  /api/applications        : Mengirim lamaran + otomatis hitung skor kecocokan
 |    - DELETE /api/applications/{id}  : Membatalkan pengajuan berkas lamaran
 |
+| 4. Recruitment Pipeline Service (MUHAMMAD AFFIF - 24225046)
+|    - GET   /api/pipelines/{id}      : Pelamar melihat riwayat linimasa proses lamaran
+|    - PATCH /api/pipelines/{id}/status : Recruiter update status / tahap seleksi pelamar
+|
 */
 
 // =========================================================================
@@ -49,6 +54,7 @@ Route::get('/health', function () {
                 'Auth & Profile Service' => ['POST /api/auth/login', 'PUT /api/profile/skills'],
                 'Job Catalog Service' => ['GET /api/jobs', 'POST /api/jobs'],
                 'Application & Matchmaking Service' => ['POST /api/applications', 'DELETE /api/applications/{id}'],
+                'Recruitment Pipeline Service' => ['PATCH /api/pipelines/{id}/status', 'GET /api/pipelines/{id}'],
             ],
         ],
         'meta' => [
@@ -99,4 +105,16 @@ Route::middleware('jwt.auth')->group(function () {
 
     // Method DELETE: Membatalkan pengajuan lamaran yang belum disetujui/ditolak
     Route::delete('/applications/{id}', [ApplicationController::class, 'destroy']);
+});
+
+// =========================================================================
+// 5. Service 4: Recruitment Pipeline Service
+// =========================================================================
+Route::middleware('jwt.auth')->group(function () {
+    // Method GET: Pelamar melihat riwayat linimasa dan status tahapan seleksinya
+    Route::get('/pipelines/{applicationId}', [PipelineController::class, 'showTimeline']);
+
+    // Method PATCH: Khusus Recruiter untuk memajukan tahapan (Screening -> Assessment -> Interview -> Offering)
+    Route::patch('/pipelines/{applicationId}/status', [PipelineController::class, 'updateStatus'])->middleware('jwt.auth:recruiter');
+    Route::patch('/applications/{id}/stage', [PipelineController::class, 'updateStatus'])->middleware('jwt.auth:recruiter');
 });
