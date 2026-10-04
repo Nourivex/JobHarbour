@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\ApplicationController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\JobVacancyController;
 use App\Http\Controllers\Api\ProfileSkillController;
@@ -26,6 +27,12 @@ use Illuminate\Support\Facades\Route;
 |    - GET   /api/jobs/{id}           : Menampilkan detail satu lowongan kerja
 |    - POST  /api/jobs                : Recruiter memposting lowongan kerja baru
 |
+| 3. Application & Matchmaking Service (MUHAMMAD YASIR ILHAM NABIL - 23215040)
+|    - GET   /api/applications        : Menampilkan daftar lamaran kerja
+|    - GET   /api/applications/{id}   : Menampilkan detail berkas lamaran
+|    - POST  /api/applications        : Mengirim lamaran + otomatis hitung skor kecocokan
+|    - DELETE /api/applications/{id}  : Membatalkan pengajuan berkas lamaran
+|
 */
 
 // =========================================================================
@@ -41,6 +48,7 @@ Route::get('/health', function () {
             'modul_tersedia' => [
                 'Auth & Profile Service' => ['POST /api/auth/login', 'PUT /api/profile/skills'],
                 'Job Catalog Service' => ['GET /api/jobs', 'POST /api/jobs'],
+                'Application & Matchmaking Service' => ['POST /api/applications', 'DELETE /api/applications/{id}'],
             ],
         ],
         'meta' => [
@@ -77,3 +85,18 @@ Route::get('/jobs/{id}', [JobVacancyController::class, 'show']);
 
 // Method POST: Khusus peran 'recruiter' untuk menerbitkan lowongan pekerjaan baru
 Route::post('/jobs', [JobVacancyController::class, 'store'])->middleware('jwt.auth:recruiter');
+
+// =========================================================================
+// 4. Service 3: Application & Matchmaking Service
+// =========================================================================
+Route::middleware('jwt.auth')->group(function () {
+    // Melihat daftar lamaran milik sendiri
+    Route::get('/applications', [ApplicationController::class, 'index']);
+    Route::get('/applications/{id}', [ApplicationController::class, 'show']);
+
+    // Method POST: Mengirim berkas lamaran + memicu kalkulasi skor kecocokan secara otomatis
+    Route::post('/applications', [ApplicationController::class, 'store']);
+
+    // Method DELETE: Membatalkan pengajuan lamaran yang belum disetujui/ditolak
+    Route::delete('/applications/{id}', [ApplicationController::class, 'destroy']);
+});
