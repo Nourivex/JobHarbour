@@ -39,8 +39,8 @@
 
 **PaduKerja** adalah platform rekrutmen terintegrasi yang dibangun dengan arsitektur **microservice** dan **REST API** berstandar industri. Sistem ini dirancang untuk menyelesaikan dua masalah fundamental dalam proses rekrutmen digital:
 
-1. **Bagi Pencari Kerja** — fenomena *"black-hole resume"* di mana lamaran dikirim namun tidak pernah ada kejelasan status atau feedback.
-2. **Bagi Recruiter** — tumpukan ratusan CV PDF yang tidak relevan, tanpa mekanisme filter otomatis berbasis keahlian.
+1. **Bagi Pencari Kerja** - fenomena *"black-hole resume"* di mana lamaran dikirim namun tidak pernah ada kejelasan status atau feedback.
+2. **Bagi Recruiter** - tumpukan ratusan CV PDF yang tidak relevan, tanpa mekanisme filter otomatis berbasis keahlian.
 
 ---
 
@@ -81,10 +81,10 @@ Pelamar dapat memantau posisi mereka di pipeline secara real-time.
 
 | # | Service | Deskripsi | Penanggung Jawab |
 |---|---------|-----------|------------------|
-| 1 | **Auth & Profile Service** | Autentikasi JWT multi-role (`applicant`, `recruiter`, `admin`), manajemen profil pengguna, dan skill matrix profile | **MUHAMMAD AFFIF** |
-| 2 | **Job Catalog Service** | Manajemen lowongan pekerjaan, kuota posisi, requirements & skill tagging per lowongan | **MUHAMAD FAHREN ANDREAN RANGKUTI** |
-| 3 | **Application & Matchmaking Service** | Upload CV, pengajuan lamaran, dan scoring engine untuk kalkulasi match percentage | **NABE'ELA AYU NING TYAZ ZAHRA** |
-| 4 | **Recruitment Pipeline Service** | Kanban stage timeline, transisi tahapan seleksi, dan interview scheduling | **MUHAMMAD YASIR ILHAM NABIL** |
+| 1 | **Auth & Profile Service** | Autentikasi JWT multi-role (`applicant`, `recruiter`, `admin`), manajemen profil pengguna, dan skill matrix profile | **NABE'ELA AYU NING TYAS ZAHRA** |
+| 2 | **Job Catalog Service** | Manajemen lowongan pekerjaan, kuota posisi, requirements & skill tagging per lowongan | **M. FAHREN ANDREAN RANGKUTI** |
+| 3 | **Application & Matchmaking Service** | Upload CV, pengajuan lamaran, dan scoring engine untuk kalkulasi match percentage | **MUHAMMAD YASIR ILHAM NABIL** |
+| 4 | **Recruitment Pipeline Service** | Kanban stage timeline, transisi tahapan seleksi, dan interview scheduling | **MUHAMMAD AFFIF** |
 
 > Setiap anggota bertanggung jawab penuh atas **desain API**, **implementasi**, **testing**, dan **dokumentasi** service masing-masing.
 

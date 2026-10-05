@@ -1,7 +1,7 @@
-# PaduKerja — Agent Guidelines
+# PaduKerja - Agent Guidelines
 
 > Platform Rekrutmen Terintegrasi Berbasis Microservice dengan Mesin Pemadanan Keahlian Otomatis.
-> Mata Kuliah: Pemrograman Web Service (5537344 / 3 SKS) — Universitas Harkat Negeri — Kelompok 4.
+> Mata Kuliah: Pemrograman Web Service (5537344 / 3 SKS) - Universitas Harkat Negeri - Kelompok 4.
 
 ---
 
@@ -13,10 +13,10 @@ PaduKerja is a recruitment platform built with **4 independent Laravel microserv
 
 | # | Service | Port | Database | Owner |
 |---|---------|------|----------|-------|
-| 1 | **Auth & Profile Service** | `:8001` | `db_auth` | MUHAMMAD AFFIF |
-| 2 | **Job Catalog Service** | `:8002` | `db_jobs` | MUHAMAD FAHREN ANDREAN RANGKUTI |
-| 3 | **Application & Matchmaking Service** | `:8003` | `db_applications` | NABE'ELA AYU NING TYAZ ZAHRA |
-| 4 | **Recruitment Pipeline Service** | `:8004` | `db_pipeline` | MUHAMMAD YASIR ILHAM NABIL |
+| 1 | **Auth & Profile Service** | `:8001` | `db_auth` | NABE'ELA AYU NING TYAS ZAHRA |
+| 2 | **Job Catalog Service** | `:8002` | `db_jobs` | M. FAHREN ANDREAN RANGKUTI |
+| 3 | **Application & Matchmaking Service** | `:8003` | `db_applications` | MUHAMMAD YASIR ILHAM NABIL |
+| 4 | **Recruitment Pipeline Service** | `:8004` | `db_pipeline` | MUHAMMAD AFFIF |
 
 ---
 
@@ -55,7 +55,7 @@ After installation, ask the user to restart their terminal.
 
 All endpoints MUST follow these conventions:
 
-1. **JSON envelope** — Every response uses this structure:
+1. **JSON envelope** - Every response uses this structure:
    ```json
    {
      "status": "success | error",
@@ -65,19 +65,19 @@ All endpoints MUST follow these conventions:
    }
    ```
 
-2. **Headers** — All requests must include:
+2. **Headers** - All requests must include:
    - `Content-Type: application/json` (POST/PUT/PATCH)
    - `Accept: application/json` (all requests)
    - `Authorization: Bearer <token>` (protected endpoints)
 
-3. **HTTP Methods** — Use correct semantics:
+3. **HTTP Methods** - Use correct semantics:
    - `GET` → read (idempotent)
    - `POST` → create
    - `PUT` → full replace
    - `PATCH` → partial update
    - `DELETE` → remove
 
-4. **Status Codes** — Use appropriate codes:
+4. **Status Codes** - Use appropriate codes:
    - `200` OK, `201` Created
    - `400` Bad Request, `401` Unauthorized, `403` Forbidden
    - `404` Not Found, `409` Conflict, `422` Validation Error
@@ -122,6 +122,7 @@ Screening → Assessment → Interview → Offering / Rejected
 - Use Laravel API Resources for response transformation.
 - Use Form Request classes for validation.
 - Write feature tests for every endpoint.
+- **Punctuation rule:** DILARANG menggunakan strip panjang (em-dash U+2014 atau en-dash U+2013) di seluruh dokumentasi, kode, dan HTML. Selalu gunakan strip pendek biasa (-).
 
 ---
 
