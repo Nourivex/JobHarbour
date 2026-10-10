@@ -1,0 +1,146 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1300 820" width="1300" height="820">
+  <defs>
+    <style>
+      .title { font-family: 'Segoe UI', Arial, sans-serif; font-size: 24px; font-weight: 800; fill: #731B29; }
+      .subtitle { font-family: 'Segoe UI', Arial, sans-serif; font-size: 13px; fill: #4b5563; }
+      .entity-title { font-family: 'Segoe UI', Arial, sans-serif; font-size: 15px; font-weight: 700; fill: #ffffff; }
+      .attr-pk { font-family: 'Consolas', monospace; font-size: 11.5px; font-weight: 700; fill: #b91c1c; }
+      .attr-fk { font-family: 'Consolas', monospace; font-size: 11.5px; font-weight: 700; fill: #1d4ed8; }
+      .attr-name { font-family: 'Consolas', monospace; font-size: 11.5px; fill: #1e293b; }
+      .attr-type { font-family: 'Segoe UI', Arial, sans-serif; font-size: 11px; fill: #64748b; }
+      .rel-label { font-family: 'Segoe UI', Arial, sans-serif; font-size: 11.5px; font-weight: 700; fill: #731B29; }
+    </style>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-opacity="0.08" />
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1300" height="820" fill="#f8fafc" rx="16" />
+  <rect x="20" y="20" width="1260" height="780" fill="none" stroke="#e2e8f0" stroke-width="1.5" rx="12" />
+
+  <!-- Header Banner -->
+  <rect x="40" y="35" width="1220" height="75" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1" filter="url(#shadow)" />
+  <text x="65" y="68" class="title">PaduKerja - REST API Resource Relationship Graph</text>
+  <text x="65" y="92" class="subtitle">Diagram Relasi Antar Sumber Daya Data (Resource) dalam Ekosistem Microservice PaduKerja</text>
+  <rect x="1070" y="52" width="165" height="38" rx="6" fill="#F8E9EB" stroke="#731B29" stroke-width="1" />
+  <text x="1085" y="75" style="font-family:'Segoe UI',sans-serif;font-size:11px;font-weight:700;fill:#731B29;">Kelompok 4 - UHN</text>
+
+  <!-- ENTITY 1: USERS -->
+  <g transform="translate(60, 150)" filter="url(#shadow)">
+    <rect width="250" height="250" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" />
+    <path d="M 0 8 Q 0 0 8 0 L 242 0 Q 250 0 250 8 L 250 36 L 0 36 Z" fill="#731B29" />
+    <text x="15" y="24" class="entity-title">USERS (Resource: users)</text>
+    <line x1="0" y1="36" x2="250" y2="36" stroke="#5c1520" stroke-width="1" />
+    <!-- Attributes -->
+    <text x="15" y="60" class="attr-pk">PK  id</text><text x="160" y="60" class="attr-type">bigint (auto)</text>
+    <text x="15" y="85" class="attr-name">    name</text><text x="160" y="85" class="attr-type">string(255)</text>
+    <text x="15" y="110" class="attr-name">    email</text><text x="160" y="110" class="attr-type">string(255)</text>
+    <text x="15" y="135" class="attr-name">    password</text><text x="160" y="135" class="attr-type">string(Bcrypt)</text>
+    <text x="15" y="160" class="attr-name">    role</text><text x="160" y="160" class="attr-type">enum(3)</text>
+    <text x="15" y="185" class="attr-name">    phone</text><text x="160" y="185" class="attr-type">string(20)</text>
+    <text x="15" y="210" class="attr-name">    location</text><text x="160" y="210" class="attr-type">string(100)</text>
+    <text x="15" y="235" class="attr-name">    skills</text><text x="160" y="235" class="attr-type">json (array)</text>
+  </g>
+
+  <!-- ENTITY 2: USER_SKILLS (Sub-resource) -->
+  <g transform="translate(60, 480)" filter="url(#shadow)">
+    <rect width="250" height="150" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" />
+    <path d="M 0 8 Q 0 0 8 0 L 242 0 Q 250 0 250 8 L 250 36 L 0 36 Z" fill="#9f1239" />
+    <text x="15" y="24" class="entity-title">USER_SKILLS (Sub-Resource)</text>
+    <line x1="0" y1="36" x2="250" y2="36" stroke="#881337" stroke-width="1" />
+    <!-- Attributes -->
+    <text x="15" y="60" class="attr-pk">PK  id</text><text x="160" y="60" class="attr-type">bigint (auto)</text>
+    <text x="15" y="85" class="attr-fk">FK  user_id</text><text x="160" y="85" class="attr-type">bigint</text>
+    <text x="15" y="110" class="attr-name">    skill_name</text><text x="160" y="110" class="attr-type">string(50)</text>
+    <text x="15" y="135" class="attr-name">    level</text><text x="160" y="135" class="attr-type">string(20)</text>
+  </g>
+
+  <!-- ENTITY 3: JOB_VACANCIES -->
+  <g transform="translate(480, 150)" filter="url(#shadow)">
+    <rect width="280" height="270" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" />
+    <path d="M 0 8 Q 0 0 8 0 L 272 0 Q 280 0 280 8 L 280 36 L 0 36 Z" fill="#15803d" />
+    <text x="15" y="24" class="entity-title">JOB_VACANCIES (Resource: jobs)</text>
+    <line x1="0" y1="36" x2="280" y2="36" stroke="#166534" stroke-width="1" />
+    <!-- Attributes -->
+    <text x="15" y="60" class="attr-pk">PK  id</text><text x="180" y="60" class="attr-type">bigint (auto)</text>
+    <text x="15" y="85" class="attr-fk">FK  posted_by</text><text x="180" y="85" class="attr-type">bigint (user_id)</text>
+    <text x="15" y="110" class="attr-name">    title</text><text x="180" y="110" class="attr-type">string(255)</text>
+    <text x="15" y="135" class="attr-name">    company</text><text x="180" y="135" class="attr-type">string(255)</text>
+    <text x="15" y="160" class="attr-name">    location</text><text x="180" y="160" class="attr-type">string(100)</text>
+    <text x="15" y="185" class="attr-name">    quota</text><text x="180" y="185" class="attr-type">integer</text>
+    <text x="15" y="210" class="attr-name">    requirements</text><text x="180" y="210" class="attr-type">json (weighted)</text>
+    <text x="15" y="235" class="attr-name">    status</text><text x="180" y="235" class="attr-type">enum(open,closed)</text>
+    <text x="15" y="260" class="attr-name">    salary_range</text><text x="180" y="260" class="attr-type">bigint min/max</text>
+  </g>
+
+  <!-- ENTITY 4: APPLICATIONS -->
+  <g transform="translate(480, 480)" filter="url(#shadow)">
+    <rect width="280" height="260" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" />
+    <path d="M 0 8 Q 0 0 8 0 L 272 0 Q 280 0 280 8 L 280 36 L 0 36 Z" fill="#b45309" />
+    <text x="15" y="24" class="entity-title">APPLICATIONS (Resource)</text>
+    <line x1="0" y1="36" x2="280" y2="36" stroke="#92400e" stroke-width="1" />
+    <!-- Attributes -->
+    <text x="15" y="60" class="attr-pk">PK  id</text><text x="180" y="60" class="attr-type">bigint (auto)</text>
+    <text x="15" y="85" class="attr-fk">FK  user_id</text><text x="180" y="85" class="attr-type">bigint (pelamar)</text>
+    <text x="15" y="110" class="attr-fk">FK  job_vacancy_id</text><text x="180" y="110" class="attr-type">bigint</text>
+    <text x="15" y="135" class="attr-name">    match_score</text><text x="180" y="135" class="attr-type">decimal(5,2)</text>
+    <text x="15" y="160" class="attr-name">    match_category</text><text x="180" y="160" class="attr-type">string(50)</text>
+    <text x="15" y="185" class="attr-name">    matched_skills</text><text x="180" y="185" class="attr-type">json (array)</text>
+    <text x="15" y="210" class="attr-name">    missing_skills</text><text x="180" y="210" class="attr-type">json (array)</text>
+    <text x="15" y="235" class="attr-name">    status</text><text x="180" y="235" class="attr-type">enum(submitted..)</text>
+  </g>
+
+  <!-- ENTITY 5: PIPELINE_TIMELINES -->
+  <g transform="translate(930, 480)" filter="url(#shadow)">
+    <rect width="290" height="230" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" />
+    <path d="M 0 8 Q 0 0 8 0 L 282 0 Q 290 0 290 8 L 290 36 L 0 36 Z" fill="#be185d" />
+    <text x="15" y="24" class="entity-title">PIPELINES (Resource: pipelines)</text>
+    <line x1="0" y1="36" x2="290" y2="36" stroke="#9d174d" stroke-width="1" />
+    <!-- Attributes -->
+    <text x="15" y="60" class="attr-pk">PK  id</text><text x="190" y="60" class="attr-type">bigint (auto)</text>
+    <text x="15" y="85" class="attr-fk">FK  application_id</text><text x="190" y="85" class="attr-type">bigint (unique)</text>
+    <text x="15" y="110" class="attr-name">    current_stage</text><text x="190" y="110" class="attr-type">enum(4 stages)</text>
+    <text x="15" y="135" class="attr-name">    stages</text><text x="190" y="135" class="attr-type">json (timeline)</text>
+    <text x="15" y="160" class="attr-name">    notes</text><text x="190" y="160" class="attr-type">text</text>
+    <text x="15" y="185" class="attr-name">    created_at</text><text x="190" y="185" class="attr-type">timestamp</text>
+    <text x="15" y="210" class="attr-name">    updated_at</text><text x="190" y="210" class="attr-type">timestamp</text>
+  </g>
+
+  <!-- ================= RELATIONSHIP CONNECTORS (All with fill="none"!) ================= -->
+  <!-- 1. USERS to USER_SKILLS (1 : N) -->
+  <path d="M 185 400 L 185 480" fill="none" stroke="#731B29" stroke-width="2.5" />
+  <rect x="135" y="425" width="100" height="22" rx="4" fill="#ffffff" stroke="#731B29" stroke-width="1" />
+  <text x="145" y="440" class="rel-label">1 : N (hasMany)</text>
+  <circle cx="185" cy="405" r="4" fill="#731B29" />
+  <polygon points="185,475 180,465 190,465" fill="#731B29" />
+
+  <!-- 2. USERS to JOB_VACANCIES (1 : N) -->
+  <path d="M 310 260 L 480 260" fill="none" stroke="#15803d" stroke-width="2.5" />
+  <rect x="335" y="248" width="120" height="22" rx="4" fill="#ffffff" stroke="#15803d" stroke-width="1" />
+  <text x="342" y="263" class="rel-label" fill="#15803d">1 : N (recruiter posts)</text>
+  <circle cx="315" cy="260" r="4" fill="#15803d" />
+  <polygon points="475,260 465,255 465,265" fill="#15803d" />
+
+  <!-- 3. USERS to APPLICATIONS (1 : N) -->
+  <path d="M 310 370 C 390 370, 390 530, 480 530" fill="none" stroke="#b45309" stroke-width="2.5" />
+  <rect x="350" y="435" width="85" height="22" rx="4" fill="#ffffff" stroke="#b45309" stroke-width="1" />
+  <text x="357" y="450" class="rel-label" fill="#b45309">1 : N (applies)</text>
+  <circle cx="315" cy="370" r="4" fill="#b45309" />
+  <polygon points="475,530 465,525 465,535" fill="#b45309" />
+
+  <!-- 4. JOB_VACANCIES to APPLICATIONS (1 : N) -->
+  <path d="M 620 420 L 620 480" fill="none" stroke="#b45309" stroke-width="2.5" />
+  <rect x="575" y="438" width="90" height="22" rx="4" fill="#ffffff" stroke="#b45309" stroke-width="1" />
+  <text x="583" y="453" class="rel-label" fill="#b45309">1 : N (receives)</text>
+  <circle cx="620" cy="425" r="4" fill="#b45309" />
+  <polygon points="620,475 615,465 625,465" fill="#b45309" />
+
+  <!-- 5. APPLICATIONS to PIPELINE_TIMELINES (1 : 1) -->
+  <path d="M 760 590 L 930 590" fill="none" stroke="#be185d" stroke-width="2.5" />
+  <rect x="805" y="578" width="80" height="22" rx="4" fill="#ffffff" stroke="#be185d" stroke-width="1" />
+  <text x="815" y="593" class="rel-label" fill="#be185d">1 : 1 (tracks)</text>
+  <circle cx="765" cy="590" r="4" fill="#be185d" />
+  <polygon points="925,590 915,585 915,595" fill="#be185d" />
+
+</svg>

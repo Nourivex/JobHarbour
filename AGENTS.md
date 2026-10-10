@@ -122,7 +122,11 @@ Screening → Assessment → Interview → Offering / Rejected
 - Use Laravel API Resources for response transformation.
 - Use Form Request classes for validation.
 - Write feature tests for every endpoint.
+- **Gaya Bahasa Mahasiswa (Tone of Voice):** Saat menulis dokumentasi, laporan praktikum, atau panduan tugas, GUNAKAN gaya bahasa mahasiswa yang santai, lugas, wajar, dan mudah dipahami sesama mahasiswa. JANGAN terlihat terlalu kaku, formal birokratis, korporat berlebihan, atau sok ahli/dosen. Buat penjelasannya membumi, to-the-point, dan enak dibaca teman sekelompok.
 - **Punctuation rule:** DILARANG menggunakan strip panjang (em-dash U+2014 atau en-dash U+2013) di seluruh dokumentasi, kode, dan HTML. Selalu gunakan strip pendek biasa (-).
+- **Aturan Berkas Tugas Individu:**
+  - JANGAN PERNAH mencantumkan label pembagian kelompok internal seperti "Paket A", "Paket B", "Paket C", "Paket D" atau semacamnya di dalam berkas PDF/HTML laporan tugas yang dikumpulkan ke dosen. Dokumen harus murni tampil sebagai tugas mandiri mahasiswa untuk proyek semester.
+  - Penulisan tugas harus proporsional dan fokus menjawab apa yang diminta modul/dosen (misal: jika tugas hanya meminta Bagian A, B, C, cukup buat Bagian A, B, C saja, jangan berlebihan menambahkan analisis ekstra atau padding halaman yang tidak diminta).
 
 ---
 
