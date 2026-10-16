@@ -1,0 +1,259 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 900" width="1400" height="900">
+  <defs>
+    <style>
+      .title { font-family: 'Segoe UI', Arial, sans-serif; font-size: 24px; font-weight: 800; fill: #731B29; }
+      .subtitle { font-family: 'Segoe UI', Arial, sans-serif; font-size: 13px; fill: #4b5563; }
+      .service-title { font-family: 'Segoe UI', Arial, sans-serif; font-size: 15px; font-weight: 700; }
+      .node-title { font-family: 'Segoe UI', Arial, sans-serif; font-size: 13px; font-weight: 700; fill: #111827; }
+      .node-desc { font-family: 'Segoe UI', Arial, sans-serif; font-size: 11px; fill: #4b5563; }
+      .badge-text { font-family: 'Segoe UI', Arial, sans-serif; font-size: 10px; font-weight: 800; fill: #ffffff; }
+      .uri-text { font-family: 'Consolas', 'Courier New', monospace; font-size: 11px; font-weight: 600; fill: #731B29; }
+      .arrow-label { font-family: 'Segoe UI', Arial, sans-serif; font-size: 11px; font-weight: 700; }
+    </style>
+    <linearGradient id="bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fdfbfb" />
+      <stop offset="100%" stop-color="#f8fafc" />
+    </linearGradient>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-opacity="0.08" />
+    </filter>
+    <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#475569" />
+    </marker>
+    <marker id="arrow-blue" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#1d4ed8" />
+    </marker>
+    <marker id="arrow-maroon" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#731B29" />
+    </marker>
+    <marker id="arrow-green" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#16a34a" />
+    </marker>
+    <marker id="arrow-amber" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#b45309" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1400" height="900" fill="url(#bg-grad)" rx="16" />
+  <rect x="20" y="20" width="1360" height="860" fill="none" stroke="#e2e8f0" stroke-width="1.5" rx="12" />
+
+  <!-- Header Banner -->
+  <rect x="40" y="35" width="1320" height="75" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1" filter="url(#shadow)" />
+  <text x="65" y="68" class="title">PaduKerja - REST API Journey &amp; Lifecycle Flow</text>
+  <text x="65" y="92" class="subtitle">Alur Perjalanan Request API Antar Microservice (Auth, Lowongan, Lamaran &amp; Matchmaking, Seleksi Pipeline)</text>
+  <rect x="1170" y="52" width="165" height="38" rx="6" fill="#F8E9EB" stroke="#731B29" stroke-width="1" />
+  <text x="1185" y="75" style="font-family:'Segoe UI',sans-serif;font-size:11px;font-weight:700;fill:#731B29;">Kelompok 4 - UHN</text>
+
+  <!-- ================= SERVICE 1 ================= -->
+  <rect x="40" y="130" width="305" height="720" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" filter="url(#shadow)" />
+  <rect x="40" y="130" width="305" height="42" rx="10" fill="#eff6ff" />
+  <rect x="40" y="162" width="305" height="10" fill="#eff6ff" />
+  <text x="60" y="157" class="service-title" fill="#1d4ed8">1. Auth &amp; Profile Service</text>
+  <text x="260" y="156" style="font-family:'Consolas',monospace;font-size:11px;font-weight:700;fill:#3b82f6;">(:8001)</text>
+
+  <!-- S1 Node 1: Register -->
+  <g transform="translate(60, 190)">
+    <rect width="265" height="85" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1" />
+    <rect x="12" y="12" width="46" height="18" rx="4" fill="#16a34a" />
+    <text x="22" y="25" class="badge-text">POST</text>
+    <text x="66" y="25" class="uri-text">/api/auth/register</text>
+    <text x="12" y="48" class="node-title">Registrasi Akun Baru</text>
+    <text x="12" y="65" class="node-desc">Pelamar / Recruiter buat akun di sistem</text>
+  </g>
+
+  <!-- Arrow S1-1 to S1-2 -->
+  <path d="M 192 275 L 192 295" fill="none" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- S1 Node 2: Login -->
+  <g transform="translate(60, 305)">
+    <rect width="265" height="95" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1" />
+    <rect x="12" y="12" width="46" height="18" rx="4" fill="#16a34a" />
+    <text x="22" y="25" class="badge-text">POST</text>
+    <text x="66" y="25" class="uri-text">/api/auth/login</text>
+    <text x="12" y="48" class="node-title">Login Akun &amp; Bikin JWT</text>
+    <text x="12" y="65" class="node-desc">Cek email &amp; sandi pake hash Bcrypt</text>
+    <text x="12" y="80" class="node-desc" fill="#16a34a" font-weight="700">- Dapet Bearer Access Token (7 hari)</text>
+  </g>
+
+  <!-- Arrow S1-2 to S1-3 -->
+  <path d="M 192 400 L 192 420" fill="none" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- S1 Node 3: Update Skills -->
+  <g transform="translate(60, 430)">
+    <rect width="265" height="95" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1" />
+    <rect x="12" y="12" width="42" height="18" rx="4" fill="#ea580c" />
+    <text x="23" y="25" class="badge-text">PUT</text>
+    <text x="62" y="25" class="uri-text">/api/profile/skills</text>
+    <text x="12" y="48" class="node-title">Isi / Update Skill Pelamar</text>
+    <text x="12" y="65" class="node-desc">Pelamar simpan list keahlian ke profil</text>
+    <text x="12" y="80" class="node-desc" style="font-family:'Consolas',monospace;font-size:10px;fill:#475569;">["PHP", "Laravel", "MySQL", "Git"]</text>
+  </g>
+
+  <!-- Arrow S1-3 to S1-4 -->
+  <path d="M 192 525 L 192 545" fill="none" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- S1 Node 4: Get Profile -->
+  <g transform="translate(60, 555)">
+    <rect width="265" height="85" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1" />
+    <rect x="12" y="12" width="40" height="18" rx="4" fill="#0284c7" />
+    <text x="21" y="25" class="badge-text">GET</text>
+    <text x="60" y="25" class="uri-text">/api/auth/me</text>
+    <text x="12" y="48" class="node-title">Cek Profil &amp; Validasi Sesi</text>
+    <text x="12" y="65" class="node-desc">Pastikan token valid &amp; skill tersimpan</text>
+  </g>
+
+  <!-- ================= SERVICE 2 ================= -->
+  <rect x="375" y="130" width="305" height="720" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" filter="url(#shadow)" />
+  <rect x="375" y="130" width="305" height="42" rx="10" fill="#f0fdf4" />
+  <rect x="375" y="162" width="305" height="10" fill="#f0fdf4" />
+  <text x="395" y="157" class="service-title" fill="#15803d">2. Job Catalog Service</text>
+  <text x="595" y="156" style="font-family:'Consolas',monospace;font-size:11px;font-weight:700;fill:#16a34a;">(:8002)</text>
+
+  <!-- S2 Node 1: Post Job -->
+  <g transform="translate(395, 230)">
+    <rect width="265" height="120" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1" />
+    <rect x="12" y="12" width="46" height="18" rx="4" fill="#16a34a" />
+    <text x="22" y="25" class="badge-text">POST</text>
+    <text x="66" y="25" class="uri-text">/api/jobs</text>
+    <text x="12" y="48" class="node-title">Recruiter Pasang Lowongan</text>
+    <text x="12" y="65" class="node-desc">Posting posisi baru + syarat skill</text>
+    <text x="12" y="80" class="node-desc">- Kuota posisi &amp; deskripsi pekerjaan</text>
+    <text x="12" y="95" class="node-desc" style="font-family:'Consolas',monospace;font-size:10px;fill:#475569;">Syarat: [PHP:3, Laravel:3, MySQL:2]</text>
+  </g>
+
+  <!-- Arrow S2-1 to S2-2 -->
+  <path d="M 527 350 L 527 380" fill="none" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- S2 Node 2: List Jobs -->
+  <g transform="translate(395, 390)">
+    <rect width="265" height="110" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1" />
+    <rect x="12" y="12" width="40" height="18" rx="4" fill="#0284c7" />
+    <text x="21" y="25" class="badge-text">GET</text>
+    <text x="60" y="25" class="uri-text">/api/jobs</text>
+    <text x="12" y="48" class="node-title">Pelamar Cari Lowongan</text>
+    <text x="12" y="65" class="node-desc">Browse lowongan yang lagi buka</text>
+    <text x="12" y="80" class="node-desc">- Filter by skill: ?skill=PHP</text>
+    <text x="12" y="95" class="node-desc">- Filter by lokasi &amp; pagination</text>
+  </g>
+
+  <!-- Arrow S2-2 to S2-3 -->
+  <path d="M 527 500 L 527 530" fill="none" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- S2 Node 3: Job Detail -->
+  <g transform="translate(395, 540)">
+    <rect width="265" height="85" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1" />
+    <rect x="12" y="12" width="40" height="18" rx="4" fill="#0284c7" />
+    <text x="21" y="25" class="badge-text">GET</text>
+    <text x="60" y="25" class="uri-text">/api/jobs/{id}</text>
+    <text x="12" y="48" class="node-title">Lihat Rincian Lowongan</text>
+    <text x="12" y="65" class="node-desc">Cek gaji, kuota, &amp; detail syaratnya</text>
+  </g>
+
+  <!-- ================= SERVICE 3 ================= -->
+  <rect x="710" y="130" width="315" height="720" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" filter="url(#shadow)" />
+  <rect x="710" y="130" width="315" height="42" rx="10" fill="#fef3c7" />
+  <rect x="710" y="162" width="315" height="10" fill="#fef3c7" />
+  <text x="730" y="157" class="service-title" fill="#b45309">3. Application &amp; Matchmaking</text>
+  <text x="945" y="156" style="font-family:'Consolas',monospace;font-size:11px;font-weight:700;fill:#d97706;">(:8003)</text>
+
+  <!-- S3 Node 1: Submit Application -->
+  <g transform="translate(730, 255)">
+    <rect width="275" height="165" rx="8" fill="#fffbeb" stroke="#fcd34d" stroke-width="1.5" />
+    <rect x="12" y="12" width="46" height="18" rx="4" fill="#16a34a" />
+    <text x="22" y="25" class="badge-text">POST</text>
+    <text x="66" y="25" class="uri-text">/api/applications</text>
+    <text x="12" y="48" class="node-title">Kirim Lamaran &amp; Hitung Skor</text>
+    <text x="12" y="65" class="node-desc">Body: job_id, cover_letter, skills</text>
+    <rect x="12" y="73" width="251" height="55" rx="6" fill="#fef08a" stroke="#eab308" stroke-width="1" />
+    <text x="20" y="90" style="font-family:'Segoe UI',sans-serif;font-size:11px;font-weight:700;fill:#854d0e;">Weighted Jaccard Engine</text>
+    <text x="20" y="105" style="font-family:'Segoe UI',sans-serif;font-size:10px;fill:#713f12;">Skor = (Total Bobot Cocok / Total Syarat) x 100%</text>
+    <text x="20" y="120" style="font-family:'Segoe UI',sans-serif;font-size:10px;font-weight:700;fill:#15803d;">Hasil: 88.89% (Kategori: QUALIFIED)</text>
+    <text x="12" y="148" class="node-desc" font-weight="700" fill="#b45309">- Status: 201 Created (Transaksi DB Aman)</text>
+  </g>
+
+  <!-- Arrow S3-1 to S3-2 -->
+  <path d="M 867 420 L 867 455" fill="none" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- S3 Node 2: List My Applications -->
+  <g transform="translate(730, 465)">
+    <rect width="275" height="85" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1" />
+    <rect x="12" y="12" width="40" height="18" rx="4" fill="#0284c7" />
+    <text x="21" y="25" class="badge-text">GET</text>
+    <text x="60" y="25" class="uri-text">/api/applications</text>
+    <text x="12" y="48" class="node-title">Cek Daftar Lamaran Saya</text>
+    <text x="12" y="65" class="node-desc">Pelamar ngecek status lamarannya</text>
+  </g>
+
+  <!-- Arrow S3-2 to S3-3 -->
+  <path d="M 867 550 L 867 585" fill="none" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- S3 Node 3: Cancel Application -->
+  <g transform="translate(730, 595)">
+    <rect width="275" height="90" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1" />
+    <rect x="12" y="12" width="55" height="18" rx="4" fill="#dc2626" />
+    <text x="19" y="25" class="badge-text">DELETE</text>
+    <text x="75" y="25" class="uri-text">/api/applications/{id}</text>
+    <text x="12" y="48" class="node-title">Batalkan Pengajuan Lamaran</text>
+    <text x="12" y="65" class="node-desc">Pelamar batalin lamaran secara sopan</text>
+    <text x="12" y="80" class="node-desc" fill="#dc2626">- Soft-cancel aman (status: canceled)</text>
+  </g>
+
+  <!-- ================= SERVICE 4 ================= -->
+  <rect x="1055" y="130" width="305" height="720" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" filter="url(#shadow)" />
+  <rect x="1055" y="130" width="305" height="42" rx="10" fill="#fdf2f8" />
+  <rect x="1055" y="162" width="305" height="10" fill="#fdf2f8" />
+  <text x="1075" y="157" class="service-title" fill="#be185d">4. Recruitment Pipeline</text>
+  <text x="1275" y="156" style="font-family:'Consolas',monospace;font-size:11px;font-weight:700;fill:#db2777;">(:8004)</text>
+
+  <!-- S4 Node 1: Get Timeline -->
+  <g transform="translate(1075, 290)">
+    <rect width="265" height="125" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1" />
+    <rect x="12" y="12" width="40" height="18" rx="4" fill="#0284c7" />
+    <text x="21" y="25" class="badge-text">GET</text>
+    <text x="60" y="25" class="uri-text">/api/pipelines/{id}</text>
+    <text x="12" y="48" class="node-title">Pantau Linimasa Seleksi</text>
+    <text x="12" y="65" class="node-desc">Pelamar lihat tahapannya transparan:</text>
+    <rect x="12" y="73" width="241" height="40" rx="4" fill="#fdf4ff" stroke="#e879f9" stroke-width="0.8" />
+    <text x="20" y="88" style="font-family:'Segoe UI',sans-serif;font-size:9.5px;font-weight:700;fill:#86198f;">Urutan Tahapan Seleksi:</text>
+    <text x="20" y="103" style="font-family:'Segoe UI',sans-serif;font-size:9.5px;fill:#a21caf;">Screening -> Assessment -> Interview -> Offering</text>
+  </g>
+
+  <!-- Arrow S4-1 to S4-2 -->
+  <path d="M 1207 415 L 1207 455" fill="none" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- S4 Node 2: Update Stage -->
+  <g transform="translate(1075, 465)">
+    <rect width="265" height="120" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1" />
+    <rect x="12" y="12" width="55" height="18" rx="4" fill="#9333ea" />
+    <text x="19" y="25" class="badge-text">PATCH</text>
+    <text x="75" y="25" class="uri-text">/api/pipelines/{id}/status</text>
+    <text x="12" y="48" class="node-title">Recruiter Majukan Tahapan</text>
+    <text x="12" y="65" class="node-desc">Recruiter seleksi pelamar:</text>
+    <text x="12" y="80" class="node-desc">- Lolos Screening -> Masuk Assessment</text>
+    <text x="12" y="95" class="node-desc">- Lolos Interview -> Kasih Offering</text>
+    <text x="12" y="110" class="node-desc" fill="#dc2626">- Gagal -> Status Rejected</text>
+  </g>
+
+  <!-- ================= INTER-SERVICE CONNECTORS (Clean routing with white pill badges) ================= -->
+  <!-- 1. Auth Bearer Token line to S2 -->
+  <path d="M 325 350 C 350 350, 365 260, 395 260" fill="none" stroke="#3b82f6" stroke-width="2" stroke-dasharray="4" marker-end="url(#arrow-blue)" />
+  <rect x="315" y="285" width="85" height="20" rx="4" fill="#ffffff" stroke="#3b82f6" stroke-width="1" />
+  <text x="325" y="299" class="arrow-label" fill="#1d4ed8">Bearer JWT</text>
+
+  <!-- 2. Job Requirements to S3 -->
+  <path d="M 660 280 L 725 280" fill="none" stroke="#16a34a" stroke-width="2.5" marker-end="url(#arrow-green)" />
+  <rect x="625" y="235" width="115" height="20" rx="4" fill="#ffffff" stroke="#16a34a" stroke-width="1" />
+  <text x="635" y="249" class="arrow-label" fill="#15803d">Syarat Lowongan</text>
+
+  <!-- 3. Skills Data from S1 to S3 (Routed via bottom gap) -->
+  <path d="M 325 480 C 365 480, 365 745, 680 745 C 720 745, 725 350, 730 350" fill="none" stroke="#b45309" stroke-width="2" stroke-dasharray="4" marker-end="url(#arrow-amber)" />
+  <rect x="460" y="733" width="135" height="24" rx="4" fill="#ffffff" stroke="#b45309" stroke-width="1.2" />
+  <text x="470" y="749" class="arrow-label" fill="#b45309">Data Skill Pelamar</text>
+
+  <!-- 4. Application Success triggers Pipeline -->
+  <path d="M 1005 340 L 1075 340" fill="none" stroke="#be185d" stroke-width="2.5" marker-end="url(#arrow-maroon)" />
+  <rect x="1005" y="315" width="75" height="20" rx="4" fill="#ffffff" stroke="#be185d" stroke-width="1" />
+  <text x="1012" y="329" class="arrow-label" fill="#be185d">Init Pipeline</text>
+
+</svg>

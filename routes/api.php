@@ -16,25 +16,25 @@ use Illuminate\Support\Facades\Route;
 | Standar     : RESTful JSON API (RFC 8259), HTTP Methods Semantics, JWT Bearer Token
 |
 | Pembagian Modul Referensi Praktikum:
-| 📌 PAKET D: Akun & Keahlian (Auth & Profile Service - MUHAMMAD AFFIF)
+| 📌 PAKET D: Akun & Keahlian (Auth & Profile Service - NABE'ELA AYU NING TYAZ ZAHRA - 23215052)
 |    - POST  /api/auth/login          : Login akun pengguna & generate token akses JWT
 |    - POST  /api/auth/register       : Registrasi akun baru (applicant / recruiter)
 |    - GET   /api/auth/me             : Mengambil profil lengkap user saat ini
 |    - PUT   /api/profile/skills      : Menyimpan / update data keahlian (skills) di profil
 |    - PUT   /api/users/{id}/skills   : Update keahlian pengguna berdasarkan ID
 |
-| 📌 PAKET A: Lowongan Kerja (Job Catalog Service - MUHAMAD FAHREN ANDREAN RANGKUTI)
+| 📌 PAKET A: Lowongan Kerja (Job Catalog Service - M. FAHREN ANDREAN RANGKUTI - 23215030)
 |    - GET   /api/jobs                : Menampilkan & filter daftar lowongan kerja
 |    - GET   /api/jobs/{id}           : Menampilkan detail satu lowongan kerja
 |    - POST  /api/jobs                : Recruiter memposting lowongan kerja baru
 |
-| 📌 PAKET B: Lamaran & Scoring (Application & Matchmaking Service - NABE'ELA AYU N. T. Z.)
+| 📌 PAKET B: Lamaran & Scoring (Application & Matchmaking Service - MUHAMMAD YASIR ILHAM NABIL - 23215040)
 |    - GET   /api/applications        : Menampilkan daftar lamaran kerja
 |    - GET   /api/applications/{id}   : Menampilkan detail berkas lamaran
 |    - POST  /api/applications        : Mengirim lamaran + otomatis hitung skor kecocokan
 |    - DELETE /api/applications/{id}  : Membatalkan pengajuan berkas lamaran
 |
-| 📌 PAKET C: Seleksi Pelamar (Recruitment Pipeline Service - MUHAMMAD YASIR ILHAM NABIL)
+| 📌 PAKET C: Seleksi Pelamar (Recruitment Pipeline Service - MUHAMMAD AFFIF - 24225046)
 |    - GET   /api/pipelines/{id}      : Pelamar melihat riwayat linimasa proses lamaran
 |    - PATCH /api/pipelines/{id}/status : Recruiter update status / tahap seleksi pelamar
 |

@@ -13,10 +13,10 @@ PaduKerja is a recruitment platform built with **4 independent Laravel microserv
 
 | # | Service | Port | Database | Owner |
 |---|---------|------|----------|-------|
-| 1 | **Auth & Profile Service** | `:8001` | `db_auth` | MUHAMMAD AFFIF |
-| 2 | **Job Catalog Service** | `:8002` | `db_jobs` | MUHAMAD FAHREN ANDREAN RANGKUTI |
-| 3 | **Application & Matchmaking Service** | `:8003` | `db_applications` | NABE'ELA AYU NING TYAZ ZAHRA |
-| 4 | **Recruitment Pipeline Service** | `:8004` | `db_pipeline` | MUHAMMAD YASIR ILHAM NABIL |
+| 1 | **Auth & Profile Service** | `:8001` | `db_auth` | Nabe'ela Ayu Ning Tyas Zahra (23215052) |
+| 2 | **Job Catalog Service** | `:8002` | `db_jobs` | M. Fahren Andrean Rangkuti (23215030) |
+| 3 | **Application & Matchmaking Service** | `:8003` | `db_applications` | Muhammad Yasir Ilham Nabil (23215040) |
+| 4 | **Recruitment Pipeline Service** | `:8004` | `db_pipeline` | MUHAMMAD AFFIF (24225046) |
 
 ---
 
@@ -122,7 +122,11 @@ Screening → Assessment → Interview → Offering / Rejected
 - Use Laravel API Resources for response transformation.
 - Use Form Request classes for validation.
 - Write feature tests for every endpoint.
+- **Gaya Bahasa Mahasiswa (Tone of Voice):** Saat menulis dokumentasi, laporan praktikum, atau panduan tugas, GUNAKAN gaya bahasa mahasiswa yang santai, lugas, wajar, dan mudah dipahami sesama mahasiswa. JANGAN terlihat terlalu kaku, formal birokratis, korporat berlebihan, atau sok ahli/dosen. Buat penjelasannya membumi, to-the-point, dan enak dibaca teman sekelompok.
 - **Punctuation rule:** DILARANG menggunakan strip panjang (em-dash U+2014 atau en-dash U+2013) di seluruh dokumentasi, kode, dan HTML. Selalu gunakan strip pendek biasa (-).
+- **Aturan Berkas Tugas Individu:**
+  - JANGAN PERNAH mencantumkan label pembagian kelompok internal seperti "Paket A", "Paket B", "Paket C", "Paket D" atau semacamnya di dalam berkas PDF/HTML laporan tugas yang dikumpulkan ke dosen. Dokumen harus murni tampil sebagai tugas mandiri mahasiswa untuk proyek semester.
+  - Penulisan tugas harus proporsional dan fokus menjawab apa yang diminta modul/dosen (misal: jika tugas hanya meminta Bagian A, B, C, cukup buat Bagian A, B, C saja, jangan berlebihan menambahkan analisis ekstra atau padding halaman yang tidak diminta).
 
 ---
 
