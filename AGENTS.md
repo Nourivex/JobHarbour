@@ -127,6 +127,7 @@ Screening → Assessment → Interview → Offering / Rejected
 - **Aturan Berkas Tugas Individu:**
   - JANGAN PERNAH mencantumkan label pembagian kelompok internal seperti "Paket A", "Paket B", "Paket C", "Paket D" atau semacamnya di dalam berkas PDF/HTML laporan tugas yang dikumpulkan ke dosen. Dokumen harus murni tampil sebagai tugas mandiri mahasiswa untuk proyek semester.
   - Penulisan tugas harus proporsional dan fokus menjawab apa yang diminta modul/dosen (misal: jika tugas hanya meminta Bagian A, B, C, cukup buat Bagian A, B, C saja, jangan berlebihan menambahkan analisis ekstra atau padding halaman yang tidak diminta).
+- **Lokasi Kampus / Kota Dokumen:** Kampus **Universitas Harkat Negeri** berlokasi di **Tegal** (Jawa Tengah). DILARANG menggunakan "Jakarta" sebagai lokasi tanda tangan/titimangsa dokumen atau identitas kampus. Selalu gunakan **Tegal** (misal: "Tegal, 16 Oktober 2026") pada seluruh dokumen tugas, lembar kerja, laporan praktikum, lembar pengesahan, PDF, dan dokumentasi akademik.
 
 ---
 
