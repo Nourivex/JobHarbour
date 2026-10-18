@@ -15,18 +15,22 @@ Sesuai instruksi pada Modul Ajar 04 (Bab 22: Tugas Kelompok Minggu ke-4), luaran
 | Berkas | Format | Deskripsi |
 |---|---|---|
 | [`docs/api-design.md`](../../api-design.md) | Markdown | Dokumen perancangan API resmi kelompok di root folder `docs/`. |
-| [`Tugas_Minggu_4_API_Design_Document.pdf`](Tugas_Minggu_4_API_Design_Document.pdf) | PDF (A4) | Berkas cetak resmi siap kumpul di LMS (4 halaman A4) dengan kop logo baru UHN. |
-| [`Tugas_Minggu_4_API_Design_Document.html`](Tugas_Minggu_4_API_Design_Document.html) | HTML | Sumber template web dokumen dengan styling cetak CSS presisi. |
+| [`Tugas_Minggu_4_API_Design_Document.html`](Tugas_Minggu_4_API_Design_Document.html) | HTML (A4) | Sumber cetak PDF untuk LMS (10 halaman A4), isi sama dengan `docs/api-design.md`. |
+| [`Lembar_Kerja_Workshop_Minggu_4.html`](Lembar_Kerja_Workshop_Minggu_4.html) | HTML (A4) | Lembar kerja Aktivitas Workshop Desain 20.1 - 20.4 (tugas LMS "Aktivitas Workshop Desain REST API"). |
+| [`diagrams/resource_relationship_erd.svg`](diagrams/resource_relationship_erd.svg) | SVG / PNG | ERD ringkas 10 resource data, dikelompokkan per service. |
+
+> File PDF tidak disimpan di repository (`*.pdf` ada di `.gitignore`). Untuk membuat PDF, buka file HTML di browser lalu Print (Ctrl+P), pilih **Save as PDF**, ukuran A4, dan matikan opsi header/footer.
 
 ---
 
-## 📋 Cakupan 8 Bagian Dokumen (Bagian A s.d. H)
+## 📋 Cakupan Dokumen (Bagian A s.d. H + Lampiran)
 
-1. **Bagian A - Identitas Proyek & Anggota Tim:** Nama proyek, anggota kelompok (4 mahasiswa beserta NIM dan peran microservice), base URL gateway/service, versi API (`v1`), dan konvensi penamaan (`snake_case` dan plural nouns).
-2. **Bagian B - Pemodelan Resource & Relasi:** 8 entitas resource utama (`users`, `profiles`, `skills`, `jobs`, `requirements`, `applications`, `pipelines`, `interviews`) lengkap dengan tipe data atribut dan diagram ERD ringkas.
-3. **Bagian C - Matriks Endpoint:** 18 endpoint RESTful yang mencakup rute publik dan terotentikasi, pemetaan kata kerja HTTP semantik, peran aktor, serta status code respon.
-4. **Bagian D - Desain Query:** Standar parameter filtering, searching (`?q=`), sorting (`?sort=-created_at`), dan pagination (`?page=1&per_page=15`) dengan batas maksimum untuk mencegah DoS.
-5. **Bagian E - Representasi Data:** Contoh payload JSON Envelope seragam untuk item tunggal (`200 OK`), collection terpaginasi (`meta.pagination`), dan submit lamaran (`201 Created`).
-6. **Bagian F - Penanganan Error & Status Code:** Format error envelope standar, contoh error validasi form (`422 Unprocessable Entity`), dan contoh konflik aturan bisnis (`409 Conflict`).
-7. **Bagian G - Aksi Non-CRUD:** Pemodelan proses bisnis kompleks ke pola RESTful (kalkulasi matchmaking otomatis, transisi tahapan seleksi state machine, dan pembatalan soft-state).
-8. **Bagian H - Catatan Keputusan Desain:** Rangkuman keputusan arsitektur (universal envelope, page-based pagination, pemisahan PUT vs PATCH, dan isolasi database-per-service).
+1. **Bagian A - Identitas:** Nama proyek, anggota kelompok (NIM dan service), base URL gateway/service, versi API (`v1`), bahasa penamaan, dan konvensi penamaan.
+2. **Bagian B - Resource & Relasi:** 11 resource (`users`, `me`, `profiles`, `skills`, `user_skills`, `jobs`, `job_requirements`, `applications`, `pipelines`, `pipeline_transitions`, `interviews`) beserta tipe data, jenis (collection, singleton, sub-resource), tabel relasi, dan ERD.
+3. **Bagian C - Endpoint Matrix:** 21 endpoint dengan method, URI, fungsi, aktor, status sukses, dan status gagal. POST mengembalikan `201` + `Location`, DELETE mengembalikan `204`.
+4. **Bagian D - Desain Query:** Filter, search (`?q=`), sort (`?sort=-created_at`), dan pagination (`?page=&per_page=`) untuk 3 endpoint collection, lengkap dengan whitelist, default, dan batas maksimum.
+5. **Bagian E - Representasi:** 5 contoh response (item, 2 collection dengan `meta` dan `links`, create `201`, delete `204`).
+6. **Bagian F - Error & Status:** Format error seragam dengan `code`, contoh `422` dan dua contoh `409`, daftar kode error, dan ringkasan status code.
+7. **Bagian G - Aksi Non-CRUD:** Perhitungan skor matchmaking, transisi tahap seleksi (`POST /pipelines/{id}/transitions`), dan penarikan lamaran (soft delete).
+8. **Bagian H - Catatan Keputusan:** 11 keputusan desain beserta alasannya.
+9. **Lampiran - Peer Review:** Checklist 8 butir untuk diisi kelompok reviewer beserta kolom perbaikan.

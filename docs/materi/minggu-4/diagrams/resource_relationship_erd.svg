@@ -1,0 +1,140 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1250 630" width="1250" height="630" font-family="Arial, Helvetica, sans-serif">
+<rect width="1250" height="630" fill="#FFFFFF"/>
+<rect x="20" y="52" width="470" height="345" rx="8" fill="#FBF4F5" stroke="#731B29" stroke-width="1" stroke-dasharray="5 4"/>
+<text x="480" y="65" text-anchor="end" font-size="11" font-weight="bold" fill="#731B29">Auth &amp; Profile Service :8001</text>
+<rect x="510" y="52" width="240" height="345" rx="8" fill="#FBF4F5" stroke="#731B29" stroke-width="1" stroke-dasharray="5 4"/>
+<text x="518" y="65" text-anchor="start" font-size="11" font-weight="bold" fill="#731B29">Job Catalog :8002</text>
+<rect x="510" y="420" width="240" height="192" rx="8" fill="#FBF4F5" stroke="#731B29" stroke-width="1" stroke-dasharray="5 4"/>
+<text x="518" y="433" text-anchor="start" font-size="11" font-weight="bold" fill="#731B29">Application :8003</text>
+<rect x="770" y="240" width="460" height="372" rx="8" fill="#FBF4F5" stroke="#731B29" stroke-width="1" stroke-dasharray="5 4"/>
+<text x="778" y="253" text-anchor="start" font-size="11" font-weight="bold" fill="#731B29">Pipeline Service :8004</text>
+<polyline points="240,110 270,110" fill="none" stroke="#333" stroke-width="1.4"/>
+<polyline points="140,194 140,260" fill="none" stroke="#333" stroke-width="1.4"/>
+<polyline points="240,300 270,300" fill="none" stroke="#333" stroke-width="1.4"/>
+<polyline points="140,70 140,40 630,40 630,70" fill="none" stroke="#333" stroke-width="1.4"/>
+<polyline points="630,230 630,260" fill="none" stroke="#333" stroke-width="1.4"/>
+<polyline points="730,125 758,125 758,470 730,470" fill="none" stroke="#333" stroke-width="1.4"/>
+<polyline points="40,125 28,125 28,600 630,600 630,584" fill="none" stroke="#333" stroke-width="1.4"/>
+<polyline points="730,505 790,505" fill="none" stroke="#333" stroke-width="1.4"/>
+<polyline points="990,490 1010,490" fill="none" stroke="#333" stroke-width="1.4"/>
+<polyline points="890,440 890,320 1010,320" fill="none" stroke="#333" stroke-width="1.4"/>
+<rect x="241.7" y="93" width="26.6" height="14" rx="3" fill="#FFFFFF" stroke="#731B29" stroke-width="0.8"/>
+<text x="255" y="104" text-anchor="middle" font-size="10" font-weight="bold" fill="#731B29">1:1</text>
+<rect x="146.7" y="220" width="26.6" height="14" rx="3" fill="#FFFFFF" stroke="#731B29" stroke-width="0.8"/>
+<text x="160" y="231" text-anchor="middle" font-size="10" font-weight="bold" fill="#731B29">1:N</text>
+<rect x="241.7" y="283" width="26.6" height="14" rx="3" fill="#FFFFFF" stroke="#731B29" stroke-width="0.8"/>
+<text x="255" y="294" text-anchor="middle" font-size="10" font-weight="bold" fill="#731B29">N:1</text>
+<rect x="300.4" y="23" width="169.20000000000002" height="14" rx="3" fill="#FFFFFF" stroke="#731B29" stroke-width="0.8"/>
+<text x="385" y="34" text-anchor="middle" font-size="10" font-weight="bold" fill="#731B29">1:N (recruiter memposting)</text>
+<rect x="636.7" y="238" width="26.6" height="14" rx="3" fill="#FFFFFF" stroke="#731B29" stroke-width="0.8"/>
+<text x="650" y="249" text-anchor="middle" font-size="10" font-weight="bold" fill="#731B29">1:N</text>
+<rect x="758.7" y="290" width="26.6" height="14" rx="3" fill="#FFFFFF" stroke="#731B29" stroke-width="0.8"/>
+<text x="772" y="301" text-anchor="middle" font-size="10" font-weight="bold" fill="#731B29">1:N</text>
+<rect x="224.7" y="583" width="150.6" height="14" rx="3" fill="#FFFFFF" stroke="#731B29" stroke-width="0.8"/>
+<text x="300" y="594" text-anchor="middle" font-size="10" font-weight="bold" fill="#731B29">1:N (applicant melamar)</text>
+<rect x="746.7" y="488" width="26.6" height="14" rx="3" fill="#FFFFFF" stroke="#731B29" stroke-width="0.8"/>
+<text x="760" y="499" text-anchor="middle" font-size="10" font-weight="bold" fill="#731B29">1:1</text>
+<rect x="986.7" y="473" width="26.6" height="14" rx="3" fill="#FFFFFF" stroke="#731B29" stroke-width="0.8"/>
+<text x="1000" y="484" text-anchor="middle" font-size="10" font-weight="bold" fill="#731B29">1:N</text>
+<rect x="916.7" y="303" width="26.6" height="14" rx="3" fill="#FFFFFF" stroke="#731B29" stroke-width="0.8"/>
+<text x="930" y="314" text-anchor="middle" font-size="10" font-weight="bold" fill="#731B29">1:N</text>
+<rect x="40" y="70" width="200" height="124" rx="5" fill="#FFFFFF" stroke="#000" stroke-width="1.2"/>
+<path d="M40,98 V75 a5,5 0 0 1 5,-5 H235 a5,5 0 0 1 5,5 V98 Z" fill="#731B29"/>
+<text x="140.0" y="89" text-anchor="middle" font-size="12.5" font-weight="bold" fill="#FFFFFF" font-family="Courier New, monospace">users</text>
+<text x="50" y="113" font-size="11" fill="#111">id</text>
+<text x="230" y="113" text-anchor="end" font-size="9.5" font-weight="bold" fill="#731B29">PK</text>
+<text x="50" y="131" font-size="11" fill="#111">name</text>
+<text x="50" y="149" font-size="11" fill="#111">email</text>
+<text x="50" y="167" font-size="11" fill="#111">password_hash</text>
+<text x="50" y="185" font-size="11" fill="#111">role</text>
+<rect x="270" y="70" width="200" height="124" rx="5" fill="#FFFFFF" stroke="#000" stroke-width="1.2"/>
+<path d="M270,98 V75 a5,5 0 0 1 5,-5 H465 a5,5 0 0 1 5,5 V98 Z" fill="#731B29"/>
+<text x="370.0" y="89" text-anchor="middle" font-size="12.5" font-weight="bold" fill="#FFFFFF" font-family="Courier New, monospace">profiles</text>
+<text x="280" y="113" font-size="11" fill="#111">id</text>
+<text x="460" y="113" text-anchor="end" font-size="9.5" font-weight="bold" fill="#731B29">PK</text>
+<text x="280" y="131" font-size="11" fill="#111">user_id</text>
+<text x="460" y="131" text-anchor="end" font-size="9.5" font-weight="bold" fill="#731B29">FK</text>
+<text x="280" y="149" font-size="11" fill="#111">phone</text>
+<text x="280" y="167" font-size="11" fill="#111">bio</text>
+<text x="280" y="185" font-size="11" fill="#111">portfolio_url</text>
+<rect x="40" y="260" width="200" height="106" rx="5" fill="#FFFFFF" stroke="#000" stroke-width="1.2"/>
+<path d="M40,288 V265 a5,5 0 0 1 5,-5 H235 a5,5 0 0 1 5,5 V288 Z" fill="#731B29"/>
+<text x="140.0" y="279" text-anchor="middle" font-size="12.5" font-weight="bold" fill="#FFFFFF" font-family="Courier New, monospace">user_skills</text>
+<text x="50" y="303" font-size="11" fill="#111">user_id</text>
+<text x="230" y="303" text-anchor="end" font-size="9.5" font-weight="bold" fill="#731B29">FK</text>
+<text x="50" y="321" font-size="11" fill="#111">skill_id</text>
+<text x="230" y="321" text-anchor="end" font-size="9.5" font-weight="bold" fill="#731B29">FK</text>
+<text x="50" y="339" font-size="11" fill="#111">level</text>
+<text x="50" y="357" font-size="11" fill="#111">years_exp</text>
+<rect x="270" y="260" width="200" height="88" rx="5" fill="#FFFFFF" stroke="#000" stroke-width="1.2"/>
+<path d="M270,288 V265 a5,5 0 0 1 5,-5 H465 a5,5 0 0 1 5,5 V288 Z" fill="#731B29"/>
+<text x="370.0" y="279" text-anchor="middle" font-size="12.5" font-weight="bold" fill="#FFFFFF" font-family="Courier New, monospace">skills</text>
+<text x="280" y="303" font-size="11" fill="#111">id</text>
+<text x="460" y="303" text-anchor="end" font-size="9.5" font-weight="bold" fill="#731B29">PK</text>
+<text x="280" y="321" font-size="11" fill="#111">name</text>
+<text x="280" y="339" font-size="11" fill="#111">category</text>
+<rect x="530" y="70" width="200" height="160" rx="5" fill="#FFFFFF" stroke="#000" stroke-width="1.2"/>
+<path d="M530,98 V75 a5,5 0 0 1 5,-5 H725 a5,5 0 0 1 5,5 V98 Z" fill="#731B29"/>
+<text x="630.0" y="89" text-anchor="middle" font-size="12.5" font-weight="bold" fill="#FFFFFF" font-family="Courier New, monospace">jobs</text>
+<text x="540" y="113" font-size="11" fill="#111">id</text>
+<text x="720" y="113" text-anchor="end" font-size="9.5" font-weight="bold" fill="#731B29">PK</text>
+<text x="540" y="131" font-size="11" fill="#111">title</text>
+<text x="540" y="149" font-size="11" fill="#111">company_name</text>
+<text x="540" y="167" font-size="11" fill="#111">salary_min / max</text>
+<text x="540" y="185" font-size="11" fill="#111">quota</text>
+<text x="540" y="203" font-size="11" fill="#111">status</text>
+<text x="540" y="221" font-size="11" fill="#111">posted_by</text>
+<text x="720" y="221" text-anchor="end" font-size="9.5" font-weight="bold" fill="#731B29">FK</text>
+<rect x="530" y="260" width="200" height="124" rx="5" fill="#FFFFFF" stroke="#000" stroke-width="1.2"/>
+<path d="M530,288 V265 a5,5 0 0 1 5,-5 H725 a5,5 0 0 1 5,5 V288 Z" fill="#731B29"/>
+<text x="630.0" y="279" text-anchor="middle" font-size="12.5" font-weight="bold" fill="#FFFFFF" font-family="Courier New, monospace">job_requirements</text>
+<text x="540" y="303" font-size="11" fill="#111">id</text>
+<text x="720" y="303" text-anchor="end" font-size="9.5" font-weight="bold" fill="#731B29">PK</text>
+<text x="540" y="321" font-size="11" fill="#111">job_id</text>
+<text x="720" y="321" text-anchor="end" font-size="9.5" font-weight="bold" fill="#731B29">FK</text>
+<text x="540" y="339" font-size="11" fill="#111">skill_name</text>
+<text x="540" y="357" font-size="11" fill="#111">level</text>
+<text x="540" y="375" font-size="11" fill="#111">weight</text>
+<rect x="530" y="440" width="200" height="142" rx="5" fill="#FFFFFF" stroke="#000" stroke-width="1.2"/>
+<path d="M530,468 V445 a5,5 0 0 1 5,-5 H725 a5,5 0 0 1 5,5 V468 Z" fill="#731B29"/>
+<text x="630.0" y="459" text-anchor="middle" font-size="12.5" font-weight="bold" fill="#FFFFFF" font-family="Courier New, monospace">applications</text>
+<text x="540" y="483" font-size="11" fill="#111">id</text>
+<text x="720" y="483" text-anchor="end" font-size="9.5" font-weight="bold" fill="#731B29">PK</text>
+<text x="540" y="501" font-size="11" fill="#111">job_id</text>
+<text x="720" y="501" text-anchor="end" font-size="9.5" font-weight="bold" fill="#731B29">FK</text>
+<text x="540" y="519" font-size="11" fill="#111">user_id</text>
+<text x="720" y="519" text-anchor="end" font-size="9.5" font-weight="bold" fill="#731B29">FK</text>
+<text x="540" y="537" font-size="11" fill="#111">match_score</text>
+<text x="540" y="555" font-size="11" fill="#111">match_category</text>
+<text x="540" y="573" font-size="11" fill="#111">status</text>
+<rect x="790" y="440" width="200" height="106" rx="5" fill="#FFFFFF" stroke="#000" stroke-width="1.2"/>
+<path d="M790,468 V445 a5,5 0 0 1 5,-5 H985 a5,5 0 0 1 5,5 V468 Z" fill="#731B29"/>
+<text x="890.0" y="459" text-anchor="middle" font-size="12.5" font-weight="bold" fill="#FFFFFF" font-family="Courier New, monospace">pipelines</text>
+<text x="800" y="483" font-size="11" fill="#111">id</text>
+<text x="980" y="483" text-anchor="end" font-size="9.5" font-weight="bold" fill="#731B29">PK</text>
+<text x="800" y="501" font-size="11" fill="#111">application_id</text>
+<text x="980" y="501" text-anchor="end" font-size="9.5" font-weight="bold" fill="#731B29">FK</text>
+<text x="800" y="519" font-size="11" fill="#111">current_stage</text>
+<text x="800" y="537" font-size="11" fill="#111">updated_at</text>
+<rect x="1010" y="440" width="200" height="142" rx="5" fill="#FFFFFF" stroke="#000" stroke-width="1.2"/>
+<path d="M1010,468 V445 a5,5 0 0 1 5,-5 H1205 a5,5 0 0 1 5,5 V468 Z" fill="#731B29"/>
+<text x="1110.0" y="459" text-anchor="middle" font-size="12.5" font-weight="bold" fill="#FFFFFF" font-family="Courier New, monospace">pipeline_transitions</text>
+<text x="1020" y="483" font-size="11" fill="#111">id</text>
+<text x="1200" y="483" text-anchor="end" font-size="9.5" font-weight="bold" fill="#731B29">PK</text>
+<text x="1020" y="501" font-size="11" fill="#111">pipeline_id</text>
+<text x="1200" y="501" text-anchor="end" font-size="9.5" font-weight="bold" fill="#731B29">FK</text>
+<text x="1020" y="519" font-size="11" fill="#111">from_stage</text>
+<text x="1020" y="537" font-size="11" fill="#111">to_stage</text>
+<text x="1020" y="555" font-size="11" fill="#111">changed_by</text>
+<text x="1020" y="573" font-size="11" fill="#111">created_at</text>
+<rect x="1010" y="260" width="200" height="124" rx="5" fill="#FFFFFF" stroke="#000" stroke-width="1.2"/>
+<path d="M1010,288 V265 a5,5 0 0 1 5,-5 H1205 a5,5 0 0 1 5,5 V288 Z" fill="#731B29"/>
+<text x="1110.0" y="279" text-anchor="middle" font-size="12.5" font-weight="bold" fill="#FFFFFF" font-family="Courier New, monospace">interviews</text>
+<text x="1020" y="303" font-size="11" fill="#111">id</text>
+<text x="1200" y="303" text-anchor="end" font-size="9.5" font-weight="bold" fill="#731B29">PK</text>
+<text x="1020" y="321" font-size="11" fill="#111">pipeline_id</text>
+<text x="1200" y="321" text-anchor="end" font-size="9.5" font-weight="bold" fill="#731B29">FK</text>
+<text x="1020" y="339" font-size="11" fill="#111">scheduled_at</text>
+<text x="1020" y="357" font-size="11" fill="#111">type</text>
+<text x="1020" y="375" font-size="11" fill="#111">status</text>
+</svg>
