@@ -491,13 +491,13 @@ Proses bisnis tidak dimodelkan sebagai endpoint kata kerja (`/calculateScore`, `
 
 | No | Butir Pemeriksaan | Ya | Tidak | Catatan | Perbaikan yang Dilakukan |
 |:---:|---|:---:|:---:|---|---|
-| 1 | Semua URI memakai kata benda jamak, huruf kecil, dan tanpa kata kerja | ✓ |  | Seluruh 40 URI huruf kecil dan memakai kata benda. Pengecualian: /auth/register, /auth/login, /auth/logout mengandung kata kerja; /me dan /applications/{id}/cv berbentuk tunggal karena singleton. | Tidak ada perubahan URI. Pengecualian /auth/* dicatat pada Catatan Keputusan no. 16. |
+| 1 | Semua URI memakai kata benda jamak, huruf kecil, dan tanpa kata kerja | ✓ |  | Seluruh 40 URI huruf kecil dan memakai kata benda. Pengecualian: /auth/register, /auth/login, /auth/logout mengandung kata kerja; /me dan /applications/{id}/cv berbentuk tunggal karena singleton. Pengecualian /auth/* sudah dicatat pada Catatan Keputusan no. 16. | - |
 | 2 | Prefix /api/v1 dipakai konsisten | ✓ |  | Seluruh 40 endpoint diawali /api/v1; base URL gateway dan keempat service juga memakai /api/v1. | - |
 | 3 | Method sesuai operasi; GET tidak mengubah data | ✓ |  | 17 endpoint GET hanya membaca data. Perubahan data memakai POST, PUT, PATCH, atau DELETE; logout memakai POST karena mencabut token. | - |
 | 4 | POST -> 201, DELETE -> 204, dan status gagal relevan dicantumkan | ✓ |  | Seluruh POST pembuat resource -> 201 + Location dan seluruh DELETE -> 204. POST /auth/login -> 200 karena tidak membuat resource; POST /auth/logout -> 204. Setiap baris memiliki minimal satu status gagal. | - |
 | 5 | Nesting maksimal 2 tingkat | ✓ |  | URI terdalam /jobs/{id}/requirements/{requirement_id} dan /me/skills/{skill_id} (2 tingkat). Interview diubah lewat URI datar PATCH /interviews/{id}. | - |
-| 6 | Setiap collection memiliki pagination dengan batas maksimum |  | ✓ | Dari 11 endpoint collection, baru 4 yang memiliki desain pagination (/jobs, /jobs/{id}/applications, /pipelines, /applications). Tujuh collection lain belum memiliki default dan batas. | Ditambahkan bagian D.5: pagination, sort default, dan whitelist untuk 7 collection lainnya. |
-| 7 | Filter/sort memakai query parameter dengan whitelist | ✓ |  | Filter dan sort pada bagian D memakai query parameter dengan whitelist; nilai di luar whitelist ditolak 422. | Whitelist sort untuk 7 collection tambahan ikut didefinisikan di D.5. |
+| 6 | Setiap collection memiliki pagination dengan batas maksimum |  | ✓ | Dari 11 endpoint collection, baru 4 yang memiliki desain pagination (/jobs, /jobs/{id}/applications, /pipelines, /applications). Tujuh collection lain belum memiliki default dan batas. | Ditambahkan bagian D.5: pagination, sort default, dan whitelist sort untuk 7 collection lainnya. |
+| 7 | Filter/sort memakai query parameter dengan whitelist | ✓ |  | Filter dan sort pada bagian D memakai query parameter dengan whitelist; nilai di luar whitelist ditolak 422. | - |
 | 8 | Format error seragam | ✓ |  | Semua contoh error memakai struktur status, message, code, meta; 422 menambahkan errors per field. Terdapat 14 kode error yang didefinisikan. | - |
 
 **Ringkasan:** 7 dari 8 butir terpenuhi. Butir 6 belum terpenuhi pada saat pemeriksaan dan sudah diperbaiki dengan menambahkan bagian D.5.
