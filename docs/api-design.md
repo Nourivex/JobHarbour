@@ -500,7 +500,6 @@ Proses bisnis tidak dimodelkan sebagai endpoint kata kerja (`/calculateScore`, `
 | 7 | Filter/sort memakai query parameter dengan whitelist | ✓ |  | Filter dan sort pada bagian D memakai query parameter dengan whitelist; nilai di luar whitelist ditolak 422. | - |
 | 8 | Format error seragam | ✓ |  | Semua contoh error memakai struktur status, message, code, meta; 422 menambahkan errors per field. Terdapat 14 kode error yang didefinisikan. | - |
 
-**Ringkasan:** 7 dari 8 butir terpenuhi. Butir 6 belum terpenuhi pada saat pemeriksaan dan sudah diperbaiki dengan menambahkan bagian D.5.
 
 ### Riwayat Revisi Internal
 
