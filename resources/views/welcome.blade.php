@@ -96,6 +96,13 @@
             </a>
 
             <a
+                href="{{ url('/docs') }}"
+                class="rounded-lg px-3 py-2 text-slate-600 transition hover:bg-slate-100 hover:text-slate-950"
+            >
+                API Docs
+            </a>
+
+            <a
                 href="https://github.com/Nourivex"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -194,6 +201,31 @@
                     >
 
                         Get Started
+
+                        <svg
+                            class="h-4 w-4"
+                            viewBox="0 0 20 20"
+                            fill="none"
+                            aria-hidden="true"
+                        >
+                            <path
+                                d="M4 10h11M10 5l5 5-5 5"
+                                stroke="currentColor"
+                                stroke-width="1.7"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            />
+                        </svg>
+
+                    </a>
+
+
+                    <a
+                        href="{{ url('/docs') }}"
+                        class="inline-flex items-center gap-2 rounded-xl bg-cyan-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-cyan-500"
+                    >
+
+                        Buka Dokumentasi Swagger API
 
                         <svg
                             class="h-4 w-4"
