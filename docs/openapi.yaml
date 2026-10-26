@@ -1,14 +1,14 @@
-# PaduKerja - Kontrak OpenAPI v1 (OAS 3.1.0)
+# JobHarbour - Kontrak OpenAPI v1 (OAS 3.1.0)
 # Sumber desain: docs/api-design.md (API Design Document v1, 40 endpoint)
 # Lint : npx @redocly/cli lint docs/openapi.yaml
 # Mock : npx @stoplight/prism-cli mock docs/openapi.yaml
 openapi: 3.1.0
 info:
-  title: PaduKerja API
+  title: JobHarbour API
   version: 1.0.0
-  summary: Kontrak REST API platform rekrutmen PaduKerja (Kelompok 4).
+  summary: Kontrak REST API platform rekrutmen JobHarbour (Kelompok 4 UHN Tegal).
   description: |-
-    Kontrak OpenAPI v1 untuk PaduKerja, platform rekrutmen terintegrasi berbasis microservice dengan mesin pemadanan keahlian otomatis. Dokumen ini diturunkan dari API Design Document v1 (`docs/api-design.md`) dan menjadi acuan implementasi.
+    Kontrak OpenAPI v1 untuk JobHarbour, platform rekrutmen terintegrasi berbasis microservice dengan mesin pemadanan keahlian otomatis (Filosofi: Pelabuhan para talenta sebelum berlayar ke dunia kerja). Dokumen ini diturunkan dari API Design Document v1 (`docs/api-design.md`) dan menjadi acuan implementasi.
 
     **Konvensi**
     - Seluruh response sukses memakai envelope `status`, `message`, `data`, `meta`; collection menambahkan `links`.

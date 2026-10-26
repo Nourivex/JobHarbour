@@ -1,13 +1,14 @@
-# PaduKerja - Claude/Cursor Guidelines
+# JobHarbour - Claude/Cursor Guidelines
 
 > Platform Rekrutmen Terintegrasi Berbasis Microservice dengan Mesin Pemadanan Keahlian Otomatis.
+> Filosofi: Pelabuhan para talenta dan pencari kerja sebelum berlayar menuju dunia kerja profesional.
 > Mata Kuliah: Pemrograman Web Service (5537344 / 3 SKS) - Universitas Harkat Negeri - Kelompok 4.
 
 ---
 
 ## Project Context
 
-PaduKerja is a microservice-based recruitment platform for a university Web Service Programming course. It consists of **4 independent Laravel services** with dedicated databases, communicating exclusively via REST API JSON.
+JobHarbour is a microservice-based recruitment platform for a university Web Service Programming course. It consists of **4 independent Laravel services** with dedicated databases, communicating exclusively via REST API JSON.
 
 ### Services
 

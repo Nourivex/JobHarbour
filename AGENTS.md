@@ -1,13 +1,14 @@
-# PaduKerja - Agent Guidelines
+# JobHarbour - Agent Guidelines
 
 > Platform Rekrutmen Terintegrasi Berbasis Microservice dengan Mesin Pemadanan Keahlian Otomatis.
+> Filosofi: Pelabuhan para talenta dan pencari kerja sebelum berlayar menuju dunia kerja profesional.
 > Mata Kuliah: Pemrograman Web Service (5537344 / 3 SKS) - Universitas Harkat Negeri - Kelompok 4.
 
 ---
 
 ## Project Overview
 
-PaduKerja is a recruitment platform built with **4 independent Laravel microservices** communicating via **REST API JSON**. Each service has its own database (database-per-service pattern).
+JobHarbour is a recruitment platform built with **4 independent Laravel microservices** communicating via **REST API JSON**. Each service has its own database (database-per-service pattern).
 
 ### Microservices
 

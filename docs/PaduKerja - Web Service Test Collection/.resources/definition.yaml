@@ -1,7 +1,8 @@
 $kind: collection
 description: |-
-  Koleksi pengujian REST API PaduKerja untuk 4 Layanan Microservice.
-  Universitas Harkat Negeri - Kelompok 4.
+  Koleksi pengujian REST API JobHarbour untuk 4 Layanan Microservice.
+  Filosofi: Pelabuhan para pekerja sebelum keberangkatan menuju dunia kerja profesional.
+  Universitas Harkat Negeri (Tegal) - Kelompok 4.
 variables:
   base_url: http://127.0.0.1:32768/api
   recruiter_token: ""

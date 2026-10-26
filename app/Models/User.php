@@ -11,7 +11,7 @@ use Illuminate\Notifications\Notifiable;
 /**
  * Model User
  *
- * Entitas data pengguna sistem PaduKerja (pelamar, recruiter, admin).
+ * Entitas data pengguna sistem JobHarbour (pelamar, recruiter, admin).
  * Bagian dari Layanan Microservice: Auth & Profile Service.
  */
 class User extends Authenticatable

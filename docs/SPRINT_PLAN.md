@@ -1,4 +1,7 @@
-# Sprint Plan - PaduKerja
+# Sprint Plan - JobHarbour
+
+> Platform Rekrutmen Terintegrasi Berbasis Microservice dengan Mesin Pemadanan Keahlian Otomatis
+> Filosofi: Pelabuhan para talenta dan pencari kerja sebelum berlayar ke dunia kerja profesional
 
 > Pemetaan milestone perkuliahan Semester 7 dan Product Backlog untuk Platform Rekrutmen Terintegrasi Berbasis Microservice.
 
@@ -201,5 +204,5 @@ Sebuah task dianggap **Done** jika memenuhi:
 ---
 
 <p align="center">
-  <strong>PaduKerja</strong> · Sprint Plan · Kelompok 4 UHN
+  <strong>JobHarbour</strong> · Sprint Plan · Kelompok 4 UHN Tegal
 </p>

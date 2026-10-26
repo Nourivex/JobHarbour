@@ -35,7 +35,7 @@ Bila Anda ingin mempelajari atau memodifikasi script Auth & Profile Service, ber
 ## 🔐 Cara Kerja Autentikasi JWT (JSON Web Token)
 
 ```text
-[ Client (Thunder Client / Web) ]                 [ Server (PaduKerja API) ]
+[ Client (Thunder Client / Web) ]                 [ Server (JobHarbour API) ]
               │                                                │
               │  1. POST /api/auth/login (email + password)   │
               ├───────────────────────────────────────────────▶│ Verifikasi hash sandi
@@ -56,8 +56,8 @@ Bila Anda ingin mempelajari atau memodifikasi script Auth & Profile Service, ber
 ## 🚀 Panduan Uji Coba API (Testing)
 
 ### Akun Pengujian yang Tersedia:
-- **Pelamar:** `budi@padukerja.id` (Password: `password123`)
-- **Recruiter:** `recruiter@padukerja.id` (Password: `password123`)
+- **Pelamar:** `budi@jobharbour.id` (Password: `password123`)
+- **Recruiter:** `recruiter@jobharbour.id` (Password: `password123`)
 
 ---
 
@@ -71,7 +71,7 @@ Bila Anda ingin mempelajari atau memodifikasi script Auth & Profile Service, ber
 - **Request Body (JSON):**
 ```json
 {
-  "email": "budi@padukerja.id",
+  "email": "budi@jobharbour.id",
   "password": "password123"
 }
 ```
@@ -96,7 +96,7 @@ curl -s -X POST http://127.0.0.1:32768/api/auth/login \
     "user": {
       "id": 2,
       "name": "Budi Santoso",
-      "email": "budi@padukerja.id",
+      "email": "budi@jobharbour.id",
       "role": "applicant",
       "location": "Bandung",
       "skills": ["PHP", "Laravel", "MySQL", "Git"]
@@ -151,7 +151,7 @@ curl -s -X PUT http://127.0.0.1:32768/api/profile/skills \
   "data": {
     "user_id": 2,
     "name": "Budi Santoso",
-    "email": "budi@padukerja.id",
+    "email": "budi@jobharbour.id",
     "skills": [
       "PHP",
       "Laravel",

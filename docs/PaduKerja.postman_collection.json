@@ -1,8 +1,8 @@
 {
   "info": {
-    "_postman_id": "padukerja-collection-v1",
-    "name": "PaduKerja - Web Service Test Collection",
-    "description": "Koleksi pengujian REST API PaduKerja untuk 4 Layanan Microservice.\nUniversitas Harkat Negeri - Kelompok 4.",
+    "_postman_id": "jobharbour-collection-v1",
+    "name": "JobHarbour - Web Service Test Collection",
+    "description": "Koleksi pengujian REST API JobHarbour untuk 4 Layanan Microservice.\nFilosofi: Pelabuhan para pekerja sebelum keberangkatan menuju karier impian.\nUniversitas Harkat Negeri (Tegal) - Kelompok 4.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [

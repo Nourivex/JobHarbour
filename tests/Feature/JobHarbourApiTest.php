@@ -8,7 +8,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
-class PaduKerjaApiTest extends TestCase
+class JobHarbourApiTest extends TestCase
 {
     use RefreshDatabase;
 

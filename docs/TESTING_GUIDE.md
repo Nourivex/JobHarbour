@@ -1,7 +1,8 @@
-# Panduan Pengujian API - PaduKerja (Thunder Client & Postman)
+# Panduan Pengujian API - JobHarbour (Thunder Client & Postman)
 
-> Panduan praktikum & testing REST API PaduKerja untuk **4 Layanan Microservice**.
-> Sesuai standar mata kuliah Pemrograman Web Service (5537344 / 3 SKS) - Kelompok 4 UHN.
+> Panduan praktikum & testing REST API JobHarbour untuk **4 Layanan Microservice**.
+> Filosofi: Pelabuhan para talenta dan pencari kerja sebelum berlayar ke dunia kerja profesional.
+> Sesuai standar mata kuliah Pemrograman Web Service (5537344 / 3 SKS) - Kelompok 4 UHN Tegal.
 
 ---
 
@@ -21,13 +22,13 @@ Saat DDEV berjalan, API dapat diakses melalui:
 
 ## 2. Akun Percobaan (Pre-Seeded Accounts)
 
-Database telah disiapkan (*seeded*) dengan akun berikut:
+Database telah disiapkan (*seeded*) dengan akun berikut (didukung juga alias `@padukerja.id`):
 
 | Peran (Role) | Email | Password | Keterangan |
 |--------------|-------|----------|------------|
-| **Recruiter** | `recruiter@padukerja.id` | `password123` | HR / Recruiter PT Teknologi Maju |
-| **Pelamar (Budi)** | `budi@padukerja.id` | `password123` | Skills: `PHP`, `Laravel`, `MySQL`, `Git` |
-| **Pelamar (Siti)** | `siti@padukerja.id` | `password123` | Skills: `Python`, `Django`, `PostgreSQL`, `Docker` |
+| **Recruiter** | `recruiter@jobharbour.id` | `password123` | HR / Recruiter PT Teknologi Maju |
+| **Pelamar (Budi)** | `budi@jobharbour.id` | `password123` | Skills: `PHP`, `Laravel`, `MySQL`, `Git` |
+| **Pelamar (Siti)** | `siti@jobharbour.id` | `password123` | Skills: `Python`, `Django`, `PostgreSQL`, `Docker` |
 
 ---
 
@@ -59,7 +60,7 @@ Database telah disiapkan (*seeded*) dengan akun berikut:
 - **Body:**
 ```json
 {
-  "email": "budi@padukerja.id",
+  "email": "budi@jobharbour.id",
   "password": "password123"
 }
 ```
@@ -184,7 +185,7 @@ Database telah disiapkan (*seeded*) dengan akun berikut:
   "interview_schedule": {
     "datetime": "2026-10-10T10:00:00+07:00",
     "type": "online",
-    "meeting_url": "https://meet.google.com/padukerja-interview",
+    "meeting_url": "https://meet.google.com/jobharbour-interview",
     "interviewer": "Engineering Lead & HR Manager"
   }
 }
@@ -211,7 +212,7 @@ curl -s http://127.0.0.1:32768/api/health | jq .
 # Dapatkan Token Login Pelamar
 BUDI_TOKEN=$(curl -s -X POST http://127.0.0.1:32768/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email":"budi@padukerja.id","password":"password123"}' | jq -r '.data.token')
+  -d '{"email":"budi@jobharbour.id","password":"password123"}' | jq -r '.data.token')
 
 # Lihat Riwayat Linimasa
 curl -s http://127.0.0.1:32768/api/pipelines/1 \

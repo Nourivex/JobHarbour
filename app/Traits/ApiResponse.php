@@ -8,7 +8,7 @@ use Illuminate\Http\JsonResponse;
  * Trait ApiResponse
  *
  * Trait ini berfungsi sebagai helper global untuk standardisasi JSON Envelope
- * pada seluruh response REST API sistem PaduKerja.
+ * pada seluruh response REST API sistem JobHarbour.
  *
  * Sesuai kesepakatan dokumen API_CONTRACT_STANDARDS.md:
  * Setiap response API wajib memiliki struktur pembungkus (envelope):

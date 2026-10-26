@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Dokumentasi API - {{ config('app.name', 'PaduKerja') }}</title>
+    <title>Dokumentasi API - {{ config('app.name', 'JobHarbour') }}</title>
 
     <link
         rel="icon"
@@ -172,7 +172,7 @@
 <body>
     <header class="pk-topbar">
         <div class="pk-brand">
-            <span>PaduKerja API Docs</span>
+            <span>JobHarbour API Docs</span>
             <span class="pk-badge">OpenAPI 3.1</span>
         </div>
 

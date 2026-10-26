@@ -38,7 +38,7 @@ Untuk menjalankan endpoint `POST /api/jobs`, diperlukan token akses dengan peran
 curl -s -X POST http://127.0.0.1:32768/api/auth/login \
   -H "Content-Type: application/json" \
   -H "Accept: application/json" \
-  -d '{"email": "recruiter@padukerja.id", "password": "password123"}' | jq -r '.data.token'
+  -d '{"email": "recruiter@jobharbour.id", "password": "password123"}' | jq -r '.data.token'
 ```
 *Salin (copy) token yang dihasilkan untuk dimasukkan pada header `Authorization: Bearer <token>`.*
 

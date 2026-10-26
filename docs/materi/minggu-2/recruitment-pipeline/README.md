@@ -51,8 +51,8 @@ Proses rekrutmen mengikuti urutan linier berikut:
 ## 🚀 Panduan Uji Coba API (Testing)
 
 ### Persiapan Akun Pengujian
-- **Akun Recruiter:** `recruiter@padukerja.id` (Password: `password123`)
-- **Akun Pelamar (Budi):** `budi@padukerja.id` (Password: `password123`)
+- **Akun Recruiter:** `recruiter@jobharbour.id` (Password: `password123`)
+- **Akun Pelamar (Budi):** `budi@jobharbour.id` (Password: `password123`)
 - **Lamaran Tersedia di Database:** Lamaran ID `1` milik Budi Santoso.
 
 ---
@@ -74,7 +74,7 @@ Proses rekrutmen mengikuti urutan linier berikut:
   "interview_schedule": {
     "datetime": "2026-10-10T10:00:00+07:00",
     "type": "online",
-    "meeting_url": "https://meet.google.com/padukerja-interview-budi",
+    "meeting_url": "https://meet.google.com/jobharbour-interview-budi",
     "interviewer": "Engineering Lead & HR Specialist"
   }
 }
@@ -85,7 +85,7 @@ Proses rekrutmen mengikuti urutan linier berikut:
 # 1. Login Recruiter untuk mendapatkan token
 RECRUITER_TOKEN=$(curl -s -X POST http://127.0.0.1:32768/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email":"recruiter@padukerja.id","password":"password123"}' | jq -r '.data.token')
+  -d '{"email":"recruiter@jobharbour.id","password":"password123"}' | jq -r '.data.token')
 
 # 2. Update status seleksi lamaran ID 1
 curl -s -X PATCH http://127.0.0.1:32768/api/pipelines/1/status \
@@ -99,7 +99,7 @@ curl -s -X PATCH http://127.0.0.1:32768/api/pipelines/1/status \
     "interview_schedule": {
       "datetime": "2026-10-10T10:00:00+07:00",
       "type": "online",
-      "meeting_url": "https://meet.google.com/padukerja-sesi-interview",
+      "meeting_url": "https://meet.google.com/jobharbour-sesi-interview",
       "interviewer": "Engineering Lead & HR Specialist"
     }
   }' | jq .
@@ -140,7 +140,7 @@ curl -s -X PATCH http://127.0.0.1:32768/api/pipelines/1/status \
         "completed_at": null,
         "interview_schedule": {
           "datetime": "2026-10-10T10:00:00+07:00",
-          "meeting_url": "https://meet.google.com/padukerja-sesi-interview"
+          "meeting_url": "https://meet.google.com/jobharbour-sesi-interview"
         }
       }
     ],
@@ -168,7 +168,7 @@ curl -s -X PATCH http://127.0.0.1:32768/api/pipelines/1/status \
 # 1. Login sebagai Pelamar Budi
 BUDI_TOKEN=$(curl -s -X POST http://127.0.0.1:32768/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email":"budi@padukerja.id","password":"password123"}' | jq -r '.data.token')
+  -d '{"email":"budi@jobharbour.id","password":"password123"}' | jq -r '.data.token')
 
 # 2. Lihat linimasa proses lamaran
 curl -s http://127.0.0.1:32768/api/pipelines/1 \
@@ -214,7 +214,7 @@ curl -s http://127.0.0.1:32768/api/pipelines/1 \
         "completed_at": null,
         "interview_schedule": {
           "datetime": "2026-10-10T10:00:00+07:00",
-          "meeting_url": "https://meet.google.com/padukerja-sesi-interview"
+          "meeting_url": "https://meet.google.com/jobharbour-sesi-interview"
         }
       }
     ],

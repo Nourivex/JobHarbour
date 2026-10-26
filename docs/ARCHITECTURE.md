@@ -1,6 +1,7 @@
-# Arsitektur Sistem PaduKerja
+# Arsitektur Sistem JobHarbour
 
 > Platform Rekrutmen Terintegrasi Berbasis Microservice dengan Mesin Pemadanan Keahlian Otomatis
+> Filosofi: Pelabuhan para talenta dan pencari kerja sebelum berlayar ke dunia kerja profesional
 
 ---
 
@@ -338,5 +339,5 @@ flowchart LR
 ---
 
 <p align="center">
-  <strong>PaduKerja</strong> · Architecture Documentation · Kelompok 4 UHN
+  <strong>JobHarbour</strong> · Architecture Documentation · Kelompok 4 UHN Tegal
 </p>

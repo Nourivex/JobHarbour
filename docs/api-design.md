@@ -1,8 +1,9 @@
-# API Design Document v1: PaduKerja
+# API Design Document v1: JobHarbour
 
 > **Platform Rekrutmen Terintegrasi Berbasis Microservice**  
 > *Automated Skill-Matchmaking Engine & Multi-Stage Pipeline Tracker*  
-> Mata Kuliah: Pemrograman Web Service (5537344 / 3 SKS) - Universitas Harkat Negeri  
+> *Filosofi: Pelabuhan para talenta & pencari kerja sebelum berlayar ke dunia kerja profesional*  
+> Mata Kuliah: Pemrograman Web Service (5537344 / 3 SKS) - Universitas Harkat Negeri (Tegal)  
 > Dosen Pengampu: Zaenul Arif, S.Kom., M.Kom.  
 > Bagian Pertama Milestone M2 - API Blueprint (Minggu ke-4)  
 
@@ -45,7 +46,7 @@
 
 ## B. Pemodelan Resource & Relasi
 
-Sistem PaduKerja dimodelkan ke dalam 14 resource (13 resource data + 1 singleton `me`) yang tersebar di 4 service.
+Sistem JobHarbour dimodelkan ke dalam 14 resource (13 resource data + 1 singleton `me`) yang tersebar di 4 service.
 
 ### 1. Spesifikasi Atribut Resource
 
@@ -87,7 +88,7 @@ Relasi lintas service (misal `applications.job_id` ke `jobs.id`) hanya berupa re
 
 ### 3. Diagram Relasi Entitas (ERD Ringkas)
 
-![ERD PaduKerja](materi/minggu-4/diagrams/resource_relationship_erd.svg)
+![ERD JobHarbour](materi/minggu-4/diagrams/resource_relationship_erd.svg)
 
 Versi teks:
 
@@ -405,7 +406,7 @@ Seluruh error memakai satu format: `status: "error"`, `message` (dibaca manusia)
 
 ### 5. Ringkasan Penggunaan Status Code
 
-| Kode | Nama | Penggunaan di PaduKerja |
+| Kode | Nama | Penggunaan di JobHarbour |
 |:---:|---|---|
 | `200` | OK | GET, PUT, PATCH berhasil; login berhasil. |
 | `201` | Created | Resource baru dibuat (`register`, `me/skills`, `jobs`, `requirements`, `applications`, `pipelines`, `transitions`, `assessments`, `interviews`, `offerings`) + header `Location`. |

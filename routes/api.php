@@ -9,10 +9,11 @@ use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
-| Dokumentasi & Peta Rute REST API - Sistem PaduKerja
+| Dokumentasi & Peta Rute REST API - Sistem JobHarbour
 |--------------------------------------------------------------------------
 |
-| Mata Kuliah : Pemrograman Web Service (5537344 / 3 SKS) - Kelompok 4 UHN
+| Filosofi    : Pelabuhan para talenta & pencari kerja sebelum berlayar ke dunia kerja
+| Mata Kuliah : Pemrograman Web Service (5537344 / 3 SKS) - Kelompok 4 UHN Tegal
 | Standar     : RESTful JSON API (RFC 8259), HTTP Methods Semantics, JWT Bearer Token
 |
 | Pembagian Modul Microservices:
@@ -46,9 +47,10 @@ use Illuminate\Support\Facades\Route;
 Route::get('/health', function () {
     return response()->json([
         'status' => 'success',
-        'message' => 'Layanan REST API PaduKerja beroperasi normal dan siap menerima request.',
+        'message' => 'Layanan REST API JobHarbour beroperasi normal dan siap menerima request.',
         'data' => [
-            'aplikasi' => 'PaduKerja Core API',
+            'aplikasi' => 'JobHarbour Core API',
+            'filosofi' => 'Pelabuhan Para Pekerja Sebelum Keberangkatan',
             'versi' => '1.0.0',
             'modul_tersedia' => [
                 'Auth & Profile Service' => ['POST /api/auth/login', 'PUT /api/profile/skills'],

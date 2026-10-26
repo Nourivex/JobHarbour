@@ -18,19 +18,45 @@ class DatabaseSeeder extends Seeder
     {
         // 1. Seed Recruiter
         $recruiter = User::firstOrCreate(
-            ['email' => 'recruiter@padukerja.id'],
+            ['email' => 'recruiter@jobharbour.id'],
             [
                 'name' => 'Fahren (Recruiter PT Maju)',
                 'password' => Hash::make('password123'),
                 'role' => 'recruiter',
                 'phone' => '081234567891',
                 'bio' => 'Lead Technical Recruiter',
-                'location' => 'Jakarta Selatan',
+                'location' => 'Tegal',
+            ]
+        );
+
+        // Seed Alias Recruiter lama (backward compatibility)
+        User::firstOrCreate(
+            ['email' => 'recruiter@padukerja.id'],
+            [
+                'name' => 'Fahren (Recruiter PT Maju)',
+                'password' => Hash::make('password123'),
+                'role' => 'recruiter',
+                'phone' => '081234567891',
+                'bio' => 'Lead Technical Recruiter (Alias PaduKerja)',
+                'location' => 'Tegal',
             ]
         );
 
         // 2. Seed Applicant 1 (Budi)
         $budi = User::firstOrCreate(
+            ['email' => 'budi@jobharbour.id'],
+            [
+                'name' => 'Budi Santoso',
+                'password' => Hash::make('password123'),
+                'role' => 'applicant',
+                'phone' => '081234567890',
+                'bio' => 'Backend Developer dengan pengalaman 3 tahun di ekosistem PHP & Laravel.',
+                'location' => 'Tegal',
+                'skills' => ['PHP', 'Laravel', 'MySQL', 'Git'],
+            ]
+        );
+
+        User::firstOrCreate(
             ['email' => 'budi@padukerja.id'],
             [
                 'name' => 'Budi Santoso',
@@ -38,13 +64,26 @@ class DatabaseSeeder extends Seeder
                 'role' => 'applicant',
                 'phone' => '081234567890',
                 'bio' => 'Backend Developer dengan pengalaman 3 tahun di ekosistem PHP & Laravel.',
-                'location' => 'Bandung',
+                'location' => 'Tegal',
                 'skills' => ['PHP', 'Laravel', 'MySQL', 'Git'],
             ]
         );
 
         // 3. Seed Applicant 2 (Siti)
         $siti = User::firstOrCreate(
+            ['email' => 'siti@jobharbour.id'],
+            [
+                'name' => 'Siti Nurhaliza',
+                'password' => Hash::make('password123'),
+                'role' => 'applicant',
+                'phone' => '081298765432',
+                'bio' => 'Software Engineer spesialis Python & Data Engineering.',
+                'location' => 'Semarang',
+                'skills' => ['Python', 'Django', 'PostgreSQL', 'Docker'],
+            ]
+        );
+
+        User::firstOrCreate(
             ['email' => 'siti@padukerja.id'],
             [
                 'name' => 'Siti Nurhaliza',
@@ -52,7 +91,7 @@ class DatabaseSeeder extends Seeder
                 'role' => 'applicant',
                 'phone' => '081298765432',
                 'bio' => 'Software Engineer spesialis Python & Data Engineering.',
-                'location' => 'Surabaya',
+                'location' => 'Semarang',
                 'skills' => ['Python', 'Django', 'PostgreSQL', 'Docker'],
             ]
         );
@@ -61,8 +100,8 @@ class DatabaseSeeder extends Seeder
         $job1 = JobVacancy::firstOrCreate(
             ['title' => 'Senior Backend Engineer', 'company' => 'PT Teknologi Maju'],
             [
-                'description' => 'Membangun dan mengembangkan microservices REST API dengan performa tinggi untuk platform PaduKerja.',
-                'location' => 'Jakarta Selatan',
+                'description' => 'Membangun dan mengembangkan microservices REST API dengan performa tinggi untuk platform JobHarbour.',
+                'location' => 'Tegal',
                 'employment_type' => 'full-time',
                 'salary_min' => 12000000,
                 'salary_max' => 18000000,
@@ -144,7 +183,7 @@ class DatabaseSeeder extends Seeder
                         'interview_schedule' => [
                             'datetime' => now()->addDays(2)->setTime(10, 0)->toIso8601String(),
                             'type' => 'online',
-                            'meeting_url' => 'https://meet.google.com/padukerja-interview-budi',
+                            'meeting_url' => 'https://meet.google.com/jobharbour-interview-budi',
                             'interviewer' => 'Tech Lead & HR Manager',
                         ],
                     ],

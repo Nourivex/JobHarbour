@@ -1,12 +1,13 @@
 <p align="center">
-  <img src="public/logo.png" width="96" alt="PaduKerja Logo">
+  <img src="public/logo.png" width="96" alt="JobHarbour Logo">
 </p>
 
-<h1 align="center">PaduKerja</h1>
+<h1 align="center">JobHarbour</h1>
 
 <p align="center">
   <strong>Platform Rekrutmen Terintegrasi Berbasis Microservice</strong><br>
-  <em>Automated Skill-Matchmaking Engine & Multi-Stage Pipeline Tracker</em>
+  <em>Automated Skill-Matchmaking Engine & Multi-Stage Pipeline Tracker</em><br>
+  <strong>"Pelabuhan Para Pekerja Sebelum Keberangkatan Menuju Dunia Karier"</strong>
 </p>
 
 <p align="center">
@@ -15,361 +16,273 @@
 ![PHP](https://img.shields.io/badge/PHP-8.4%2B-777BB4?style=flat-square&logo=php&logoColor=white)
 ![Architecture](https://img.shields.io/badge/Architecture-Microservices-0D1117?style=flat-square)
 ![API](https://img.shields.io/badge/API-REST%20JSON-blue?style=flat-square)
+![OpenAPI](https://img.shields.io/badge/OpenAPI-3.1.0-49cc90?style=flat-square&logo=openapiinitiative&logoColor=white)
 ![DDEV](https://img.shields.io/badge/DDEV-supported-0D1117?style=flat-square)
-![Platform](https://img.shields.io/badge/Platform-Fedora%20%2F%20Linux-294172?style=flat-square&logo=fedora&logoColor=white)
+![Platform](https://img.shields.io/badge/Platform-Linux%20%2F%20Windows-294172?style=flat-square)
 ![Team](https://img.shields.io/badge/Team-Kelompok%204%20UHN-orange?style=flat-square)
 
 </p>
 
 ---
 
-## Informasi Akademik
+## 📌 Informasi Akademik
 
-| | |
+| Komponen | Keterangan |
 |---|---|
 | **Mata Kuliah** | Pemrograman Web Service (5537344 / 3 SKS) |
-| **Universitas** | Universitas Harkat Negeri |
-| **Dosen Pengampu** | Zaenul Arif, S.Kom., M.Kom |
-| **Kelompok** | 4 |
+| **Program Studi / Kampus** | Teknik Informatika - Universitas Harkat Negeri (Tegal) |
+| **Dosen Pengampu** | Zaenul Arif, S.Kom., M.Kom. |
+| **Kelompok** | Kelompok 4 |
 | **Semester** | 7 (Ganjil) |
 
 ---
 
-## Executive Summary
+## ⚓ Kenalan sama JobHarbour (Buat Pemula)
 
-**PaduKerja** adalah platform rekrutmen terintegrasi yang dibangun dengan arsitektur **microservice** dan **REST API** berstandar industri. Sistem ini dirancang untuk menyelesaikan dua masalah fundamental dalam proses rekrutmen digital:
+Sederhananya, **JobHarbour** adalah proyek web service platform lowongan kerja dan rekrutmen. Berbeda dari job portal konvensional, JobHarbour dibangun dengan arsitektur **microservices** yang saling berkomunikasi melalui **REST API JSON**, bukan aplikasi monolitik yang semua kodenya menumpuk di satu tempat.
 
-1. **Bagi Pencari Kerja** - fenomena *"black-hole resume"* di mana lamaran dikirim namun tidak pernah ada kejelasan status atau feedback.
-2. **Bagi Recruiter** - tumpukan ratusan CV PDF yang tidak relevan, tanpa mekanisme filter otomatis berbasis keahlian.
+### 🌊 Filosofi Nama "JobHarbour"
 
----
+Mengapa dinamakan **JobHarbour**?
+Ibarat sebuah pelabuhan (*harbour*) yang menjadi tempat berlabuh aman bagi kapal-kapal sebelum berlayar mengarungi samudra lepas, **JobHarbour** adalah pelabuhan tempat bertemunya talenta pencari kerja dan recruiter.
 
-## Problem Statement
+Di pelabuhan ini:
+1. **Talenta & Pencari Kerja** mempersiapkan profil dan keahlian terbaik mereka, mencocokkan arah kapal dengan lowongan yang sesuai, dan memantau kesiapan keberangkatan.
+2. **Recruiter & Perusahaan** menemukan armada talenta yang paling cocok tanpa harus tersesat di tengah lautan ratusan berkas CV yang tidak relevan.
+3. **Harmoni Daerah:** Filosofi pelabuhan ini juga sangat selaras dan mencerminkan identitas kampus **Universitas Harkat Negeri** yang berakar di **Tegal** - kota bahari dengan sejarah maritim dan pelabuhan yang kuat.
 
-Proses rekrutmen konvensional memiliki inefisiensi kritis:
+### 🎯 Masalah Nyata yang Mau Diselesaikan
 
-- **Pencari kerja** mengirim lamaran ke puluhan lowongan tanpa mengetahui seberapa cocok profil mereka dengan kualifikasi yang diminta, dan tidak memiliki visibilitas terhadap tahapan seleksi.
-- **Recruiter** harus menyaring ratusan CV secara manual, menghabiskan waktu untuk profil yang tidak memenuhi kualifikasi, dan kesulitan mengelola pipeline seleksi multi-tahap.
+Pernah melamar kerja lalu merasa CV seperti masuk ke "lubang hitam" tanpa kepastian? Atau recruiter yang kewalahan menyortir tumpukan ratusan PDF manual? JobHarbour menyelesaikan dua persoalan utama tersebut:
 
----
-
-## Value Proposition
-
-PaduKerja menghadirkan tiga solusi utama:
-
-### 1. 🎯 Automated Skill-Matchmaking Engine
-Kalkulasi persentase kecocokan skill profil pelamar versus kualifikasi lowongan secara **real-time** melalui API. Recruiter langsung mendapatkan daftar pelamar terurut berdasarkan skor kecocokan.
-
-### 2. 📊 Multi-Stage Transparent Pipeline Tracker
-Status seleksi bertahap yang transparan bagi kedua pihak:
-
-```
-Screening → Assessment → Interview → Offering / Rejected
-```
-
-Pelamar dapat memantau posisi mereka di pipeline secara real-time.
-
-### 3. 🏗️ Desain Microservice Terdistribusi
-4 service independen dengan pola **database-per-service**, berkomunikasi melalui kontrak **REST API JSON** yang ketat sesuai kaidah fondasi HTTP:
-- Status codes `2xx` / `4xx` / `5xx`
-- Semantik methods `GET` / `POST` / `PUT` / `PATCH` / `DELETE`
-- Headers `Content-Type` & `Accept: application/json`
+1. **Bagi Pelamar:** Tahu persis seberapa cocok keahlian (skills) kamu dengan kualifikasi lowongan (skor dihitung otomatis secara transparan). Kamu juga bisa memantau posisi lamaranmu berada di tahapan mana secara real-time.
+2. **Bagi Recruiter:** Tidak perlu lagi memeriksa manual ratusan berkas satu per satu. Sistem langsung menyajikan peringkat pelamar berdasarkan persentase kecocokan kualifikasi, lengkap dengan papan linimasa seleksi bertahap.
 
 ---
 
-## Arsitektur Microservices & Pembagian Tugas Tim
+## 🚀 Fitur Unggulan
 
-| # | Service | Deskripsi | Penanggung Jawab |
-|---|---------|-----------|------------------|
-| 1 | **Auth & Profile Service** | Autentikasi JWT multi-role (`applicant`, `recruiter`, `admin`), manajemen profil pengguna, dan skill matrix profile | **NABE'ELA AYU NING TYAS ZAHRA** |
-| 2 | **Job Catalog Service** | Manajemen lowongan pekerjaan, kuota posisi, requirements & skill tagging per lowongan | **M. FAHREN ANDREAN RANGKUTI** |
-| 3 | **Application & Matchmaking Service** | Upload CV, pengajuan lamaran, dan scoring engine untuk kalkulasi match percentage | **MUHAMMAD YASIR ILHAM NABIL** |
-| 4 | **Recruitment Pipeline Service** | Kanban stage timeline, transisi tahapan seleksi, dan interview scheduling | **MUHAMMAD AFFIF** |
-
-> Setiap anggota bertanggung jawab penuh atas **desain API**, **implementasi**, **testing**, dan **dokumentasi** service masing-masing.
+- **🎯 Mesin Pemadanan Keahlian Otomatis (Skill-Matchmaking Engine):** Menghitung skor kecocokan antara profil pelamar dan kualifikasi lowongan secara real-time menggunakan formula *Weighted Jaccard Similarity*.
+- **📊 Pelacak Linimasa Seleksi Transparan (Multi-Stage Pipeline):** Tahapan rekrutmen yang jelas dan dapat dipantau langsung:
+  ```text
+  Screening -> Assessment -> Interview -> Offering / Rejected
+  ```
+- **🏗️ Arsitektur 4 Microservices Mandiri:** Setiap layanan memiliki database dan tanggung jawab mandiri (*database-per-service*), berkomunikasi secara terstruktur lewat kontrak REST API.
+- **📄 Kontrak OpenAPI 3.1 & Koleksi Pengujian Siap Pakai:** Lengkap dengan spesifikasi OpenAPI, koleksi Postman, dan Thunder Client yang bisa langsung di-import untuk mencoba endpoint.
 
 ---
 
-## Konvensi Komunikasi REST API
+## 👥 Tim Pengembang & Pembagian Layanan
 
-### JSON Envelope Standar
+Setiap anggota kelompok memegang satu layanan microservice secara penuh (mulai dari perancangan API, implementasi database dan controller, penulisan pengujian, hingga dokumentasi):
 
-Seluruh response API mengikuti format envelope yang konsisten:
+| No | Layanan Microservice | Penanggung Jawab | NIM | Database & Port | Dokumentasi Detail |
+|:---:|---|---|:---:|:---:|:---:|
+| 1 | **Auth & Profile Service** | **Nabe'ela Ayu Ning Tyas Zahra** | `23215052` | `db_auth` (:8001) | [Baca Modul Auth](docs/materi/minggu-2/auth-profile/README.md) |
+| 2 | **Job Catalog Service** | **M. Fahren Andrean Rangkuti** | `23215030` | `db_jobs` (:8002) | [Baca Modul Job Catalog](docs/materi/minggu-2/job-catalog/README.md) |
+| 3 | **Application & Matchmaking Service** | **Muhammad Yasir Ilham Nabil** | `23215040` | `db_applications` (:8003) | [Baca Modul Application](docs/materi/minggu-2/application-matchmaking/README.md) |
+| 4 | **Recruitment Pipeline Service** | **MUHAMMAD AFFIF** | `24225046` | `db_pipeline` (:8004) | [Baca Modul Pipeline](docs/materi/minggu-2/recruitment-pipeline/README.md) |
+
+---
+
+## 📚 Peta Navigasi Dokumentasi Proyek
+
+Biar nggak bingung mencari berkas tugas, spesifikasi, atau panduan teknis, gunakan daftar navigasi berikut:
+
+### 1. Dokumen Arsitektur & Spesifikasi Resmi
+
+- [📐 `docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) - Penjelasan arsitektur sistem, topologi jaringan, komunikasi antar service, dan formula kalkulasi matchmaking.
+- [📋 `docs/API_CONTRACT_STANDARDS.md`](docs/API_CONTRACT_STANDARDS.md) - Format standar JSON envelope, header HTTP, aturan status code, dan format penanganan error.
+- [📝 `docs/api-design.md`](docs/api-design.md) - Dokumen perancangan API resmi kelompok (API Design Document v1) yang mencakup 40 endpoint lengkap.
+- [🌐 `docs/openapi.yaml`](docs/openapi.yaml) - Spesifikasi formal kontrak OpenAPI 3.1.0 untuk seluruh endpoint JobHarbour (lolos Redocly lint dengan 0 error).
+- [🧪 `docs/TESTING_GUIDE.md`](docs/TESTING_GUIDE.md) - Panduan praktis pengujian API menggunakan Postman dan Thunder Client (lengkap dengan akun demo pre-seeded).
+- [📅 `docs/SPRINT_PLAN.md`](docs/SPRINT_PLAN.md) - Pemetaan milestone perkuliahan, product backlog, dan rencana sprint agile tim.
+
+### 2. Berkas Tugas & Materi Perkuliahan Mingguan
+
+- [📦 `docs/materi/minggu-2/README.md`](docs/materi/minggu-2/README.md) - Fondasi Web Service, protokol HTTP/HTTPS, dan implementasi 8 Endpoint Inti REST API.
+  - Modul [Auth & Profile](docs/materi/minggu-2/auth-profile/README.md)
+  - Modul [Job Catalog](docs/materi/minggu-2/job-catalog/README.md)
+  - Modul [Application & Matchmaking](docs/materi/minggu-2/application-matchmaking/README.md)
+  - Modul [Recruitment Pipeline](docs/materi/minggu-2/recruitment-pipeline/README.md)
+- [📝 `docs/materi/minggu-3/README.md`](docs/materi/minggu-3/README.md) - Lembar Kerja Desain REST API (Worksheet Mandiri per Anggota) dan diagram relasi resource.
+- [📐 `docs/materi/minggu-4/README.md`](docs/materi/minggu-4/README.md) - API Design Document v1 (Milestone M2 Bagian 1), rancangan resource, dan hasil aktivitas workshop.
+- [⚡ `docs/materi/minggu-5/README.md`](docs/materi/minggu-5/README.md) - OpenAPI v1, pengujian mock server dengan Stoplight Prism, dan dokumentasi interaktif Swagger UI.
+
+---
+
+## 📡 Standar Komunikasi REST API
+
+Semua endpoint JobHarbour berbicara dalam format **JSON** yang seragam dan mudah dipahami oleh frontend maupun client service lain.
+
+### Format JSON Envelope Standar
+
+Setiap respon dari server selalu dibungkus dengan format berikut:
 
 ```json
 {
-  "status": "success | error",
-  "message": "Human-readable message",
-  "data": { },
+  "status": "success",
+  "message": "Data berhasil dimuat",
+  "data": {},
   "meta": {
-    "timestamp": "2026-10-02T15:00:00+07:00",
+    "timestamp": "2026-10-26T19:00:00+07:00",
     "version": "1.0.0"
   }
 }
 ```
 
-### HTTP Status Codes
+### Panduan Kode Status HTTP (HTTP Status Codes)
 
-| Code | Makna | Penggunaan |
-|------|-------|------------|
-| `200` | OK | Request berhasil, data dikembalikan |
-| `201` | Created | Resource baru berhasil dibuat |
-| `400` | Bad Request | Request tidak valid / malformed |
-| `401` | Unauthorized | Token tidak ada atau expired |
-| `403` | Forbidden | Token valid, tapi role tidak memiliki akses |
-| `404` | Not Found | Resource tidak ditemukan |
-| `409` | Conflict | Konflik data (e.g. email sudah terdaftar) |
-| `422` | Unprocessable Entity | Validation error pada field tertentu |
-| `500` | Internal Server Error | Kesalahan tidak terduga di server |
-
-### Semantik HTTP Methods
-
-| Method | Semantik | Contoh |
-|--------|----------|--------|
-| `GET` | Mengambil data (read-only, idempotent) | `GET /api/jobs` |
-| `POST` | Membuat resource baru | `POST /api/jobs` |
-| `PUT` | Mengganti seluruh resource | `PUT /api/jobs/{id}` |
-| `PATCH` | Memperbarui sebagian resource | `PATCH /api/users/{id}/skills` |
-| `DELETE` | Menghapus resource | `DELETE /api/jobs/{id}` |
-
-> 📄 Dokumentasi lengkap kontrak API tersedia di [`docs/API_CONTRACT_STANDARDS.md`](docs/API_CONTRACT_STANDARDS.md)
+| Kode | Arti | Kapan Dipakai? |
+|:---:|---|---|
+| `200` | OK | Permintaan berhasil dan data dikembalikan |
+| `201` | Created | Data baru berhasil dibuat di database |
+| `400` | Bad Request | Format permintaan tidak sesuai atau parameter salah |
+| `401` | Unauthorized | Belum login atau token JWT sudah kadaluarsa |
+| `403` | Forbidden | Sudah login, tapi role akun tidak berhak mengakses |
+| `404` | Not Found | Data atau URL yang dicari tidak ditemukan |
+| `409` | Conflict | Terjadi bentrokan data (misal email sudah terdaftar) |
+| `422` | Unprocessable Entity | Validasi input form gagal (misal password kurang panjang) |
+| `500` | Internal Server Error | Terjadi kendala tidak terduga pada server |
 
 ---
 
-## Dokumentasi Proyek
+## 🛠️ Kebutuhan Sistem & Teknologi
 
-| Dokumen | Deskripsi |
-|---------|-----------|
-| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Arsitektur sistem, diagram topologi, komunikasi inter-service, dan logika matchmaking engine |
-| [`docs/API_CONTRACT_STANDARDS.md`](docs/API_CONTRACT_STANDARDS.md) | Standar request/response payload, header wajib, format error, dan contoh endpoint |
-| [`docs/SPRINT_PLAN.md`](docs/SPRINT_PLAN.md) | Pemetaan milestone perkuliahan, sprint plan, dan product backlog |
+Sebelum menjalankan proyek, pastikan komputermu sudah terpasang:
 
----
-
-## Technology Stack
-
-| Technology | Purpose |
-|---|---|
-| Laravel 13 | Application framework (per-service) |
-| PHP 8.4+ | Backend runtime |
-| Composer | PHP dependency management |
-| Node.js 24+ | Frontend tooling |
-| npm | JavaScript dependency management |
-| Vite | Frontend asset bundling |
-| DDEV | Local development environment |
-| MariaDB | Database (per-service instance) |
-| Tailwind CSS | UI styling |
-| JWT (tymon/jwt-auth) | API authentication |
+- **PHP 8.4+** dan **Composer**
+- **Node.js 24+** dan **npm**
+- **Git**
+- **DDEV + Docker** (Sangat disarankan agar tidak perlu instal database lokal manual)
 
 ---
 
-# Local Development & Infrastructure Setup
+## 🏃 Cara Cepat Menjalankan Proyek (Quick Start)
 
-## Requirements
+Kami sudah menyiapkan skrip otomatis (`./dev` untuk Linux/macOS atau `dev.bat` untuk Windows) agar instalasi bisa selesai dalam hitungan menit!
 
-### Recommended (DDEV Workflow)
-
-- Git
-- DDEV
-- Docker
-- Node.js
-- A code editor such as VS Code
-
-DDEV provides the PHP, database, and web-server environment used by the project.
-
-### Local PHP Fallback
-
-The development helper can also work without DDEV when the local environment provides:
-
-- PHP 8.4+
-- Composer
-- Node.js
-- npm
-
----
-
-## Getting Started
-
-### 1. Clone the repository
+### 1. Clone Repositori
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/Nourivex/PaduKerja.git
 cd PaduKerja
 ```
 
-### 2. Run project setup
+### 2. Jalankan Setup Otomatis
 
-**Linux / macOS:**
-
+**Untuk Linux / macOS:**
 ```bash
 ./dev --setup
 ```
 
-**Windows:**
-
+**Untuk Windows:**
 ```bat
 dev.bat --setup
 ```
 
-The setup helper will automatically detect the available development environment.
+Skrip ini akan secara otomatis:
+1. Menjalankan DDEV (atau mendeteksi PHP lokal jika tanpa DDEV).
+2. Memasang dependensi Composer.
+3. Menyalin konfigurasi file `.env`.
+4. Membuat Laravel application key (`APP_KEY`).
+5. Memasang dependensi npm dan melakukan build aset frontend.
 
-#### With DDEV
+### 3. Migrasi Database dan Data Awal (Seeding)
 
-The helper will:
+Jalankan perintah ini untuk membuat tabel dan mengisi akun demo awal:
 
-1. Start DDEV
-2. Install Composer dependencies
-3. Create `.env` from `.env.example` when necessary
-4. Generate the Laravel application key
-5. Install Node dependencies
-6. Build frontend assets
+```bash
+./dev migrate:fresh --seed
+```
 
-#### Without DDEV
+### 4. Perintah Berguna Lainnya
 
-The helper falls back to the local PHP environment and uses `composer`, `php artisan`, and `npm` when the required tools are available.
+Skrip `./dev` berfungsi sebagai jembatan langsung ke Laravel Artisan:
+
+```bash
+./dev --doctor      # Cek kesehatan lingkungan kerja (diagnostik)
+./dev route:list    # Melihat daftar seluruh route API yang aktif
+./dev test          # Menjalankan seluruh pengujian otomatis (automated test)
+./dev tinker        # Membuka konsol interaktif Laravel
+```
 
 ---
 
-## Development Helper
+## 🧪 Cara Mencoba dan Menguji API (Buat Pemula)
 
-The project includes two equivalent development helpers:
+Nggak perlu pusing menulis kode frontend dulu kalau cuma mau mencoba API-nya. Kamu bisa langsung pakai alat bantu pengujian API:
+
+### 1. Akun Siap Pakai di Database (Demo Accounts)
+
+Setelah menjalankan `migrate:fresh --seed`, kamu bisa langsung memakai akun ini:
+
+| Peran (Role) | Email | Password | Kegunaan |
+|---|---|---|---|
+| **Recruiter** | `recruiter@jobharbour.id` | `password123` | Buat lowongan baru & ubah status pelamar |
+| **Pelamar (Budi)** | `budi@jobharbour.id` | `password123` | Pelamar dengan skill PHP, Laravel, MySQL, Git |
+| **Pelamar (Siti)** | `siti@jobharbour.id` | `password123` | Pelamar dengan skill Python, Django, PostgreSQL, Docker |
+
+> *Catatan: Akun lama `@padukerja.id` tetap didukung sebagai alias pada sistem.*
+
+### 2. Import Koleksi Pengujian
+
+Tersedia file koleksi siap pakai di folder `docs/`:
+- **Thunder Client (VS Code):** Buka ekstensi Thunder Client -> klik menu `...` di tab Collections -> pilih **Import** -> pilih file [`docs/thunder-collection_padukerja.json`](docs/thunder-collection_padukerja.json).
+- **Postman:** Buka Postman -> klik tombol **Import** -> masukkan file [`docs/PaduKerja.postman_collection.json`](docs/PaduKerja.postman_collection.json).
+
+> 💡 Untuk panduan langkah demi langkah pengujian setiap endpoint, silakan buka dokumen [`docs/TESTING_GUIDE.md`](docs/TESTING_GUIDE.md).
+
+---
+
+## 📂 Struktur Direktori Proyek
 
 ```text
-Linux / macOS:  ./dev
-Windows:        dev.bat
-```
-
-### Common Commands
-
-```bash
-# Setup & diagnostics
-./dev --setup          # Full project setup
-./dev --doctor         # Environment diagnostics
-./dev --env            # Environment information
-./dev --help           # Show help
-./dev --version        # Show version
-
-# Database
-./dev migrate                 # Run migrations
-./dev migrate:fresh --seed    # Fresh database with seeders
-
-# Artisan shortcuts
-./dev make:model User -m
-./dev make:controller AuthController
-./dev route:list
-./dev test
-./dev tinker
-```
-
-All arguments that are not recognized as helper options are passed directly to Laravel Artisan.
-
----
-
-## Environment Priority
-
-```text
-1. DDEV project    → preferred
-2. Local PHP       → fallback
-3. Error
-```
-
-If both DDEV and local PHP are available and `.ddev/config.yaml` exists, the helper uses DDEV. Otherwise, it falls back to the local PHP environment.
-
----
-
-## Frontend
-
-Frontend assets are managed through Vite.
-
-```bash
-npm install        # Install dependencies
-npm run build      # Build production assets
-```
-
-When using DDEV:
-
-```bash
-ddev npm install
-ddev npm run build
-```
-
-The development helper performs these steps automatically during `./dev --setup`.
-
----
-
-## Database
-
-Migrations are intentionally manual to prevent assumptions about database state.
-
-```bash
-./dev migrate              # Run migrations
-./dev migrate:fresh        # Fresh database
-./dev migrate:fresh --seed # With seeders
-```
-
-> **Warning:** `migrate:fresh` drops all tables before recreating them. Use it only in development.
-
----
-
-## Project Structure
-
-```text
-.
+JobHarbour/
 ├── app/
-├── bootstrap/
-├── config/
+│   ├── Http/Controllers/Api/   # Controller untuk setiap microservice
+│   ├── Models/                 # Model Eloquent (User, JobVacancy, Application, dll)
+│   └── Services/               # Logika bisnis (MatchmakingService, JwtService)
 ├── database/
-├── docs/
-│   ├── ARCHITECTURE.md
-│   ├── API_CONTRACT_STANDARDS.md
-│   └── SPRINT_PLAN.md
-├── public/
-│   ├── build/
-│   ├── favicon.ico
-│   ├── logo.png
-│   └── index.php
-├── resources/
-│   ├── css/
-│   ├── js/
-│   └── views/
+│   ├── migrations/             # Skema tabel database per service
+│   └── seeders/                # Data awal untuk pengujian
+├── docs/                       # DOKUMENTASI LENGKAP PROYEK
+│   ├── ARCHITECTURE.md         # Arsitektur & alur matchmaking
+│   ├── API_CONTRACT_STANDARDS.md# Standar kontrak payload & error
+│   ├── api-design.md           # Desain lengkap 40 endpoint REST API
+│   ├── openapi.yaml            # Spesifikasi OpenAPI 3.1.0
+│   ├── SPRINT_PLAN.md          # Rencana sprint & backlog
+│   ├── TESTING_GUIDE.md        # Panduan testing Thunder Client & Postman
+│   └── materi/                 # Berkas tugas kuliah per minggu (Minggu 2-5)
 ├── routes/
-├── storage/
+│   └── api.php                 # Rute REST API JobHarbour
 ├── tests/
-│
-├── .ddev/
-├── artisan
-├── composer.json
-├── package.json
-├── dev
-├── dev.bat
-└── README.md
+│   └── Feature/                # Pengujian otomatis REST API (PHPUnit/Pest)
+├── dev                         # Skrip pembantu lokal (Linux/macOS)
+├── dev.bat                     # Skrip pembantu lokal (Windows)
+└── README.md                   # Berkas panduan utama yang sedang kamu baca
 ```
 
 ---
 
-## Contributing
+## 🤝 Etika Kontribusi
 
-Kontribusi dan saran perbaikan sangat diterima.
+Kalau kamu mau ikut menambahkan fitur atau memperbaiki bug di proyek ini, perhatikan beberapa aturan main berikut ya:
 
-Sebelum submit perubahan:
-
-1. Pertahankan struktur Laravel standar.
-2. Hindari dependency yang tidak perlu.
-3. Jaga konsistensi behavior helper Linux dan Windows.
-4. Test perubahan di environment yang sesuai.
-5. Update dokumentasi ketika behavior berubah.
-6. Ikuti konvensi REST API yang telah ditetapkan.
+1. **Jaga Struktur Bersih:** Pertahankan kaidah struktur bawaan Laravel dan pemisahan logika controller/service.
+2. **Kepatuhan Kontrak API:** Pastikan setiap response selalu menggunakan amplop standar JSON (`status`, `message`, `data`, `meta`).
+3. **Pengujian Mandiri:** Selalu jalankan `./dev test` sebelum mengajukan pull request untuk memastikan tidak ada fitur lama yang rusak.
+4. **Dokumentasi Terbaca:** Jika menambahkan atau mengubah endpoint, perbarui dokumentasi terkait di folder `docs/`.
 
 ---
 
-## License
+## 📄 Lisensi
 
-This project is open-sourced under the MIT License.
-
-See the `LICENSE` file for details.
+Proyek ini dirilis di bawah lisensi terbuka [MIT License](LICENSE).
 
 ---
 
 <p align="center">
-  <strong>PaduKerja</strong> · Kelompok 4 · Pemrograman Web Service · Universitas Harkat Negeri
+  Dibuat dengan semangat belajar oleh <strong>Kelompok 4</strong><br>
+  Mata Kuliah Pemrograman Web Service - <strong>Universitas Harkat Negeri (Tegal)</strong>
 </p>

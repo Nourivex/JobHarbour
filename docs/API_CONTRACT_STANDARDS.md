@@ -1,6 +1,7 @@
-# Standar Kontrak API - PaduKerja
+# Standar Kontrak API - JobHarbour
 
-> Dokumen ini mendefinisikan standar global untuk seluruh request dan response payload JSON, header wajib, format error, dan contoh endpoint mock pada keempat microservice PaduKerja.
+> Dokumen ini mendefinisikan standar global untuk seluruh request dan response payload JSON, header wajib, format error, dan contoh endpoint mock pada keempat microservice JobHarbour.
+> Filosofi: Pelabuhan para talenta dan pencari kerja sebelum berlayar ke dunia kerja profesional.
 
 ---
 
@@ -556,5 +557,5 @@ Dikembalikan ketika token valid tetapi user tidak memiliki akses (role tidak ses
 ---
 
 <p align="center">
-  <strong>PaduKerja</strong> · API Contract Standards · Kelompok 4 UHN
+  <strong>JobHarbour</strong> · API Contract Standards · Kelompok 4 UHN Tegal
 </p>

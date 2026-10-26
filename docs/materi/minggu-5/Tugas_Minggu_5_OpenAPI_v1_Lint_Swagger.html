@@ -294,7 +294,7 @@
       <div class="doc-title-sub">Bagian kedua Milestone M2 - API Blueprint. Kontrak ini menjadi acuan implementasi Minggu ke-6.</div>
     </div>
     <table class="info-table">
-      <tr><td class="label-col">Project</td><td style="width: 30%; font-weight: bold;">PaduKerja</td><td class="label-col">Kelompok</td><td style="width: 28%; font-weight: bold;">Kelompok 4</td></tr>
+      <tr><td class="label-col">Project</td><td style="width: 30%; font-weight: bold;">JobHarbour</td><td class="label-col">Kelompok</td><td style="width: 28%; font-weight: bold;">Kelompok 4</td></tr>
       <tr><td class="label-col">Repository</td><td colspan="3"><span class="code-text">https://github.com/Nourivex/PaduKerja</span></td></tr>
       <tr><td class="label-col">File Kontrak</td><td><span class="code-text">docs/openapi.yaml</span></td><td class="label-col">Versi</td><td>OAS 3.1.0, info.version 1.0.0</td></tr>
       <tr><td class="label-col">Sumber Desain</td><td colspan="3"><span class="code-text">docs/api-design.md</span> (API Design Document v1, 40 endpoint)</td></tr>
@@ -303,7 +303,7 @@
 <div class="section-title">Pemenuhan Ketentuan Tugas (Modul 05 bagian 24)</div><div class="prompt-desc">Setiap angka diperoleh dari pemeriksaan otomatis terhadap docs/openapi.yaml.</div><table class="report-table"><thead><tr><th>Kriteria</th><th>Ketentuan minimum</th><th>Kondisi kontrak</th><th>Status</th></tr></thead><tbody><tr><td style="width: 15%;">Lokasi file</td><td style="width: 27%;">docs/openapi.yaml (OAS 3.1.0)</td><td style="width: 45%;">docs/openapi.yaml, <span class="code-text">openapi: 3.1.0</span></td><td class="col-center" style="width: 13%;"><span class="ok">Terpenuhi</span></td></tr><tr><td>Cakupan</td><td>Minimal 15 operation</td><td>40 operation pada 25 path, sesuai seluruh endpoint API Design Document v1</td><td class="col-center"><span class="ok">Terpenuhi</span></td></tr><tr><td>Components</td><td>Minimal 5 schema termasuk Error dan ValidationError; parameter pagination reusable</td><td>61 schema (termasuk Error dan ValidationError, input dan output terpisah); parameter reusable Page, PerPage, Id, SkillId, RequirementId; 285 rujukan $ref</td><td class="col-center"><span class="ok">Terpenuhi</span></td></tr><tr><td>Responses</td><td>Sukses dan minimal 1 gagal tiap operation</td><td>40 dari 40 operation memiliki response 2xx dan 4xx</td><td class="col-center"><span class="ok">Terpenuhi</span></td></tr><tr><td>Query</td><td>Minimal 2 collection dengan enum, default, maximum</td><td>11 parameter sort memakai enum + default; per_page memakai default + maximum pada seluruh 11 collection</td><td class="col-center"><span class="ok">Terpenuhi</span></td></tr><tr><td>Keamanan</td><td>bearerAuth global; endpoint publik security: []</td><td>bearerAuth (JWT) global; 7 endpoint publik memakai security: []</td><td class="col-center"><span class="ok">Terpenuhi</span></td></tr><tr><td>Contoh</td><td>Minimal 3 example realistis</td><td>12 contoh request body dan 30 contoh response (antara lain login, daftar lowongan, kirim lamaran)</td><td class="col-center"><span class="ok">Terpenuhi</span></td></tr><tr><td>Kualitas</td><td>Lint Redocly 0 error</td><td>Valid, 0 error, 1 warning (server localhost)</td><td class="col-center"><span class="ok">Terpenuhi</span></td></tr></tbody></table>
   </div>
   <div class="footer-box">
-    <span>Kelompok 4 - PaduKerja</span>
+    <span>Kelompok 4 - JobHarbour</span>
     <span>Tugas Kelompok Minggu ke-5: OpenAPI v1 - Halaman 1 dari 12</span>
   </div>
 </div>
@@ -349,7 +349,7 @@ Woohoo! Your API description is valid.
 You have 1 warning.</div><p class="note"><strong>Catatan warning:</strong> aturan <span class="code-text">no-server-example.com</span> mengingatkan bahwa URL server menunjuk ke localhost. Server lokal <span class="code-text">http://localhost:8000/api/v1</span> sengaja dipakai sesuai contoh Modul 05 (servers: Local development) karena layanan belum di-deploy. Warning ini tidak memengaruhi validitas dokumen.</p><div class="section-title">Statistik Dokumen</div><div class="prompt-desc">Perintah: npx @redocly/cli stats docs/openapi.yaml</div><table class="report-table"><thead><tr><th>Komponen</th><th>Jumlah</th></tr></thead><tbody><tr><td style="width: 70%;">References</td><td class="col-center" style="width: 30%;">70</td></tr><tr><td>External Documents</td><td class="col-center">0</td></tr><tr><td>Schemas</td><td class="col-center">61</td></tr><tr><td>Parameters</td><td class="col-center">18</td></tr><tr><td>Links</td><td class="col-center">0</td></tr><tr><td>Path Items</td><td class="col-center">25</td></tr><tr><td>Webhooks</td><td class="col-center">0</td></tr><tr><td>Operations</td><td class="col-center">40</td></tr><tr><td>Tags</td><td class="col-center">12</td></tr><tr><td>Vendor Extensions</td><td class="col-center">0</td></tr></tbody></table><div class="section-title">Hasil Uji Mock Server</div><div class="prompt-desc">Perintah: npx @stoplight/prism-cli mock docs/openapi.yaml (http://127.0.0.1:4010)</div><table class="report-table"><thead><tr><th>Method</th><th>Request</th><th>Skenario</th><th>Status</th><th>status / code</th></tr></thead><tbody><tr><td class="col-center" style="width: 10%;">GET</td><td style="width: 30%;"><span class="code-text">/jobs?per_page=5</span></td><td style="width: 32%;">Endpoint publik tanpa token</td><td class="col-center" style="width: 9%;">200</td><td style="width: 19%;"><span class="code-text">success</span></td></tr><tr><td class="col-center">GET</td><td><span class="code-text">/jobs?per_page=500</span></td><td>per_page melebihi maximum 50</td><td class="col-center">422</td><td><span class="code-text">VALIDATION_FAILED</span></td></tr><tr><td class="col-center">GET</td><td><span class="code-text">/jobs?sort=password</span></td><td>sort di luar enum whitelist</td><td class="col-center">422</td><td><span class="code-text">VALIDATION_FAILED</span></td></tr><tr><td class="col-center">GET</td><td><span class="code-text">/applications</span></td><td>Endpoint terproteksi tanpa token</td><td class="col-center">401</td><td><span class="code-text">UNAUTHENTICATED</span></td></tr><tr><td class="col-center">GET</td><td><span class="code-text">/applications</span></td><td>Endpoint terproteksi dengan token</td><td class="col-center">200</td><td><span class="code-text">success</span></td></tr><tr><td class="col-center">POST</td><td><span class="code-text">/applications</span></td><td>Body valid</td><td class="col-center">201</td><td><span class="code-text">success</span></td></tr><tr><td class="col-center">POST</td><td><span class="code-text">/applications</span></td><td>Body tanpa job_id (wajib)</td><td class="col-center">422</td><td><span class="code-text">VALIDATION_FAILED</span></td></tr><tr><td class="col-center">POST</td><td><span class="code-text">/pipelines/30/transitions</span></td><td>to_stage di luar enum</td><td class="col-center">422</td><td><span class="code-text">VALIDATION_FAILED</span></td></tr><tr><td class="col-center">DELETE</td><td><span class="code-text">/applications/45</span></td><td>Menarik lamaran</td><td class="col-center">204</td><td>-</td></tr><tr><td class="col-center">POST</td><td><span class="code-text">/auth/login</span></td><td>Login (publik)</td><td class="col-center">200</td><td><span class="code-text">success</span></td></tr></tbody></table>
   </div>
   <div class="footer-box">
-    <span>Kelompok 4 - PaduKerja</span>
+    <span>Kelompok 4 - JobHarbour</span>
     <span>Tugas Kelompok Minggu ke-5: OpenAPI v1 - Halaman 2 dari 12</span>
   </div>
 </div>
@@ -373,7 +373,7 @@ You have 1 warning.</div><p class="note"><strong>Catatan warning:</strong> atura
 <div class="section-title">Screenshot Swagger UI</div><div class="cap">Gambar 1. Tampilan umum Swagger UI: info, server, tombol Authorize, dan 40 operation per tag (ikon gembok = memerlukan bearerAuth)</div><img class="shot" src="screenshots/01_overview_1.png" style="height: 212.1mm; width: auto; max-width: 100%;">
   </div>
   <div class="footer-box">
-    <span>Kelompok 4 - PaduKerja</span>
+    <span>Kelompok 4 - JobHarbour</span>
     <span>Tugas Kelompok Minggu ke-5: OpenAPI v1 - Halaman 3 dari 12</span>
   </div>
 </div>
@@ -397,7 +397,7 @@ You have 1 warning.</div><p class="note"><strong>Catatan warning:</strong> atura
 <div class="section-title">Screenshot Swagger UI</div><div class="cap">Gambar 1. Tampilan umum Swagger UI (lanjutan)</div><img class="shot" src="screenshots/01_overview_2.png" style="height: 212.1mm; width: auto; max-width: 100%;">
   </div>
   <div class="footer-box">
-    <span>Kelompok 4 - PaduKerja</span>
+    <span>Kelompok 4 - JobHarbour</span>
     <span>Tugas Kelompok Minggu ke-5: OpenAPI v1 - Halaman 4 dari 12</span>
   </div>
 </div>
@@ -421,7 +421,7 @@ You have 1 warning.</div><p class="note"><strong>Catatan warning:</strong> atura
 <div class="section-title">Screenshot Swagger UI</div><div class="cap">Gambar 1. Tampilan umum Swagger UI (lanjutan)</div><img class="shot" src="screenshots/01_overview_3.png" style="height: 40.1mm; width: auto; max-width: 100%;">
   </div>
   <div class="footer-box">
-    <span>Kelompok 4 - PaduKerja</span>
+    <span>Kelompok 4 - JobHarbour</span>
     <span>Tugas Kelompok Minggu ke-5: OpenAPI v1 - Halaman 5 dari 12</span>
   </div>
 </div>
@@ -445,7 +445,7 @@ You have 1 warning.</div><p class="note"><strong>Catatan warning:</strong> atura
 <div class="section-title">Screenshot Swagger UI</div><div class="cap">Gambar 2. GET /jobs: query parameter dengan enum, default, dan batas per_page; contoh response 200 (data, links, meta) dan 422</div><img class="shot" src="screenshots/02_listJobs_1.png" style="height: 212.1mm; width: auto; max-width: 100%;">
   </div>
   <div class="footer-box">
-    <span>Kelompok 4 - PaduKerja</span>
+    <span>Kelompok 4 - JobHarbour</span>
     <span>Tugas Kelompok Minggu ke-5: OpenAPI v1 - Halaman 6 dari 12</span>
   </div>
 </div>
@@ -469,7 +469,7 @@ You have 1 warning.</div><p class="note"><strong>Catatan warning:</strong> atura
 <div class="section-title">Screenshot Swagger UI</div><div class="cap">Gambar 2. GET /jobs (lanjutan)</div><img class="shot" src="screenshots/02_listJobs_2.png" style="height: 83.6mm; width: auto; max-width: 100%;">
   </div>
   <div class="footer-box">
-    <span>Kelompok 4 - PaduKerja</span>
+    <span>Kelompok 4 - JobHarbour</span>
     <span>Tugas Kelompok Minggu ke-5: OpenAPI v1 - Halaman 7 dari 12</span>
   </div>
 </div>
@@ -493,7 +493,7 @@ You have 1 warning.</div><p class="note"><strong>Catatan warning:</strong> atura
 <div class="section-title">Screenshot Swagger UI</div><div class="cap">Gambar 3. POST /applications: request body, response 201 dengan header Location, serta response 401, 403, 404, 409, dan 422</div><img class="shot" src="screenshots/03_createApplication_1.png" style="height: 212.1mm; width: auto; max-width: 100%;">
   </div>
   <div class="footer-box">
-    <span>Kelompok 4 - PaduKerja</span>
+    <span>Kelompok 4 - JobHarbour</span>
     <span>Tugas Kelompok Minggu ke-5: OpenAPI v1 - Halaman 8 dari 12</span>
   </div>
 </div>
@@ -517,7 +517,7 @@ You have 1 warning.</div><p class="note"><strong>Catatan warning:</strong> atura
 <div class="section-title">Screenshot Swagger UI</div><div class="cap">Gambar 3. POST /applications (lanjutan)</div><img class="shot" src="screenshots/03_createApplication_2.png" style="height: 167.1mm; width: auto; max-width: 100%;">
   </div>
   <div class="footer-box">
-    <span>Kelompok 4 - PaduKerja</span>
+    <span>Kelompok 4 - JobHarbour</span>
     <span>Tugas Kelompok Minggu ke-5: OpenAPI v1 - Halaman 9 dari 12</span>
   </div>
 </div>
@@ -541,7 +541,7 @@ You have 1 warning.</div><p class="note"><strong>Catatan warning:</strong> atura
 <div class="section-title">Screenshot Swagger UI</div><div class="cap">Gambar 4. POST /auth/login: endpoint publik (security: []) dengan contoh request dan response token</div><img class="shot" src="screenshots/04_login.png" style="height: 192.9mm; width: auto; max-width: 100%;">
   </div>
   <div class="footer-box">
-    <span>Kelompok 4 - PaduKerja</span>
+    <span>Kelompok 4 - JobHarbour</span>
     <span>Tugas Kelompok Minggu ke-5: OpenAPI v1 - Halaman 10 dari 12</span>
   </div>
 </div>
@@ -565,7 +565,7 @@ You have 1 warning.</div><p class="note"><strong>Catatan warning:</strong> atura
 <div class="section-title">Screenshot Swagger UI</div><div class="cap">Gambar 5. POST /pipelines/{id}/transitions: path parameter wajib, request body, dan response 201</div><img class="shot" src="screenshots/05_transition_1.png" style="height: 212.1mm; width: auto; max-width: 100%;">
   </div>
   <div class="footer-box">
-    <span>Kelompok 4 - PaduKerja</span>
+    <span>Kelompok 4 - JobHarbour</span>
     <span>Tugas Kelompok Minggu ke-5: OpenAPI v1 - Halaman 11 dari 12</span>
   </div>
 </div>
@@ -589,7 +589,7 @@ You have 1 warning.</div><p class="note"><strong>Catatan warning:</strong> atura
 <div class="section-title">Screenshot Swagger UI</div><div class="cap">Gambar 5. POST /pipelines/{id}/transitions (lanjutan)</div><img class="shot" src="screenshots/05_transition_2.png" style="height: 160.7mm; width: auto; max-width: 100%;">
   </div>
   <div class="footer-box">
-    <span>Kelompok 4 - PaduKerja</span>
+    <span>Kelompok 4 - JobHarbour</span>
     <span>Tugas Kelompok Minggu ke-5: OpenAPI v1 - Halaman 12 dari 12</span>
   </div>
 </div>

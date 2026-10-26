@@ -2,7 +2,7 @@
 
 > **Mata Kuliah:** Pemrograman Web Service (5537344 / 3 SKS)  
 > **Dosen Pengampu:** Zaenul Arif, S.Kom., M.Kom.  
-> **Platform Proyek:** PaduKerja (Platform Rekrutmen Terintegrasi Berbasis Microservice)  
+> **Platform Proyek:** JobHarbour (Platform Rekrutmen Terintegrasi Berbasis Microservice)  
 > **Kelompok:** Kelompok 4 UHN  
 > **Milestone:** Bagian Pertama Milestone M2 - API Blueprint  
 

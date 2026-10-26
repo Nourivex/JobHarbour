@@ -8,7 +8,7 @@ body:
   type: text
   content: |-
     {
-      "email": "recruiter@padukerja.id",
+      "email": "recruiter@jobharbour.id",
       "password": "password123"
     }
 scripts:

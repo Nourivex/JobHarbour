@@ -12,7 +12,7 @@
 
 ## 📌 Ringkasan 8 Endpoint Inti REST API
 
-Sistem PaduKerja dirancang memiliki tepat **8 REST API Inti**, terbagi secara proporsional ke dalam 4 layanan microservices untuk masing-masing penanggung jawab:
+Sistem JobHarbour dirancang memiliki tepat **8 REST API Inti**, terbagi secara proporsional ke dalam 4 layanan microservices untuk masing-masing penanggung jawab:
 
 | Layanan Microservice | Penanggung Jawab | NIM | Modul Utama | Method & Endpoint | Deskripsi Fungsionalitas |
 |---|---|---|---|---|---|

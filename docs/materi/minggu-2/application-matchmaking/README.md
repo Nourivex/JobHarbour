@@ -58,7 +58,7 @@ Gunakan akun pelamar Siti Nurhaliza atau Budi Santoso untuk menguji endpoint:
 curl -s -X POST http://127.0.0.1:32768/api/auth/login \
   -H "Content-Type: application/json" \
   -H "Accept: application/json" \
-  -d '{"email": "siti@padukerja.id", "password": "password123"}' | jq -r '.data.token'
+  -d '{"email": "siti@jobharbour.id", "password": "password123"}' | jq -r '.data.token'
 ```
 *Salin token yang dihasilkan untuk dimasukkan pada header `Authorization: Bearer <token>`.*
 
