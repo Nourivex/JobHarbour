@@ -760,6 +760,30 @@ paths:
                 meta:
                   timestamp: '2026-10-16T17:45:00+07:00'
                   version: v1
+  /jobs/my:
+    get:
+      tags:
+      - Jobs
+      summary: Daftar lowongan milik recruiter saat ini
+      operationId: listMyJobs
+      description: |-
+        Menampilkan daftar lowongan yang diposting dan dikelola oleh recruiter yang sedang login, beserta jumlah pelamar per lowongan.
+
+        **Aktor:** Recruiter.
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/PerPage'
+      responses:
+        '200':
+          description: Daftar lowongan milik recruiter berhasil diambil
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
   /jobs/{id}:
     get:
       tags:
@@ -1071,6 +1095,26 @@ paths:
             example:
               job_id: 12
               cover_letter: Saya tertarik dengan posisi Backend Developer.
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+              - job_id
+              properties:
+                job_id:
+                  type: integer
+                  format: int64
+                  example: 12
+                cover_letter:
+                  type: string
+                  example: Saya tertarik dengan posisi Backend Developer.
+                candidate_skills:
+                  type: string
+                  description: Array JSON string keahlian pelamar (contoh ["PHP","Laravel","MySQL"])
+                cv_file:
+                  type: string
+                  contentMediaType: application/pdf
+                  description: Berkas CV pelamar (PDF, maks. 2 MB)
       responses:
         '201':
           description: Lamaran berhasil dibuat beserta skor kecocokan

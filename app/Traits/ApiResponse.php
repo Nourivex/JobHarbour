@@ -59,11 +59,12 @@ trait ApiResponse
     /**
      * Mengirim response error standar (HTTP 4xx atau 5xx).
      *
-     * @param  string  $message     Pesan kegagalan/kesalahan
-     * @param  int     $statusCode  Kode status HTTP (default: 400 Bad Request)
-     * @param  mixed   $errors      Detail error (opsional)
+     * @param  string       $message     Pesan kegagalan/kesalahan
+     * @param  int          $statusCode  Kode status HTTP (default: 400 Bad Request)
+     * @param  mixed        $errors      Detail error validasi per field (opsional)
+     * @param  string|null  $errorCode   Kode error terstandarisasi untuk frontend (cth: TOKEN_EXPIRED, FORBIDDEN)
      */
-    protected function errorResponse(string $message, int $statusCode = 400, mixed $errors = null): JsonResponse
+    protected function errorResponse(string $message, int $statusCode = 400, mixed $errors = null, ?string $errorCode = null): JsonResponse
     {
         $response = [
             'status' => 'error',
@@ -74,6 +75,12 @@ trait ApiResponse
                 'version' => '1.0.0',
             ],
         ];
+
+        // Jika terdapat error_code khusus (seperti TOKEN_EXPIRED atau IDOR_FORBIDDEN), sertakan di level atas
+        if ($errorCode !== null) {
+            $response['error_code'] = $errorCode;
+            $response['code'] = $errorCode;
+        }
 
         // Jika terdapat detail validasi atau error spesifik, sertakan di object 'errors'
         if ($errors !== null) {
@@ -92,30 +99,32 @@ trait ApiResponse
      */
     protected function validationErrorResponse(mixed $errors, string $message = 'Validasi data masukan gagal.'): JsonResponse
     {
-        return $this->errorResponse($message, 422, $errors);
+        return $this->errorResponse($message, 422, $errors, 'VALIDATION_ERROR');
     }
 
     /**
      * Mengirim response tidak terautentikasi (HTTP 401 Unauthorized).
      * Digunakan saat client tidak menyertakan token JWT, token salah, atau sudah kedaluwarsa (expired).
      *
-     * @param  string  $message  Pesan penolakan autentikasi
+     * @param  string       $message    Pesan penolakan autentikasi
+     * @param  string|null  $errorCode  Kode error spesifik (TOKEN_EXPIRED, TOKEN_INVALID, UNAUTHORIZED)
      */
-    protected function unauthorizedResponse(string $message = 'Akses ditolak. Token autentikasi tidak valid atau belum disertakan.'): JsonResponse
+    protected function unauthorizedResponse(string $message = 'Akses ditolak. Token autentikasi tidak valid atau belum disertakan.', ?string $errorCode = 'UNAUTHORIZED'): JsonResponse
     {
-        return $this->errorResponse($message, 401);
+        return $this->errorResponse($message, 401, null, $errorCode);
     }
 
     /**
      * Mengirim response hak akses tidak memadai (HTTP 403 Forbidden).
      * Digunakan saat identitas client dikenali (token valid), tetapi peran (role) pengguna tidak berhak
-     * mengakses resource tersebut (misal: pelamar mencoba memposting lowongan kerja).
+     * mengakses resource tersebut (misal: pelamar mencoba memposting lowongan kerja, atau celah IDOR).
      *
-     * @param  string  $message  Pesan penolakan hak akses
+     * @param  string       $message    Pesan penolakan hak akses
+     * @param  string|null  $errorCode  Kode error spesifik (FORBIDDEN, ACCESS_DENIED)
      */
-    protected function forbiddenResponse(string $message = 'Akses dilarang. Akun Anda tidak memiliki hak otorisasi untuk tindakan ini.'): JsonResponse
+    protected function forbiddenResponse(string $message = 'Akses dilarang. Akun Anda tidak memiliki hak otorisasi untuk tindakan ini.', ?string $errorCode = 'FORBIDDEN'): JsonResponse
     {
-        return $this->errorResponse($message, 403);
+        return $this->errorResponse($message, 403, null, $errorCode);
     }
 
     /**
@@ -126,6 +135,6 @@ trait ApiResponse
      */
     protected function notFoundResponse(string $message = 'Data yang diminta tidak ditemukan.'): JsonResponse
     {
-        return $this->errorResponse($message, 404);
+        return $this->errorResponse($message, 404, null, 'RESOURCE_NOT_FOUND');
     }
 }

@@ -153,7 +153,7 @@ Keterangan status: setiap `POST` yang membuat resource mengembalikan `201 Create
 | 39 | `PATCH` | `/api/v1/interviews/{id}` | Mengubah jadwal atau status wawancara | Recruiter | `200` | `401`, `403`, `404`, `422` |
 | 40 | `POST` | `/api/v1/pipelines/{id}/offerings` | Mengirim penawaran kerja kepada kandidat | Recruiter | `201` | `401`, `403`, `404`, `409`, `422` |
 
-Catatan otorisasi: `GET /api/v1/applications` secara implisit hanya mengembalikan lamaran milik pelamar yang login, dan `GET /api/v1/pipelines` hanya kandidat dari lowongan milik recruiter yang login. Aturan ini ditegakkan oleh server, bukan oleh parameter dari client. Endpoint bertanda *Service internal* dipanggil antar-service dengan service token.
+Catatan otorisasi: `GET /api/v1/applications` secara implisit hanya mengembalikan lamaran milik pelamar yang login, dan `GET /api/v1/pipelines` hanya kandidat dari lowongan milik recruiter yang login. Selain itu, sistem menerapkan **proteksi anti-IDOR (Insecure Direct Object Reference)** ketat pada seluruh operasi modifikasi lowongan (`PUT/PATCH/DELETE /api/v1/jobs/{id}`) dan pembaruan status pipeline (`PATCH /api/v1/pipelines/{id}/status`), di mana recruiter hanya diizinkan mengelola lowongan dan kandidat yang ia posting sendiri. Upaya manipulasi resource pihak lain akan langsung diblokir dengan status HTTP `403 Forbidden` (`IDOR_FORBIDDEN`). Aturan ini ditegakkan oleh server, bukan oleh parameter dari client. Endpoint bertanda *Service internal* dipanggil antar-service dengan service token.
 
 ---
 
@@ -389,9 +389,12 @@ Seluruh error memakai satu format: `status: "error"`, `message` (dibaca manusia)
 
 | `code` | Status | Kondisi |
 |---|:---:|---|
-| `VALIDATION_FAILED` | 422 | Field body atau query parameter tidak valid |
-| `UNAUTHENTICATED` | 401 | Token tidak ada, tidak valid, atau kedaluwarsa |
-| `FORBIDDEN` | 403 | Role atau kepemilikan tidak sesuai |
+| `VALIDATION_FAILED` / `VALIDATION_ERROR` | 422 | Field body atau query parameter tidak valid |
+| `UNAUTHENTICATED` / `TOKEN_INVALID` | 401 | Token tidak ada atau signature token tidak valid |
+| `TOKEN_EXPIRED` | 401 | Masa berlaku JWT telah habis (expired) |
+| `MISSING_BEARER_TOKEN` | 401 | Header Authorization Bearer tidak disertakan |
+| `FORBIDDEN` / `INSUFFICIENT_ROLE` | 403 | Role pengguna tidak mencukupi untuk resource ini |
+| `IDOR_FORBIDDEN` | 403 | Upaya mengakses atau memanipulasi lowongan/pipeline milik recruiter lain |
 | `RESOURCE_NOT_FOUND` | 404 | ID tidak ditemukan atau tidak boleh diketahui pengguna |
 | `EMAIL_ALREADY_REGISTERED` | 409 | Registrasi dengan email yang sudah ada |
 | `SKILL_ALREADY_ADDED` | 409 | Menambah keahlian yang sudah dimiliki |
@@ -399,7 +402,7 @@ Seluruh error memakai satu format: `status: "error"`, `message` (dibaca manusia)
 | `APPLICATION_ALREADY_EXISTS` | 409 | Pelamar melamar lowongan yang sama dua kali |
 | `JOB_CLOSED` | 409 | Melamar lowongan berstatus closed |
 | `JOB_HAS_ACTIVE_APPLICATIONS` | 409 | Menghapus lowongan yang masih memiliki lamaran aktif |
-| `WITHDRAWAL_NOT_ALLOWED` | 409 | Menarik lamaran yang sudah masuk tahap interview atau lebih |
+| `WITHDRAWAL_NOT_ALLOWED` / `CANCELLATION_NOT_ALLOWED` | 409 | Menarik/membatalkan lamaran yang sudah masuk tahap assessment, interview, atau lebih |
 | `PIPELINE_ALREADY_EXISTS` | 409 | Membuat pipeline kedua untuk lamaran yang sama |
 | `INVALID_STAGE_TRANSITION` | 409 | Transisi tahap melompat, mundur, atau dari tahap final |
 | `STAGE_MISMATCH` | 409 | Assessment, interview, atau offering dibuat saat kandidat tidak berada di tahap tersebut |

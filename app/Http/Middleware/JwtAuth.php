@@ -44,28 +44,42 @@ class JwtAuth
 
         // Periksa apakah format header sesuai standar: "Bearer <token>"
         if (! $header || ! preg_match('/Bearer\s(\S+)/', $header, $matches)) {
-            return $this->unauthorizedResponse('Akses ditolak. Header "Authorization: Bearer <token>" wajib disertakan pada endpoint ini.');
+            return $this->unauthorizedResponse(
+                'Akses ditolak. Header "Authorization: Bearer <token>" wajib disertakan pada endpoint ini.',
+                'MISSING_BEARER_TOKEN'
+            );
         }
 
         $token = $matches[1];
 
         // 2. Dekode dan verifikasi isi token JWT
-        $payload = $this->jwtService->decodeToken($token);
+        $verification = $this->jwtService->verifyToken($token);
 
-        if (! $payload || ! isset($payload->sub)) {
-            return $this->unauthorizedResponse('Akses ditolak. Token akses tidak valid atau telah kedaluwarsa.');
+        if (! $verification['valid'] || ! isset($verification['payload']->sub)) {
+            return $this->unauthorizedResponse(
+                $verification['message'] ?? 'Akses ditolak. Token akses tidak valid atau telah kedaluwarsa.',
+                $verification['error_code'] ?? 'TOKEN_INVALID'
+            );
         }
+
+        $payload = $verification['payload'];
 
         // 3. Cari pengguna berdasarkan ID (sub) yang tersimpan di dalam token
         $user = User::find($payload->sub);
 
         if (! $user) {
-            return $this->unauthorizedResponse('Pengguna pemilik token ini tidak ditemukan dalam database.');
+            return $this->unauthorizedResponse(
+                'Pengguna pemilik token ini tidak ditemukan dalam database.',
+                'USER_NOT_FOUND'
+            );
         }
 
         // 4. Pengecekan Otorisasi Peran (Role Check) jika ditentukan di route
         if ($requiredRole !== null && $user->role !== $requiredRole && $user->role !== 'admin') {
-            return $this->forbiddenResponse("Akses ditolak. Tindakan ini secara khusus memerlukan hak akses peran '{$requiredRole}'. Peran Anda saat ini: '{$user->role}'.");
+            return $this->forbiddenResponse(
+                "Akses ditolak. Tindakan ini secara khusus memerlukan hak akses peran '{$requiredRole}'. Peran Anda saat ini: '{$user->role}'.",
+                'INSUFFICIENT_ROLE'
+            );
         }
 
         // 5. Lampirkan pengguna ke request agar dapat diakses di Controller melalui $request->user()

@@ -107,7 +107,7 @@ Database telah disiapkan (*seeded*) dengan akun berikut (didukung juga alias `@p
   "title": "Cloud & DevOps Engineer",
   "company": "PT Solusi Cloud Nusantara",
   "description": "Mengelola deployment infrastruktur berbasis container dan CI/CD pipeline.",
-  "location": "Jakarta Pusat",
+  "location": "Tegal",
   "employment_type": "full-time",
   "salary_min": 15000000,
   "salary_max": 22000000,
@@ -122,37 +122,82 @@ Database telah disiapkan (*seeded*) dengan akun berikut (didukung juga alias `@p
 ```
 - **Response `201 Created`:** Lowongan tersimpan dengan ID baru dan status `open`.
 
+#### 3. GET: Recruiter Melihat Lowongan Milik Sendiri
+- **Endpoint:** `GET /api/jobs/my`
+- **Headers:**
+  - `Accept: application/json`
+  - `Authorization: Bearer <TOKEN_RECRUITER>`
+- **Response `200 OK`:** Menampilkan lowongan yang diposting oleh recruiter yang login beserta hitungan jumlah pelamar (`applications_count`).
+
+#### 4. PUT: Mengubah Data Lowongan (Anti-IDOR)
+- **Endpoint:** `PUT /api/jobs/{id}`
+- **Headers:**
+  - `Content-Type: application/json`
+  - `Accept: application/json`
+  - `Authorization: Bearer <TOKEN_RECRUITER>`
+- **Body:**
+```json
+{
+  "title": "Senior Cloud & DevOps Engineer",
+  "salary_min": 17000000,
+  "salary_max": 25000000,
+  "quota": 3,
+  "status": "open"
+}
+```
+- **Response `200 OK`:** Data lowongan berhasil diperbarui.
+- **Skenario Uji IDOR:** Jika token recruiter lain mencoba mengedit lowongan ini, server merespons `403 Forbidden` dengan kode error `IDOR_FORBIDDEN`.
+
+#### 5. DELETE: Menutup Lowongan (Anti-IDOR)
+- **Endpoint:** `DELETE /api/jobs/{id}`
+- **Headers:**
+  - `Accept: application/json`
+  - `Authorization: Bearer <TOKEN_RECRUITER>`
+- **Response `200 OK`:** Status lowongan diubah menjadi `closed`.
+
 ---
 
 ### 3. Application & Matchmaking Service (Lamaran & Scoring)
 *Penanggung Jawab: Muhammad Yasir Ilham Nabil (23215040)*
 
-#### 1. POST: Mengirim Lamaran + Otomatis Hitung Skor Kecocokan
+#### 1. POST: Mengirim Lamaran + Unggah CV (PDF) & Otomatis Hitung Skor
 - **Endpoint:** `POST /api/applications`
-- **Headers:**
-  - `Content-Type: application/json`
-  - `Accept: application/json`
-  - `Authorization: Bearer <TOKEN_PELAMAR>`
-- **Body:**
-```json
-{
-  "job_id": 2,
-  "cover_letter": "Saya sangat tertarik dengan lowongan ini karena sesuai keahlian teknis saya.",
-  "candidate_skills": ["React", "JavaScript", "Tailwind CSS", "Git"]
-}
-```
+- **Pilihan Request A: JSON Payload**
+  - **Headers:** `Content-Type: application/json`, `Authorization: Bearer <TOKEN_PELAMAR>`
+  - **Body:**
+    ```json
+    {
+      "job_id": 2,
+      "cover_letter": "Saya sangat tertarik dengan lowongan ini karena sesuai keahlian teknis saya.",
+      "candidate_skills": ["React", "JavaScript", "Tailwind CSS", "Git"]
+    }
+    ```
+- **Pilihan Request B: Multipart Form Data (Upload Berkas CV PDF)**
+  - **Headers:** `Authorization: Bearer <TOKEN_PELAMAR>` (tanpa Content-Type manual agar boundary otomatis dibuat client)
+  - **Form Fields:**
+    - `job_id`: `2`
+    - `cover_letter`: `"Berikut terlampir CV resume lengkap saya untuk posisi ini."`
+    - `candidate_skills`: `["React", "JavaScript", "Tailwind CSS", "Git"]`
+    - `cv_file`: `[pilih berkas PDF max 2 MB]`
 - **Response `201 Created`:**
-  - Sistem otomatis menjalankan formula **Weighted Jaccard Similarity**:
+  - Menghasilkan `cv_download_url` untuk melihat atau mengunduh kembali berkas CV yang diunggah.
+  - Menghitung **Weighted Jaccard Similarity**:
     $$\text{Match Score} = \frac{\sum \text{weight skill yang cocok}}{\sum \text{weight seluruh skill lowongan}} \times 100\%$$
   - Memberikan kategori `excellent` ($\ge 80\%$), `good` ($50\% - 79\%$), atau `under_qualified` ($< 50\%$).
-  - Otomatis membuat entri linimasa pipeline awal (`screening`).
+  - Otomatis membuat linimasa pipeline awal pada tahap `screening`.
 
-#### 2. DELETE: Membatalkan Pengajuan Lamaran
+#### 2. GET: Mengunduh / Membaca Berkas CV Pelamar
+- **Endpoint:** `GET /api/applications/{id}/cv`
+- **Headers:**
+  - `Authorization: Bearer <TOKEN_PELAMAR_ATAU_RECRUITER>`
+- **Response `200 OK`:** Mengembalikan stream berkas PDF asli dengan header `Content-Type: application/pdf`.
+
+#### 3. DELETE: Membatalkan Pengajuan Lamaran (Dengan Safeguard Tahapan)
 - **Endpoint:** `DELETE /api/applications/{id}`
 - **Headers:**
   - `Accept: application/json`
   - `Authorization: Bearer <TOKEN_PELAMAR>`
-- **Response `200 OK`:**
+- **Response `200 OK` (Bila masih tahap submitted/screening):**
 ```json
 {
   "status": "success",
@@ -163,19 +208,22 @@ Database telah disiapkan (*seeded*) dengan akun berikut (didukung juga alias `@p
   }
 }
 ```
+- **Response `409 Conflict` (Bila sudah masuk tahap assessment/interview):**
+  Pelamar tidak bisa membatalkan sepihak jika proses seleksi sudah masuk tahap wawancara atau offering. Server mengembalikan kode error `CANCELLATION_NOT_ALLOWED`.
 
 ---
 
 ### 4. Recruitment Pipeline Service (Seleksi Pelamar)
 *Penanggung Jawab: MUHAMMAD AFFIF (24225046)*
 
-#### 1. PATCH: Recruiter Update Status/Tahap Seleksi Pelamar
+#### 1. PATCH: Recruiter Update Status/Tahap Seleksi Pelamar (Anti-IDOR)
 - **Endpoint:** `PATCH /api/pipelines/{applicationId}/status`
 - **Headers:**
   - `Content-Type: application/json`
   - `Accept: application/json`
   - `Authorization: Bearer <TOKEN_RECRUITER>`
-- **Pilihan Stage:** `screening` $\to$ `assessment` $\to$ `interview` $\to$ `offering` $\to$ `rejected`
+- **Aturan Kepemilikan (Anti-IDOR):** Hanya recruiter yang mempublikasikan lowongan kerja terkait yang berhak memajukan atau menolak kandidat. Jika diakses oleh recruiter lain, server akan merespons dengan HTTP `403 Forbidden` (`IDOR_FORBIDDEN`).
+- **Pilihan Stage:** `screening` -> `assessment` -> `interview` -> `offering` -> `rejected`
 - **Body (Contoh Jadwal Interview):**
 ```json
 {

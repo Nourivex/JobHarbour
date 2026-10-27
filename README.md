@@ -131,6 +131,30 @@ Setiap respon dari server selalu dibungkus dengan format berikut:
 }
 ```
 
+### 🌐 Daftar Endpoint Inti REST API
+
+Sistem JobHarbour mengimplementasikan endpoint REST API modular yang siap diakses:
+
+| Layanan Microservice | Method | Endpoint URI | Fungsi & Hak Akses |
+|---|:---:|---|---|
+| **Auth & Profile** | `POST` | `/api/auth/login` | Login & terbitkan JWT token (Publik) |
+| | `POST` | `/api/auth/register` | Pendaftaran akun baru pelamar / recruiter (Publik) |
+| | `GET` | `/api/auth/me` | Profil lengkap user yang sedang login (Semua user) |
+| | `PUT` | `/api/profile/skills` | Simpan kumpulan keahlian / skills pelamar (Pelamar) |
+| **Job Catalog** | `GET` | `/api/jobs` | Katalog lowongan, pencarian & filter (Publik) |
+| | `GET` | `/api/jobs/my` | Daftar lowongan milik recruiter yang login (Recruiter) |
+| | `GET` | `/api/jobs/{id}` | Detail lowongan pekerjaan (Publik) |
+| | `POST` | `/api/jobs` | Publikasi lowongan baru (Recruiter) |
+| | `PUT` | `/api/jobs/{id}` | Update data lowongan dengan verifikasi anti-IDOR (Recruiter) |
+| | `DELETE` | `/api/jobs/{id}` | Tutup lowongan dengan verifikasi anti-IDOR (Recruiter) |
+| **Application & Matchmaking** | `GET` | `/api/applications` | Daftar lamaran milik pelamar (Pelamar) |
+| | `GET` | `/api/applications/{id}` | Detail berkas lamaran & skor matchmaking (Pelamar / Recruiter) |
+| | `POST` | `/api/applications` | Kirim lamaran + upload CV (PDF) & hitung skor otomatis (Pelamar) |
+| | `GET` | `/api/applications/{id}/cv` | Download / view file resume CV format PDF (Pelamar / Recruiter) |
+| | `DELETE` | `/api/applications/{id}` | Batalkan lamaran sebelum tahap interview (Pelamar) |
+| **Recruitment Pipeline** | `GET` | `/api/pipelines/{id}` | Linimasa kronologis tahapan seleksi (Pelamar / Recruiter) |
+| | `PATCH` | `/api/pipelines/{id}/status` | Update tahap kandidat dengan proteksi anti-IDOR (Recruiter) |
+
 ### Panduan Kode Status HTTP (HTTP Status Codes)
 
 | Kode | Arti | Kapan Dipakai? |

@@ -53,6 +53,11 @@ class MatchmakingService
                 'category' => 'excellent',
                 'matched_skills' => $candidateSkills,
                 'missing_skills' => [],
+                'calculation_details' => [
+                    'matched_weight' => 0,
+                    'total_weight' => 0,
+                    'formula' => 'Tanpa syarat spesifik (Default 100%)',
+                ],
             ];
         }
 

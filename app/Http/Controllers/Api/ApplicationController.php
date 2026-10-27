@@ -11,7 +11,9 @@ use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 /**
  * Class ApplicationController
@@ -71,18 +73,33 @@ class ApplicationController extends Controller
     {
         $currentUser = $request->attributes->get('auth_user') ?? $request->user();
 
-        $application = Application::with(['jobVacancy', 'applicant:id,name,email,skills', 'pipelineTimeline'])->find($id);
+        $application = Application::with([
+            'jobVacancy',
+            'applicant:id,name,email,phone,bio,location,skills',
+            'pipelineTimeline'
+        ])->find($id);
 
         if (! $application) {
             return $this->notFoundResponse('Data berkas lamaran tidak ditemukan.');
         }
 
-        // Pengecekan otorisasi: Pelamar tidak boleh melihat isi lamaran milik orang lain
+        // Pengecekan otorisasi:
+        // - Pelamar hanya boleh melihat lamarannya sendiri
+        // - Recruiter hanya boleh melihat lamaran pada lowongan yang ia terbitkan (Proteksi IDOR)
         if ($currentUser->role === 'applicant' && $application->user_id !== $currentUser->id) {
-            return $this->forbiddenResponse('Akses dilarang. Anda tidak memiliki izin untuk melihat lamaran kandidat lain.');
+            return $this->forbiddenResponse('Akses dilarang. Anda tidak memiliki izin untuk melihat lamaran kandidat lain.', 'IDOR_FORBIDDEN');
         }
 
-        return $this->successResponse($application, 'Detail berkas lamaran berhasil dimuat.');
+        if ($currentUser->role === 'recruiter' && $application->jobVacancy && $application->jobVacancy->posted_by !== $currentUser->id && $currentUser->role !== 'admin') {
+            return $this->forbiddenResponse('Akses dilarang. Anda bukan pemilik lowongan dari kandidat ini.', 'IDOR_FORBIDDEN');
+        }
+
+        $appData = $application->toArray();
+        if ($application->cv_file_path) {
+            $appData['cv_download_url'] = url("/api/applications/{$application->id}/cv");
+        }
+
+        return $this->successResponse($appData, 'Detail berkas lamaran berhasil dimuat.');
     }
 
     /**
@@ -104,15 +121,18 @@ class ApplicationController extends Controller
             return $this->unauthorizedResponse();
         }
 
-        // 2. Validasi input: pastikan ID lowongan valid dan terdaftar di database
+        // 2. Validasi input: ID lowongan, cover letter, skills, dan berkas CV PDF (maks 2MB)
         $validator = Validator::make($request->all(), [
             'job_id' => 'nullable|integer|exists:job_vacancies,id',
             'job_vacancy_id' => 'nullable|integer|exists:job_vacancies,id',
             'cover_letter' => 'nullable|string',
-            'candidate_skills' => 'nullable|array',
+            'candidate_skills' => 'nullable',
+            'cv_file' => 'nullable|file|mimes:pdf|max:2048',
         ], [
             'job_vacancy_id.exists' => 'Lowongan pekerjaan yang dituju tidak ditemukan.',
             'job_id.exists' => 'Lowongan pekerjaan yang dituju tidak ditemukan.',
+            'cv_file.mimes' => 'Berkas CV/Resume harus berformat PDF.',
+            'cv_file.max' => 'Ukuran berkas CV/Resume maksimal adalah 2 MB (2048 KB).',
         ]);
 
         if ($validator->fails()) {
@@ -148,7 +168,18 @@ class ApplicationController extends Controller
         }
 
         // 5. Tentukan daftar keahlian pelamar (ambil dari request body atau fallback ke profil database pengguna)
-        $candidateSkills = $request->input('candidate_skills') ?? $currentUser->skills ?? [];
+        $rawCandidateSkills = $request->input('candidate_skills');
+        if (is_string($rawCandidateSkills)) {
+            $candidateSkills = json_decode($rawCandidateSkills, true) ?? [];
+        } else {
+            $candidateSkills = $rawCandidateSkills ?? $currentUser->skills ?? [];
+        }
+
+        // Simpan berkas CV jika diunggah via multipart/form-data
+        $cvFilePath = null;
+        if ($request->hasFile('cv_file')) {
+            $cvFilePath = $request->file('cv_file')->store('resumes', 'public');
+        }
 
         // 6. Jalankan Mesin Skoring Pemadanan Keahlian (Weighted Jaccard Similarity Engine)
         $matchResult = $this->matchmakingService->calculate(
@@ -157,12 +188,13 @@ class ApplicationController extends Controller
         );
 
         // 7. Simpan lamaran dan buat linimasa pipeline secara atomic di dalam Database Transaction
-        return DB::transaction(function () use ($currentUser, $job, $request, $matchResult, $candidateSkills) {
+        return DB::transaction(function () use ($currentUser, $job, $request, $matchResult, $candidateSkills, $cvFilePath) {
             // A. Simpan data lamaran kerja
             $application = Application::create([
                 'user_id' => $currentUser->id,
                 'job_vacancy_id' => $job->id,
                 'cover_letter' => $request->cover_letter,
+                'cv_file_path' => $cvFilePath,
                 'match_score' => $matchResult['score'],
                 'match_category' => $matchResult['category'],
                 'matched_skills' => $matchResult['matched_skills'],
@@ -210,12 +242,13 @@ class ApplicationController extends Controller
                     'match_category' => $matchResult['category'],
                     'matched_skills' => $matchResult['matched_skills'],
                     'missing_skills' => $matchResult['missing_skills'],
-                    'calculation_details' => $matchResult['calculation_details'],
+                    'calculation_details' => $matchResult['calculation_details'] ?? [],
                 ],
                 'pipeline_status' => [
                     'current_stage' => $pipeline->current_stage,
                     'stage_status' => $initialStageStatus,
                 ],
+                'cv_download_url' => $cvFilePath ? url("/api/applications/{$application->id}/cv") : null,
                 'applied_at' => $application->created_at->toIso8601String(),
             ], 'Berkas lamaran berhasil dikirim. Skor pemadanan kompetensi dihitung secara otomatis.');
         });
@@ -244,12 +277,19 @@ class ApplicationController extends Controller
 
         // Verifikasi kepemilikan: Hanya pelamar yang bersangkutan (atau admin) yang boleh membatalkan
         if ($application->user_id !== $currentUser->id && $currentUser->role !== 'admin') {
-            return $this->forbiddenResponse('Akses dilarang. Anda tidak berhak membatalkan berkas lamaran milik pelamar lain.');
+            return $this->forbiddenResponse('Akses dilarang. Anda tidak berhak membatalkan berkas lamaran milik pelamar lain.', 'IDOR_FORBIDDEN');
         }
 
-        // Jika lamaran telah mencapai tahap final offering atau sudah diterima, jangan izinkan pembatalan langsung
-        if (in_array($application->status, ['offering', 'accepted'])) {
-            return $this->errorResponse('Lamaran yang telah memasuki tahap Offering atau Penerimaan tidak dapat dibatalkan melalui rute ini.', 409);
+        // Pembatasan Pembatalan:
+        // Pembatalan sepihak oleh pelamar hanya diperbolehkan pada tahap awal (submitted / screening).
+        // Jika sudah masuk tahap assessment, interview, offering, atau accepted, tolak dengan 409 Conflict.
+        if (! in_array($application->status, ['submitted', 'screening'])) {
+            return $this->errorResponse(
+                "Lamaran tidak dapat dibatalkan karena telah berada di tahap '{$application->status}'. Pembatalan sepihak oleh pelamar hanya diizinkan pada tahap awal (submitted/screening).",
+                409,
+                null,
+                'CANCELLATION_NOT_ALLOWED'
+            );
         }
 
         $canceledJobTitle = $application->jobVacancy->title ?? 'Pekerjaan';
@@ -282,5 +322,42 @@ class ApplicationController extends Controller
             'status' => 'canceled',
             'canceled_at' => now()->toIso8601String(),
         ], "Pengajuan berkas lamaran untuk posisi {$canceledJobTitle} berhasil dibatalkan.");
+    }
+
+    /**
+     * Mengunduh berkas Resume / CV pelamar dalam format PDF.
+     * Otorisasi: Hanya pelamar pemilik berkas, recruiter pemilik lowongan, atau admin yang berhak mengunduh.
+     *
+     * Method  : GET
+     * Endpoint: /api/applications/{id}/cv
+     * Headers : Authorization: Bearer <token>
+     */
+    public function downloadCv(int $id, Request $request): JsonResponse|BinaryFileResponse
+    {
+        $currentUser = $request->attributes->get('auth_user') ?? $request->user();
+
+        $application = Application::with('jobVacancy:id,title,posted_by')->find($id);
+
+        if (! $application) {
+            return $this->notFoundResponse("Data lamaran dengan nomor ID {$id} tidak ditemukan.");
+        }
+
+        // Pengecekan otorisasi unduh berkas CV:
+        $isApplicantOwner = $currentUser->id === $application->user_id;
+        $isRecruiterOwner = $application->jobVacancy && $currentUser->id === $application->jobVacancy->posted_by;
+        $isAdmin = $currentUser->role === 'admin';
+
+        if (! $isApplicantOwner && ! $isRecruiterOwner && ! $isAdmin) {
+            return $this->forbiddenResponse('Akses ditolak. Anda tidak memiliki izin untuk mengunduh berkas CV kandidat ini.', 'IDOR_FORBIDDEN');
+        }
+
+        if (! $application->cv_file_path || ! Storage::disk('public')->exists($application->cv_file_path)) {
+            return $this->notFoundResponse('Berkas CV/Resume PDF tidak tersedia untuk lamaran ini.');
+        }
+
+        $fullPath = Storage::disk('public')->path($application->cv_file_path);
+        return response()->download($fullPath, 'CV_Lamaran_' . $application->id . '.pdf', [
+            'Content-Type' => 'application/pdf',
+        ]);
     }
 }

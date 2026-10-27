@@ -54,8 +54,21 @@ Route::get('/health', function () {
             'versi' => '1.0.0',
             'modul_tersedia' => [
                 'Auth & Profile Service' => ['POST /api/auth/login', 'PUT /api/profile/skills'],
-                'Job Catalog Service' => ['GET /api/jobs', 'POST /api/jobs'],
-                'Application & Matchmaking Service' => ['POST /api/applications', 'DELETE /api/applications/{id}'],
+                'Job Catalog Service' => [
+                    'GET /api/jobs',
+                    'GET /api/jobs/my',
+                    'GET /api/jobs/{id}',
+                    'POST /api/jobs',
+                    'PUT /api/jobs/{id}',
+                    'DELETE /api/jobs/{id}'
+                ],
+                'Application & Matchmaking Service' => [
+                    'GET /api/applications',
+                    'GET /api/applications/{id}',
+                    'GET /api/applications/{id}/cv',
+                    'POST /api/applications',
+                    'DELETE /api/applications/{id}'
+                ],
                 'Recruitment Pipeline Service' => ['PATCH /api/pipelines/{id}/status', 'GET /api/pipelines/{id}'],
             ],
         ],
@@ -89,10 +102,17 @@ Route::middleware('jwt.auth')->group(function () {
 // =========================================================================
 // Method GET: Menampilkan dan memfilter lowongan (Dapat diakses publik atau terotentikasi)
 Route::get('/jobs', [JobVacancyController::class, 'index']);
+
+// Method GET: Khusus recruiter untuk melihat daftar lowongan yang ia kelola sendiri
+Route::get('/jobs/my', [JobVacancyController::class, 'myJobs'])->middleware('jwt.auth:recruiter');
+
 Route::get('/jobs/{id}', [JobVacancyController::class, 'show']);
 
-// Method POST: Khusus peran 'recruiter' untuk menerbitkan lowongan pekerjaan baru
+// Method POST/PUT/PATCH/DELETE: Manajemen lowongan oleh Recruiter (dengan verifikasi kepemilikan / anti-IDOR)
 Route::post('/jobs', [JobVacancyController::class, 'store'])->middleware('jwt.auth:recruiter');
+Route::put('/jobs/{id}', [JobVacancyController::class, 'update'])->middleware('jwt.auth:recruiter');
+Route::patch('/jobs/{id}', [JobVacancyController::class, 'update'])->middleware('jwt.auth:recruiter');
+Route::delete('/jobs/{id}', [JobVacancyController::class, 'destroy'])->middleware('jwt.auth:recruiter');
 
 // =========================================================================
 // 4. Service 3: Application & Matchmaking Service
@@ -102,7 +122,10 @@ Route::middleware('jwt.auth')->group(function () {
     Route::get('/applications', [ApplicationController::class, 'index']);
     Route::get('/applications/{id}', [ApplicationController::class, 'show']);
 
-    // Method POST: Mengirim berkas lamaran + memicu kalkulasi skor kecocokan secara otomatis
+    // Mengunduh / melihat berkas CV PDF lamaran
+    Route::get('/applications/{id}/cv', [ApplicationController::class, 'downloadCv']);
+
+    // Method POST: Mengirim berkas lamaran + memicu kalkulasi skor kecocokan secara otomatis (mendukung multipart CV)
     Route::post('/applications', [ApplicationController::class, 'store']);
 
     // Method DELETE: Membatalkan pengajuan lamaran yang belum disetujui/ditolak

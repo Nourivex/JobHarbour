@@ -81,11 +81,20 @@ class JobVacancyController extends Controller
             });
         }
 
-        // 6. Eksekusi query dengan paginasi Eloquent Laravel
-        $perPage = (int) $request->input('per_page', 10);
-        $paginated = $query->latest()->paginate($perPage);
+        // 6. Pengurutan Data (Sorting)
+        $sort = $request->input('sort', 'latest');
+        match ($sort) {
+            'oldest' => $query->oldest(),
+            'salary_high', 'salary_desc' => $query->orderByDesc('salary_max'),
+            'salary_low', 'salary_asc' => $query->orderBy('salary_min'),
+            default => $query->latest(),
+        };
 
-        // 7. Kembalikan response HTTP 200 OK beserta rincian informasi pagination
+        // 7. Eksekusi query dengan paginasi aman (dibatasi maksimum 50 item per halaman)
+        $perPage = min(50, max(1, (int) $request->input('per_page', 10)));
+        $paginated = $query->paginate($perPage);
+
+        // 8. Kembalikan response HTTP 200 OK beserta rincian informasi pagination
         return $this->successResponse(
             $paginated->items(),
             'Daftar lowongan kerja berhasil diambil.',
@@ -97,7 +106,7 @@ class JobVacancyController extends Controller
                     'total' => $paginated->total(),
                     'last_page' => $paginated->lastPage(),
                 ],
-                'filters_applied' => $request->only(['search', 'location', 'skill', 'employment_type', 'status']),
+                'filters_applied' => $request->only(['search', 'location', 'skill', 'employment_type', 'status', 'sort']),
             ]
         );
     }
@@ -218,5 +227,145 @@ class JobVacancyController extends Controller
             ],
             'created_at' => $job->created_at->toIso8601String(),
         ], 'Lowongan pekerjaan baru berhasil diterbitkan.');
+    }
+
+    /**
+     * Job Catalog Service: Recruiter melihat daftar lowongan yang ia terbitkan sendiri.
+     *
+     * Method  : GET
+     * Endpoint: /api/jobs/my
+     * Headers : Authorization: Bearer <token_recruiter>
+     */
+    public function myJobs(Request $request): JsonResponse
+    {
+        $currentUser = $request->attributes->get('auth_user') ?? $request->user();
+
+        if (! $currentUser || ($currentUser->role !== 'recruiter' && $currentUser->role !== 'admin')) {
+            return $this->forbiddenResponse('Hanya recruiter yang dapat mengakses daftar lowongan miliknya.');
+        }
+
+        $jobs = JobVacancy::where('posted_by', $currentUser->id)
+            ->withCount('applications')
+            ->latest()
+            ->get();
+
+        return $this->successResponse(
+            $jobs,
+            'Daftar lowongan yang Anda kelola berhasil dimuat.',
+            200,
+            ['total_managed_jobs' => $jobs->count()]
+        );
+    }
+
+    /**
+     * Job Catalog Service: Recruiter memperbarui data lowongan pekerjaannya.
+     * Proteksi IDOR: Memastikan hanya pemilik lowongan yang sah atau admin yang berhak mengedit.
+     *
+     * Method  : PUT / PATCH
+     * Endpoint: /api/jobs/{id}
+     * Headers : Authorization: Bearer <token_recruiter>
+     */
+    public function update(Request $request, int $id): JsonResponse
+    {
+        $currentUser = $request->attributes->get('auth_user') ?? $request->user();
+
+        $job = JobVacancy::find($id);
+
+        if (! $job) {
+            return $this->notFoundResponse('Lowongan pekerjaan yang ingin diperbarui tidak ditemukan.');
+        }
+
+        // Proteksi IDOR: Verifikasi kepemilikan resource
+        if ($currentUser->role !== 'admin' && $job->posted_by !== $currentUser->id) {
+            return $this->forbiddenResponse('Akses ditolak. Anda bukan pemilik dari lowongan pekerjaan ini.', 'IDOR_FORBIDDEN');
+        }
+
+        $validator = Validator::make($request->all(), [
+            'title' => 'sometimes|required|string|max:255',
+            'company' => 'sometimes|required|string|max:255',
+            'description' => 'sometimes|required|string',
+            'location' => 'nullable|string|max:100',
+            'employment_type' => 'nullable|string|in:full-time,part-time,contract,internship,remote',
+            'quota' => 'nullable|integer|min:1',
+            'salary_min' => 'nullable|integer|min:0',
+            'salary_max' => 'nullable|integer|gte:salary_min',
+            'requirements' => 'nullable|array',
+            'requirements.*.skill' => 'required_with:requirements|string|max:100',
+            'requirements.*.weight' => 'nullable|integer|in:1,2,3',
+            'requirements.*.level' => 'nullable|string|in:required,important,nice_to_have',
+            'status' => 'nullable|string|in:open,closed',
+            'expires_at' => 'nullable|date',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->validationErrorResponse($validator->errors(), 'Gagal memperbarui lowongan karena data tidak valid.');
+        }
+
+        if ($request->has('requirements')) {
+            $requirements = array_map(function ($req) {
+                $level = $req['level'] ?? 'required';
+                $weight = match ($level) {
+                    'required' => 3,
+                    'important' => 2,
+                    'nice_to_have' => 1,
+                    default => 2,
+                };
+
+                return [
+                    'skill' => trim($req['skill']),
+                    'level' => $level,
+                    'weight' => isset($req['weight']) && is_numeric($req['weight']) ? (int) $req['weight'] : $weight,
+                ];
+            }, $request->input('requirements'));
+
+            $job->requirements = $requirements;
+        }
+
+        $fillable = ['title', 'company', 'description', 'location', 'employment_type', 'salary_min', 'salary_max', 'quota', 'status', 'expires_at'];
+        foreach ($fillable as $field) {
+            if ($request->has($field)) {
+                $job->{$field} = $request->input($field);
+            }
+        }
+
+        $job->save();
+
+        return $this->successResponse($job, 'Data lowongan pekerjaan berhasil diperbarui.');
+    }
+
+    /**
+     * Job Catalog Service: Recruiter menutup atau menghapus lowongan pekerjaan.
+     * Proteksi IDOR: Memastikan hanya pemilik lowongan yang sah atau admin yang berhak menghapus.
+     *
+     * Method  : DELETE
+     * Endpoint: /api/jobs/{id}
+     * Headers : Authorization: Bearer <token_recruiter>
+     */
+    public function destroy(Request $request, int $id): JsonResponse
+    {
+        $currentUser = $request->attributes->get('auth_user') ?? $request->user();
+
+        $job = JobVacancy::find($id);
+
+        if (! $job) {
+            return $this->notFoundResponse('Lowongan pekerjaan yang ingin dihapus tidak ditemukan.');
+        }
+
+        // Proteksi IDOR: Verifikasi kepemilikan resource
+        if ($currentUser->role !== 'admin' && $job->posted_by !== $currentUser->id) {
+            return $this->forbiddenResponse('Akses ditolak. Anda bukan pemilik dari lowongan pekerjaan ini.', 'IDOR_FORBIDDEN');
+        }
+
+        $jobTitle = $job->title;
+        // Kita ubah status menjadi closed (soft close) agar integritas relasi pelamar tetap aman
+        $job->status = 'closed';
+        $job->save();
+
+        return $this->successResponse([
+            'id' => $job->id,
+            'title' => $jobTitle,
+            'status' => 'closed',
+            'closed_at' => now()->toIso8601String(),
+        ], "Lowongan '{$jobTitle}' telah berhasil ditutup.");
     }
 }

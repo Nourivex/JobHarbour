@@ -3,8 +3,11 @@
 namespace App\Services;
 
 use App\Models\User;
+use Firebase\JWT\BeforeValidException;
+use Firebase\JWT\ExpiredException;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
+use Firebase\JWT\SignatureInvalidException;
 use Throwable;
 
 /**
@@ -39,7 +42,7 @@ class JwtService
     public function __construct()
     {
         // Ambil kunci rahasia dari konfigurasi Laravel (APP_KEY)
-        $appKey = (string) config('app.key', 'base64:PaduKerjaSecretKeyForJwtAuthentication32CharsLong');
+        $appKey = (string) config('app.key', 'base64:JobHarbourSecretKeyForJwtAuth32CharsLong');
 
         // Jika diawali prefix base64:, lakukan decode terlebih dahulu
         if (str_starts_with($appKey, 'base64:')) {
@@ -75,6 +78,53 @@ class JwtService
     }
 
     /**
+     * Memverifikasi token JWT dan mengembalikan status terperinci (valid, payload, atau kode error).
+     *
+     * @param  string  $token
+     * @return array{valid: bool, payload: object|null, error_code: string|null, message: string|null}
+     */
+    public function verifyToken(string $token): array
+    {
+        try {
+            $payload = JWT::decode($token, new Key($this->secret, $this->algorithm));
+            return [
+                'valid' => true,
+                'payload' => $payload,
+                'error_code' => null,
+                'message' => null,
+            ];
+        } catch (ExpiredException) {
+            return [
+                'valid' => false,
+                'payload' => null,
+                'error_code' => 'TOKEN_EXPIRED',
+                'message' => 'Akses ditolak. Token autentikasi telah kedaluwarsa (expired). Silakan lakukan login ulang.',
+            ];
+        } catch (SignatureInvalidException) {
+            return [
+                'valid' => false,
+                'payload' => null,
+                'error_code' => 'TOKEN_INVALID',
+                'message' => 'Akses ditolak. Tanda tangan digital token tidak valid.',
+            ];
+        } catch (BeforeValidException) {
+            return [
+                'valid' => false,
+                'payload' => null,
+                'error_code' => 'TOKEN_NOT_YET_VALID',
+                'message' => 'Akses ditolak. Token belum dapat digunakan.',
+            ];
+        } catch (Throwable $e) {
+            return [
+                'valid' => false,
+                'payload' => null,
+                'error_code' => 'TOKEN_MALFORMED',
+                'message' => 'Akses ditolak. Format token akses tidak valid atau rusak.',
+            ];
+        }
+    }
+
+    /**
      * Memverifikasi dan mendekode string token JWT yang dikirimkan oleh client.
      *
      * @param  string       $token  String token JWT dari header Authorization: Bearer <token>
@@ -82,12 +132,7 @@ class JwtService
      */
     public function decodeToken(string $token): ?object
     {
-        try {
-            // Verifikasi integritas tanda tangan digital dan masa berlaku token
-            return JWT::decode($token, new Key($this->secret, $this->algorithm));
-        } catch (Throwable) {
-            // Jika token telah kedaluwarsa atau tandatangan tidak cocok, tangkap error dan kembalikan null
-            return null;
-        }
+        $res = $this->verifyToken($token);
+        return $res['valid'] ? $res['payload'] : null;
     }
 }

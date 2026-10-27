@@ -72,11 +72,20 @@ class PipelineController extends Controller
             return $this->validationErrorResponse($validator->errors(), 'Data tahapan seleksi yang dikirim tidak valid.');
         }
 
-        // 4. Cari berkas lamaran berdasarkan ID
-        $application = Application::with('jobVacancy:id,title,company')->find($applicationId);
+        // 4. Cari berkas lamaran beserta lowongan terkait
+        $application = Application::with('jobVacancy')->find($applicationId);
 
         if (! $application) {
             return $this->notFoundResponse("Data lamaran dengan nomor ID {$applicationId} tidak ditemukan.");
+        }
+
+        // 5. Proteksi IDOR (Insecure Direct Object Reference):
+        //    Memastikan recruiter yang mengubah status adalah pemilik sah lowongan pekerjaan terkait
+        if ($currentUser->role !== 'admin' && $application->jobVacancy && $application->jobVacancy->posted_by !== $currentUser->id) {
+            return $this->forbiddenResponse(
+                'Akses ditolak. Anda bukan pemilik dari lowongan pekerjaan ini sehingga tidak berhak mengubah tahapan seleksi kandidat.',
+                'IDOR_FORBIDDEN'
+            );
         }
 
         // 5. Ambil atau buat record linimasa pipeline jika belum tersedia
