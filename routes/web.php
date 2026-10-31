@@ -23,3 +23,25 @@ Route::get('/api/docs/openapi.yaml', function () {
         'Content-Type' => 'text/yaml; charset=utf-8',
     ]);
 })->name('swagger.spec');
+
+// Halaman-halaman Frontend Modern Harbour Tech
+Route::get('/catalog', function () {
+    return view('pages.catalog');
+})->name('page.catalog');
+
+Route::get('/apply', function () {
+    return view('pages.apply-modal');
+})->name('page.apply');
+
+Route::get('/my-dock', function () {
+    return view('pages.my-dock');
+})->name('page.my-dock');
+
+Route::get('/profile', function () {
+    return view('pages.profile');
+})->name('page.profile');
+
+Route::get('/recruiter', function () {
+    return view('pages.recruiter');
+})->name('page.recruiter');
+
