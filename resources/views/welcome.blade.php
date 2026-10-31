@@ -900,6 +900,8 @@
 </div>
 </footer>
 
+
+
 <!-- LIVE CATALOG INTEGRATION (M. Fahren Andrean Rangkuti) -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -915,7 +917,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function fetchJobs() {
         if (listContainer) {
-            listContainer.innerHTML = ;
+            listContainer.innerHTML = '<div class="p-8 text-center bg-surface-container-lowest rounded-xl border border-outline-variant/60"><div class="inline-block animate-spin text-secondary mb-2"><span class="material-symbols-outlined text-3xl">sync</span></div><p class="text-sm text-on-surface-variant font-medium">Mengambil data radar dermaga JobHarbour...</p></div>';
         }
 
         try {
@@ -931,7 +933,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (json.status === 'success' && Array.isArray(json.data)) {
                 currentJobs = json.data;
                 if (counterSpan) {
-                    counterSpan.textContent = ;
+                    counterSpan.textContent = currentJobs.length + ' Lowongan Terverifikasi di Database';
                 }
                 renderJobList(currentJobs);
                 if (currentJobs.length > 0) {
@@ -943,7 +945,7 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch (err) {
             console.error('Gagal mengambil katalog lowongan:', err);
             if (listContainer) {
-                listContainer.innerHTML = ;
+                listContainer.innerHTML = '<div class="p-6 text-center bg-error-container/20 border border-error/30 rounded-xl"><p class="text-sm text-error font-medium">Gagal menghubungkan radar dermaga ke backend.</p></div>';
             }
         }
     }
@@ -956,46 +958,144 @@ document.addEventListener('DOMContentLoaded', function() {
     function renderJobList(jobs) {
         if (!listContainer) return;
         if (jobs.length === 0) {
-            listContainer.innerHTML = ;
+            listContainer.innerHTML = '<div class="p-8 text-center bg-surface-container-lowest rounded-xl border border-outline-variant/60"><span class="material-symbols-outlined text-4xl text-on-surface-variant/60 mb-2">sailing</span><h3 class="font-bold text-on-surface text-base">Tidak Ada Lowongan Ditemukan</h3><p class="text-xs text-on-surface-variant mt-1">Coba ubah kata kunci pencarian atau filter lokasi pelabuhan.</p></div>';
             return;
         }
 
-        listContainer.innerHTML = jobs.map(job => {
+        listContainer.innerHTML = jobs.map(function(job) {
             const isSelected = job.id === selectedJobId;
             const borderClass = isSelected ? 'border-2 border-secondary shadow-lg' : 'border border-outline-variant/60 hover:border-secondary/60';
-            const companyInitials = (job.company || 'JH').split(' ').map(n=>n[0]).slice(0,2).join('').toUpperCase();
+            const companyInitials = (job.company || 'JH').split(' ').map(function(n){ return n[0]; }).slice(0,2).join('').toUpperCase();
             
-            const skillsHtml = (job.requirements || []).slice(0, 3).map(r => ).join('');
+            const skillsHtml = (job.requirements || []).slice(0, 3).map(function(r) {
+                return '<span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-surface-container-high text-on-surface-variant border border-outline-variant/40">' + r.skill + (r.weight === 3 ? ' ★' : '') + '</span>';
+            }).join('');
 
-            return ;
+            return '<article onclick="window.selectJob(' + job.id + ')" class="relative p-5 rounded-xl bg-surface-container-lowest ' + borderClass + ' cursor-pointer transition-all duration-150">' +
+                (isSelected ? '<div class="absolute left-0 top-0 bottom-0 w-1.5 bg-secondary rounded-l-xl"></div>' : '') +
+                '<div class="flex items-start justify-between gap-3">' +
+                    '<div class="flex items-center gap-3">' +
+                        '<div class="w-11 h-11 rounded-lg bg-primary-container text-on-primary font-bold flex items-center justify-center text-sm shadow-inner">' +
+                            companyInitials +
+                        '</div>' +
+                        '<div>' +
+                            '<div class="flex items-center gap-1.5">' +
+                                '<span class="text-sm font-bold text-on-surface">' + (job.company || 'Perusahaan Mitra') + '</span>' +
+                                '<span class="material-symbols-outlined text-secondary text-sm">verified</span>' +
+                            '</div>' +
+                            '<span class="text-xs text-on-surface-variant flex items-center gap-1 mt-0.5">' +
+                                '<span class="material-symbols-outlined text-xs">pin_drop</span>' +
+                                (job.location || 'Indonesia').toUpperCase() + ' • ' + (job.employment_type || 'Full-time') +
+                            '</span>' +
+                        '</div>' +
+                    '</div>' +
+                    '<span class="text-[11px] text-outline font-medium">Aktif</span>' +
+                '</div>' +
+                '<div class="mt-3">' +
+                    '<h3 class="text-base font-bold text-on-surface leading-snug">' + job.title + '</h3>' +
+                    '<div class="mt-2 flex items-center justify-between text-xs">' +
+                        '<span class="font-bold text-secondary flex items-center gap-1">' +
+                            '<span class="material-symbols-outlined text-sm">payments</span>' +
+                            formatRupiah(job.salary_min) + ' - ' + formatRupiah(job.salary_max) +
+                        '</span>' +
+                        '<span class="px-2 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed text-[11px] font-semibold">' +
+                            'Kuota: ' + (job.filled || 0) + '/' + (job.quota || 1) +
+                        '</span>' +
+                    '</div>' +
+                '</div>' +
+                '<div class="flex flex-wrap gap-1.5 mt-3 pt-3 border-t border-outline-variant/40">' +
+                    skillsHtml +
+                '</div>' +
+            '</article>';
         }).join('');
     }
 
     function renderEmptyDetail() {
         if (!detailContainer) return;
-        detailContainer.innerHTML = ;
+        detailContainer.innerHTML = '<div class="p-12 text-center bg-surface-container-lowest rounded-2xl border border-outline-variant/60"><span class="material-symbols-outlined text-5xl text-outline mb-3">anchor</span><h3 class="text-lg font-bold text-on-surface">Pilih Lowongan dari Sisi Kiri</h3><p class="text-sm text-on-surface-variant mt-1 max-w-sm mx-auto">Klik salah satu lowongan pada kartu di sebelah kiri untuk melihat rincian kualifikasi dan mengajukan lamaran.</p></div>';
     }
 
     window.selectJob = function(jobId) {
         selectedJobId = jobId;
         renderJobList(currentJobs);
 
-        const job = currentJobs.find(j => j.id === jobId);
+        const job = currentJobs.find(function(j) { return j.id === jobId; });
         if (!job || !detailContainer) return;
 
-        const companyInitials = (job.company || 'JH').split(' ').map(n=>n[0]).slice(0,2).join('').toUpperCase();
+        const companyInitials = (job.company || 'JH').split(' ').map(function(n){ return n[0]; }).slice(0,2).join('').toUpperCase();
 
-        const reqsHtml = (job.requirements || []).map(r => {
+        const reqsHtml = (job.requirements || []).map(function(r) {
             const weightBadge = r.weight === 3 ? 
-                '<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-error-container text-on-error-container">Wajib (Weight 3)</span>' :
+                '<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-error-container text-on-error-container">Wajib (Bobot 3)</span>' :
                 (r.weight === 2 ? 
-                    '<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-amber-100 text-amber-800">Penting (Weight 2)</span>' : 
+                    '<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-amber-100 text-amber-800">Penting (Bobot 2)</span>' : 
                     '<span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-surface-container-high text-on-surface-variant">Nilai Tambah (1)</span>');
 
-            return ;
+            return '<div class="flex items-center justify-between p-3 rounded-xl bg-surface-container border border-outline-variant/40">' +
+                '<div class="flex items-center gap-2.5">' +
+                    '<span class="material-symbols-outlined text-secondary text-sm">check_circle</span>' +
+                    '<span class="text-sm font-semibold text-on-surface">' + r.skill + '</span>' +
+                '</div>' +
+                weightBadge +
+            '</div>';
         }).join('');
 
-        detailContainer.innerHTML = ;
+        detailContainer.innerHTML = '<div class="bg-surface-container-lowest rounded-2xl border border-outline-variant/60 p-6 shadow-sm">' +
+            '<div class="flex items-start justify-between gap-4 pb-5 border-b border-outline-variant/40">' +
+                '<div class="flex items-center gap-3.5">' +
+                    '<div class="w-14 h-14 rounded-xl bg-primary-container text-on-primary font-bold text-lg flex items-center justify-center shadow">' +
+                        companyInitials +
+                    '</div>' +
+                    '<div>' +
+                        '<h2 class="text-xl font-bold text-on-surface leading-tight">' + job.title + '</h2>' +
+                        '<div class="flex items-center gap-2 mt-1 text-sm text-on-surface-variant font-medium">' +
+                            '<span>' + job.company + '</span>' +
+                            '<span>•</span>' +
+                            '<span class="flex items-center gap-0.5"><span class="material-symbols-outlined text-xs">pin_drop</span> ' + job.location + '</span>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>' +
+                '<a href="/apply?job_id=' + job.id + '" class="px-5 py-2.5 rounded-xl bg-secondary hover:bg-on-secondary-container text-white font-bold text-sm shadow-md transition-all active:scale-95 flex items-center gap-2">' +
+                    '<span class="material-symbols-outlined text-lg">send</span> Lamar Sekarang' +
+                '</a>' +
+            '</div>' +
+            '<div class="grid grid-cols-3 gap-3 my-5">' +
+                '<div class="p-3 rounded-xl bg-surface-container text-center border border-outline-variant/40">' +
+                    '<span class="text-[11px] font-semibold text-outline uppercase">Rentang Gaji</span>' +
+                    '<div class="text-sm font-bold text-secondary mt-0.5">' + formatRupiah(job.salary_min) + '</div>' +
+                '</div>' +
+                '<div class="p-3 rounded-xl bg-surface-container text-center border border-outline-variant/40">' +
+                    '<span class="text-[11px] font-semibold text-outline uppercase">Tipe Kerja</span>' +
+                    '<div class="text-sm font-bold text-on-surface mt-0.5 uppercase">' + (job.employment_type || 'Full-time') + '</div>' +
+                '</div>' +
+                '<div class="p-3 rounded-xl bg-surface-container text-center border border-outline-variant/40">' +
+                    '<span class="text-[11px] font-semibold text-outline uppercase">Sisa Kuota</span>' +
+                    '<div class="text-sm font-bold text-amber-600 mt-0.5">' + ((job.quota || 1) - (job.filled || 0)) + ' Kursi Tersedia</div>' +
+                '</div>' +
+            '</div>' +
+            '<div class="mb-6">' +
+                '<h4 class="text-sm font-bold text-on-surface uppercase tracking-wider mb-2 flex items-center gap-1.5">' +
+                    '<span class="material-symbols-outlined text-sm text-secondary">description</span> Deskripsi & Tanggung Jawab' +
+                '</h4>' +
+                '<p class="text-sm text-on-surface-variant leading-relaxed bg-surface-container/50 p-4 rounded-xl border border-outline-variant/30">' +
+                    (job.description || 'Tidak ada deskripsi rinci untuk posisi ini.') +
+                '</p>' +
+            '</div>' +
+            '<div>' +
+                '<h4 class="text-sm font-bold text-on-surface uppercase tracking-wider mb-2 flex items-center gap-1.5">' +
+                    '<span class="material-symbols-outlined text-sm text-amber-500">verified</span> Matriks Keahlian Kualifikasi (Weighted Requirements)' +
+                '</h4>' +
+                '<div class="space-y-2">' +
+                    (reqsHtml || '<p class="text-xs text-outline">Tidak ada keahlian khusus yang disyaratkan.</p>') +
+                '</div>' +
+            '</div>' +
+            '<div class="mt-6 pt-5 border-t border-outline-variant/40 flex items-center justify-between">' +
+                '<span class="text-xs text-outline">Dipublikasikan melalui JobHarbour API Service</span>' +
+                '<a href="/apply?job_id=' + job.id + '" class="px-4 py-2 rounded-lg bg-primary hover:bg-secondary text-white text-xs font-bold transition-all flex items-center gap-1.5">' +
+                    'Lanjutkan ke Formulir CV <span class="material-symbols-outlined text-sm">arrow_forward</span>' +
+                '</a>' +
+            '</div>' +
+        '</div>';
     };
 
     if (searchBtn) {
