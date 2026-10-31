@@ -1,0 +1,114 @@
+/**
+ * Helper tampilan lowongan yang dipakai bersama oleh halaman Katalog dan Detail Lowongan.
+ * Semua nilai diturunkan dari data API; tidak ada data tambahan yang dikarang.
+ */
+import { util } from './api.js';
+
+const esc = util.escapeHtml;
+
+export const EMPLOYMENT_SHORT = {
+    'full-time': 'Full-time',
+    'part-time': 'Part-time',
+    contract: 'Kontrak',
+    internship: 'Magang',
+    remote: 'Remote',
+};
+
+// Palet ubin logo: dipilih tetap berdasarkan nama perusahaan supaya konsisten di semua halaman
+const TILE_PALETTE = [
+    { bg: '#E7F2FB', fg: '#1B65A6' },
+    { bg: '#FFF1E6', fg: '#C8460B' },
+    { bg: '#EEEAFD', fg: '#5B3FD1' },
+    { bg: '#E7F5EC', fg: '#157F3B' },
+    { bg: '#0C2238', fg: '#FFFFFF' },
+    { bg: '#FDF2D9', fg: '#8A5A00' },
+];
+
+function hash(text) {
+    let h = 0;
+    for (let i = 0; i < text.length; i += 1) h = (h * 31 + text.charCodeAt(i)) >>> 0;
+    return h;
+}
+
+/** Inisial perusahaan tanpa kata badan usaha (PT, CV, Tbk). */
+export function companyInitials(company = '') {
+    const words = company.replace(/\b(PT|CV|Tbk|Persero)\b\.?/gi, '').trim().split(/\s+/).filter(Boolean);
+    return (words.slice(0, 2).map((w) => w[0]).join('') || '?').toUpperCase();
+}
+
+/** Ubin logo perusahaan berbasis inisial (backend belum menyimpan logo perusahaan). */
+export function companyTile(company, size = 'w-14 h-14 text-lg') {
+    const tone = TILE_PALETTE[hash(company || '') % TILE_PALETTE.length];
+    return `<span class="company-tile ${size} shrink-0 rounded-2xl flex items-center justify-center font-heading font-extrabold" style="background:${tone.bg};color:${tone.fg}" aria-hidden="true">${esc(companyInitials(company))}</span>`;
+}
+
+/** Kode lowongan yang dibentuk dari tahun tayang dan ID database. */
+export function jobCode(job) {
+    const year = job.created_at ? new Date(job.created_at).getFullYear() : new Date().getFullYear();
+    return `JOB-${year}-${String(job.id).padStart(5, '0')}`;
+}
+
+export function rupiah(n) {
+    return 'Rp' + Number(n).toLocaleString('id-ID');
+}
+
+export function salaryRange(job) {
+    if (!job.salary_min && !job.salary_max) return null;
+    if (job.salary_min && job.salary_max) return `${rupiah(job.salary_min)} - ${rupiah(job.salary_max)}`;
+    return rupiah(job.salary_min || job.salary_max);
+}
+
+export function remainingQuota(job) {
+    return Math.max((Number(job.quota) || 0) - (Number(job.filled) || 0), 0);
+}
+
+/** Kategori skor memakai ambang yang sama dengan MatchmakingService (80 dan 50). */
+export function scoreCategory(score) {
+    if (score >= 80) return { key: 'excellent', label: 'Sangat Cocok', color: '#157F3B', soft: '#E7F5EC' };
+    if (score >= 50) return { key: 'good', label: 'Cukup Cocok', color: '#1B65A6', soft: '#EBF3FB' };
+    return { key: 'under', label: 'Belum Cocok', color: '#C8460B', soft: '#FFF3EA' };
+}
+
+/** Lowongan tersimpan hanya disimpan di browser karena belum ada endpoint-nya. */
+export const savedJobs = {
+    key: 'jh_saved_jobs',
+    all() {
+        try {
+            return new Set(JSON.parse(localStorage.getItem(this.key) || '[]').map(Number));
+        } catch (e) {
+            return new Set();
+        }
+    },
+    has(id) {
+        return this.all().has(Number(id));
+    },
+    toggle(id) {
+        const set = this.all();
+        const n = Number(id);
+        if (set.has(n)) set.delete(n);
+        else set.add(n);
+        try {
+            localStorage.setItem(this.key, JSON.stringify([...set]));
+        } catch (e) {
+            /* abaikan: penyimpanan browser tidak tersedia */
+        }
+        return set.has(n);
+    },
+};
+
+export const ICONS = {
+    pin: '<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>',
+    briefcase: '<rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>',
+    clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+    bookmark: '<path d="M19 21l-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>',
+    arrow: '<path d="M5 12h14M13 6l6 6-6 6"/>',
+    check: '<path d="m5 12 5 5 9-10"/>',
+    users: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/>',
+    calendar: '<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+    share: '<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/>',
+    wallet: '<rect x="2" y="6" width="20" height="14" rx="2"/><path d="M16 13h2M2 10h20M6 6V4h12v2"/>',
+};
+
+export function icon(name, cls = 'w-4 h-4') {
+    return `<svg class="${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[name] || ''}</svg>`;
+}

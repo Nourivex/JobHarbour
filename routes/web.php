@@ -12,6 +12,11 @@ Route::get('/catalog', function () {
     return view('pages.catalog');
 })->name('page.catalog');
 
+// Detail Lowongan (halaman penuh)
+Route::get('/jobs/{id}', function (int $id) {
+    return view('pages.job-detail', ['jobId' => $id]);
+})->whereNumber('id')->name('page.job-detail');
+
 // Halaman Masuk & Pendaftaran Akun
 Route::get('/login', function () {
     return view('pages.login');

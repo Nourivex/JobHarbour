@@ -385,6 +385,174 @@
 }
 
 /* ------------------------------------------------------------------ */
+/* Katalog & detail lowongan                                           */
+/* ------------------------------------------------------------------ */
+.catalog-banner-fade {
+    background: linear-gradient(90deg, #F4F6F8 0%, #F4F6F8 38%, rgba(244, 246, 248, 0.85) 52%, rgba(244, 246, 248, 0) 78%);
+}
+
+@media (max-width: 1023px) {
+    .catalog-banner-fade { background: linear-gradient(180deg, rgba(244, 246, 248, 0.9) 0%, rgba(244, 246, 248, 0.96) 100%); }
+}
+
+.filter-group { padding: 0.9rem 0; }
+.filter-group:last-child { padding-bottom: 0.25rem; }
+
+.filter-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    list-style: none;
+    font-weight: 700;
+    color: var(--color-text-primary);
+}
+
+.filter-summary::-webkit-details-marker { display: none; }
+
+.filter-summary::after {
+    content: "";
+    width: 9px;
+    height: 9px;
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    transform: rotate(45deg) translateY(-3px);
+    transition: transform 200ms ease;
+    opacity: 0.6;
+}
+
+.filter-group[open] > .filter-summary::after { transform: rotate(-135deg) translateY(-2px); }
+
+.filter-body { display: grid; gap: 0.15rem; padding-top: 0.6rem; }
+
+.filter-option {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.4rem 0.35rem;
+    border-radius: 0.5rem;
+    font-size: 15px;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: background-color 150ms ease;
+}
+
+.filter-option:hover { background: var(--color-canvas); }
+
+.filter-option input {
+    width: 1.1rem;
+    height: 1.1rem;
+    accent-color: var(--color-orange-harbour);
+    cursor: pointer;
+}
+
+.filter-count {
+    margin-left: auto;
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+}
+
+/* Baris lowongan: tepi oranye dan latar hangat saat disorot */
+.job-row {
+    transition: border-color 200ms ease, background-color 200ms ease, box-shadow 200ms ease, transform 200ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.job-row:hover,
+.job-row:focus-within {
+    border-color: #F5A06B;
+    background: #FFF8F2;
+    box-shadow: 0 14px 30px -22px rgba(200, 70, 11, 0.55);
+}
+
+.job-row .row-arrow { transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease, transform 200ms ease; }
+
+.job-row:hover .row-arrow,
+.job-row:focus-within .row-arrow {
+    background: var(--color-orange-bright);
+    border-color: var(--color-orange-bright);
+    color: #FFFFFF;
+    transform: translateX(2px);
+}
+
+.job-row-link:focus-visible::after { outline: 2px solid var(--color-orange-harbour); outline-offset: 2px; }
+
+.save-btn[aria-pressed="true"] { color: var(--color-orange-harbour); }
+.save-btn[aria-pressed="true"] svg { fill: currentColor; }
+
+/* Lingkaran skor: conic-gradient, nilainya diatur lewat --deg */
+.score-ring {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    background: conic-gradient(var(--ring, #157F3B) var(--deg, 0deg), #E8EDF2 0);
+}
+
+.score-ring::before {
+    content: "";
+    position: absolute;
+    inset: 6px;
+    border-radius: inherit;
+    background: #FFFFFF;
+}
+
+.score-ring-lg::before { inset: 11px; }
+.score-ring > * { position: relative; }
+
+.match-bar {
+    width: 0;
+    transition: width 900ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.match-bar.is-filled { width: var(--w); }
+
+/* Tab detail lowongan */
+.detail-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.9rem 0.75rem;
+    border-bottom: 3px solid transparent;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+    cursor: pointer;
+    transition: color 150ms ease, border-color 150ms ease;
+}
+
+.detail-tab:hover { color: var(--color-text-primary); }
+
+.detail-tab[aria-selected="true"] {
+    color: var(--color-orange-harbour);
+    border-bottom-color: var(--color-orange-bright);
+}
+
+.detail-h2 {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--color-text-primary);
+}
+
+.detail-h2-icon {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 0.6rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-orange-soft);
+    color: var(--color-orange-harbour);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .match-bar { transition: none; }
+}
+
+/* ------------------------------------------------------------------ */
 /* Mode malam: memetakan palet terang ke palet gelap.                  */
 /* Ditulis di luar @layer agar menang atas utilitas Tailwind.          */
 /* ------------------------------------------------------------------ */
@@ -437,3 +605,9 @@ html.dark body { background-color: #0B111C; color: #E8EDF4; }
 .dark .sandbox-chip[aria-pressed="true"] { background: #157F3B; border-color: #157F3B; color: #FFFFFF; }
 .dark .lift:hover { border-color: #31405A; box-shadow: 0 16px 32px -20px rgba(0, 0, 0, 0.8); }
 .dark .animate-skeleton { background-color: #182233; }
+.dark .catalog-banner-fade { background: linear-gradient(90deg, #0B111C 0%, #0B111C 38%, rgba(11, 17, 28, 0.85) 52%, rgba(11, 17, 28, 0.15) 78%); }
+.dark .filter-option:hover { background: #182233; }
+.dark .job-row:hover, .dark .job-row:focus-within { background: #1A1712; border-color: #8A4A22; }
+.dark .score-ring { background: conic-gradient(var(--ring, #5BCB82) var(--deg, 0deg), #243045 0); }
+.dark .score-ring::before { background: #121A28; }
+.dark .company-tile { filter: saturate(0.9) brightness(0.92); }

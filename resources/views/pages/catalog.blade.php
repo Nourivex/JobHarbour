@@ -1,358 +1,127 @@
-<x-layouts.app title="Katalog Lowongan Kerja - JobHarbour">
+<x-layouts.app title="Katalog Lowongan - JobHarbour">
 
-    <div class="max-w-[1360px] mx-auto px-4 sm:px-6 py-6 sm:py-8">
-        
-        <!-- ========================================================== -->
-        <!-- HEADER & BILAH FILTER                                      -->
-        <!-- ========================================================== -->
-        <div class="bg-white rounded-2xl p-5 sm:p-6 border border-[#E2E7ED] shadow-xs mb-6">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-5 pb-5 border-b border-[#E2E7ED]">
-                <div>
-                    <h1 class="text-2xl sm:text-3xl font-extrabold text-[#0B1B2B] font-heading tracking-tight">
-                        Katalog Lowongan Kerja
-                    </h1>
-                    <p class="text-sm text-[#627080] mt-0.5" id="catalog-results-count">
-                        Memuat daftar lowongan pekerjaan aktif...
-                    </p>
-                </div>
+    <!-- ============================================================== -->
+    <!-- HEADER: judul + ringkasan, banner mercusuar di kanan           -->
+    <!-- ============================================================== -->
+    <section class="relative overflow-hidden bg-[#F4F6F8] border-b border-[#E2E7ED]">
+        <picture class="absolute inset-y-0 right-0 w-full lg:w-[62%] pointer-events-none select-none" aria-hidden="true">
+            <source srcset="/images/catalog-banner.webp" type="image/webp">
+            <img src="/images/catalog-banner.jpg" alt="" width="1800" height="600" class="catalog-banner w-full h-full object-cover object-right">
+        </picture>
+        <div class="catalog-banner-fade absolute inset-0 pointer-events-none" aria-hidden="true"></div>
 
-                <!-- Opsi Urutan & Reset Filter -->
-                <div class="flex flex-wrap items-center gap-3">
-                    <div class="flex items-center gap-2">
-                        <label for="catalog-sort" class="text-xs font-semibold text-[#627080]">Urutan:</label>
-                        <select
-                            id="catalog-sort"
-                            class="min-h-[40px] px-3 py-1.5 bg-[#F4F6F8] text-[#0B1B2B] text-xs font-semibold rounded-lg border border-[#C5CFDA] focus:border-[#C8460B] focus:ring-1 focus:ring-[#C8460B] cursor-pointer"
-                        >
-                            <option value="latest">Terbaru</option>
-                            <option value="match">Kecocokan Tertinggi</option>
-                            <option value="salary_high">Gaji Tertinggi</option>
-                            <option value="salary_low">Gaji Terendah</option>
-                            <option value="oldest">Terlama</option>
-                        </select>
-                    </div>
-
-                    <button
-                        type="button"
-                        id="catalog-reset-filters"
-                        class="min-h-[40px] px-3 py-1.5 text-xs font-semibold text-[#627080] hover:text-[#0B1B2B] hover:bg-[#F4F6F8] rounded-lg transition-colors cursor-pointer border border-[#E2E7ED]"
-                    >
-                        Reset Filter
-                    </button>
-                </div>
+        <div class="relative max-w-[1240px] mx-auto px-5 sm:px-8 pt-10 sm:pt-12 pb-10 grid lg:grid-cols-[minmax(0,1fr)_auto] gap-8 items-end">
+            <div class="hero-in" style="--d: 0ms">
+                <p class="text-sm font-extrabold uppercase tracking-[0.12em] text-[#C8460B]">Job Discovery</p>
+                <h1 class="mt-2 text-[2.1rem] sm:text-[2.6rem] leading-[1.08] font-extrabold text-[#0B1B2B]">
+                    Temukan lowongan<br>yang <span class="text-[#F26A1B]">paling sesuai</span> denganmu.
+                </h1>
+                <p id="catalog-subtitle" class="mt-3 text-[15px] text-[#3D4B5C] max-w-[34rem]">Lowongan diurutkan dan dinilai berdasarkan skill di profilmu.</p>
             </div>
 
-            <!-- Form Pencarian & Filter Input -->
-            <form id="catalog-filter-form" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 items-center">
-                <!-- Keyword Input -->
-                <div class="lg:col-span-4 relative">
-                    <div class="absolute left-3 top-1/2 -translate-y-1/2 text-[#627080]">
-                        <x-icon name="search" class="w-4 h-4" />
-                    </div>
-                    <input
-                        type="text"
-                        id="catalog-search"
-                        placeholder="Cari judul posisi atau keahlian..."
-                        class="w-full min-h-[44px] pl-9 pr-3.5 py-2.5 bg-[#F4F6F8] text-[#0B1B2B] text-sm rounded-lg border border-[#C5CFDA] focus:border-[#C8460B] focus:ring-1 focus:ring-[#C8460B] transition-colors"
-                    />
+            <!-- Ringkasan: isi diatur oleh catalog.js sesuai status login -->
+            <div id="catalog-summary" class="hero-in bg-white/95 backdrop-blur rounded-2xl border border-[#E2E7ED] shadow-[0_18px_40px_-24px_rgba(12,34,56,0.35)] px-5 py-4 flex flex-wrap items-center gap-x-6 gap-y-4" style="--d: 120ms">
+                <div class="h-12 w-[420px] max-w-full rounded-xl animate-skeleton bg-[#F4F6F8]"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================== -->
+    <!-- ISI: filter (kiri) + daftar lowongan (kanan)                   -->
+    <!-- ============================================================== -->
+    <div class="max-w-[1240px] mx-auto px-5 sm:px-8 py-8 grid lg:grid-cols-[272px_minmax(0,1fr)] gap-6 items-start">
+
+        <!-- Sidebar filter -->
+        <aside class="lg:sticky lg:top-[88px]" aria-label="Filter lowongan">
+            <div class="bg-white rounded-2xl border border-[#E2E7ED] p-5">
+                <div class="flex items-center justify-between gap-2 pb-4 border-b border-[#E2E7ED]">
+                    <h2 class="flex items-center gap-2.5 text-lg font-extrabold text-[#0B1B2B]">
+                        <svg class="w-5 h-5 text-[#3D4B5C]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg>
+                        Filter Lowongan
+                    </h2>
+                    <span id="filter-active-count" class="hidden text-xs font-bold px-2 py-0.5 rounded-full bg-[#FFF3EA] text-[#8A2E05]"></span>
                 </div>
 
-                <!-- Location Input -->
-                <div class="lg:col-span-3 relative">
-                    <div class="absolute left-3 top-1/2 -translate-y-1/2 text-[#627080]">
-                        <x-icon name="map-pin" class="w-4 h-4" />
-                    </div>
-                    <input
-                        type="text"
-                        id="catalog-location"
-                        placeholder="Kota / Penempatan..."
-                        class="w-full min-h-[44px] pl-9 pr-3.5 py-2.5 bg-[#F4F6F8] text-[#0B1B2B] text-sm rounded-lg border border-[#C5CFDA] focus:border-[#C8460B] focus:ring-1 focus:ring-[#C8460B] transition-colors"
-                    />
+                <div id="catalog-filters" class="divide-y divide-[#E2E7ED]">
+                    <!-- Tingkat kecocokan: hanya untuk pelamar yang login -->
+                    <details id="filter-match-group" class="filter-group hidden" open>
+                        <summary class="filter-summary">Tingkat Kecocokan</summary>
+                        <div class="filter-body">
+                            <label class="filter-option"><input type="checkbox" name="match" value="excellent"> <span>&ge; 80% (Sangat Cocok)</span></label>
+                            <label class="filter-option"><input type="checkbox" name="match" value="good"> <span>50% - 79% (Cukup Cocok)</span></label>
+                            <label class="filter-option"><input type="checkbox" name="match" value="under"> <span>&lt; 50% (Belum Cocok)</span></label>
+                        </div>
+                    </details>
+
+                    <details class="filter-group" open>
+                        <summary class="filter-summary">Tipe Pekerjaan</summary>
+                        <div id="filter-types" class="filter-body"></div>
+                    </details>
+
+                    <details class="filter-group" open>
+                        <summary class="filter-summary">Rentang Gaji</summary>
+                        <div class="filter-body">
+                            @foreach ([0 => 'Semua gaji', 5000000 => 'Sampai Rp5 jt ke atas', 10000000 => 'Sampai Rp10 jt ke atas', 15000000 => 'Sampai Rp15 jt ke atas'] as $value => $label)
+                                <label class="filter-option"><input type="radio" name="salary" value="{{ $value }}" @checked($value === 0)> <span>{{ $label }}</span></label>
+                            @endforeach
+                        </div>
+                    </details>
+
+                    <details class="filter-group" open>
+                        <summary class="filter-summary">Lokasi</summary>
+                        <div id="filter-cities" class="filter-body"></div>
+                    </details>
                 </div>
 
-                <!-- Employment Type -->
-                <div class="lg:col-span-3">
-                    <select
-                        id="catalog-type"
-                        class="w-full min-h-[44px] px-3.5 py-2.5 bg-[#F4F6F8] text-[#0B1B2B] text-sm rounded-lg border border-[#C5CFDA] focus:border-[#C8460B] focus:ring-1 focus:ring-[#C8460B] transition-colors cursor-pointer"
-                    >
-                        <option value="">Semua Jenis Kerja</option>
-                        <option value="full-time">Full-time (Purna Waktu)</option>
-                        <option value="part-time">Part-time (Paruh Waktu)</option>
-                        <option value="contract">Kontrak</option>
-                        <option value="internship">Magang</option>
-                        <option value="remote">Remote (Jarak Jauh)</option>
+                <button type="button" id="filter-reset" class="btn-press mt-5 w-full inline-flex items-center justify-center gap-2 h-11 rounded-xl border border-[#C8460B] text-[#C8460B] font-semibold hover:bg-[#FFF3EA] transition-colors cursor-pointer">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
+                    Reset Filter
+                </button>
+            </div>
+        </aside>
+
+        <!-- Daftar lowongan -->
+        <main class="min-w-0">
+            <div class="flex flex-col sm:flex-row gap-3">
+                <label class="flex-1 flex items-center gap-3 h-12 px-4 rounded-xl bg-white border border-[#C5CFDA] focus-within:border-[#0C2238] transition-colors">
+                    <svg class="w-5 h-5 text-[#627080] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                    <span class="sr-only">Cari lowongan</span>
+                    <input id="catalog-search" type="search" placeholder="Cari posisi, perusahaan, atau keahlian..." class="w-full bg-transparent border-0 outline-none text-[15px] text-[#0B1B2B] placeholder:text-[#8C98A8]">
+                </label>
+                <label class="flex items-center gap-2 h-12 pl-4 pr-2 rounded-xl bg-white border border-[#C5CFDA] text-sm text-[#3D4B5C]">
+                    <span class="shrink-0">Urutkan:</span>
+                    <select id="catalog-sort" class="bg-transparent border-0 outline-none font-bold text-[#0B1B2B] pr-1 cursor-pointer">
+                        <option value="match" data-applicant-only>Kecocokan tertinggi</option>
+                        <option value="latest">Terbaru</option>
+                        <option value="salary_high">Gaji tertinggi</option>
+                        <option value="salary_low">Gaji terendah</option>
                     </select>
-                </div>
-
-                <!-- Submit Button -->
-                <div class="lg:col-span-2">
-                    <button
-                        type="submit"
-                        class="w-full min-h-[44px] px-4 py-2.5 bg-[#0C2238] hover:bg-[#133150] text-white font-bold text-sm rounded-lg transition-all btn-press cursor-pointer flex items-center justify-center gap-2 shadow-xs"
-                    >
-                        <x-icon name="filter" class="w-4 h-4" />
-                        <span>Terapkan</span>
-                    </button>
-                </div>
-
-                <!-- Checkbox 80%+ Filter (Pelamar Only) -->
-                <div id="high-match-wrap" class="sm:col-span-2 lg:col-span-12 pt-2 flex items-center gap-2">
-                    <label class="inline-flex items-center gap-2 text-xs font-semibold text-[#0B1B2B] cursor-pointer">
-                        <input
-                            type="checkbox"
-                            id="catalog-high-match"
-                            class="w-4 h-4 rounded text-[#C8460B] focus:ring-[#C8460B] border-[#C5CFDA] cursor-pointer"
-                        />
-                        <span>Hanya tampilkan lowongan yang sangat cocok (Skor 80%+ auto-screening)</span>
-                    </label>
-                </div>
-            </form>
-        </div>
-
-        <!-- ========================================================== -->
-        <!-- DUA KOLOM: DAFTAR KIRI & DETAIL KANAN                      -->
-        <!-- ========================================================== -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-            
-            <!-- KOLOM KIRI: DAFTAR KARTU LOWONGAN (5 Kolom di LG) -->
-            <div class="lg:col-span-5 space-y-3">
-                
-                <!-- Loading State Skeletons -->
-                <div id="catalog-jobs-loading" class="space-y-3">
-                    <x-skeleton :lines="2" />
-                    <x-skeleton :lines="2" />
-                    <x-skeleton :lines="2" />
-                </div>
-
-                <!-- Daftar Lowongan -->
-                <div id="catalog-jobs-list" class="space-y-3">
-                    <!-- Diisi lewat JavaScript -->
-                </div>
-
-                <!-- Empty State -->
-                <div id="catalog-jobs-empty" class="hidden">
-                    <x-empty-state
-                        title="Tidak ada lowongan ditemukan"
-                        description="Coba ubah kata kunci pencarian, filter kota, atau reset seluruh filter pencarian Anda."
-                    />
-                </div>
+                </label>
             </div>
 
-            <!-- KOLOM KANAN: DETAIL LOWONGAN & PANEL KECOCOKAN (7 Kolom di LG - Sticky) -->
-            <div class="hidden lg:block lg:col-span-7 sticky top-22">
-                <div class="bg-white rounded-2xl border border-[#E2E7ED] p-6 sm:p-8 shadow-xs max-h-[calc(100vh-110px)] overflow-y-auto">
-                    
-                    <!-- Placeholder State (Belum ada lowongan dipilih) -->
-                    <div id="catalog-detail-placeholder" class="py-16 text-center text-[#627080] space-y-3">
-                        <div class="w-14 h-14 rounded-2xl bg-[#F4F6F8] text-[#627080] flex items-center justify-center mx-auto">
-                            <x-icon name="briefcase" class="w-7 h-7" />
-                        </div>
-                        <h3 class="text-base font-bold text-[#0B1B2B]">Pilih Lowongan untuk Melihat Rincian</h3>
-                        <p class="text-sm max-w-sm mx-auto">Klik salah satu lowongan di kolom sebelah kiri untuk meninjau kualifikasi, rincian gaji, dan hasil analisis pemadanan keahlian.</p>
-                    </div>
-
-                    <!-- Detail Konten (Tampil saat lowongan dipilih) -->
-                    <div id="catalog-detail-content" class="hidden space-y-6 transition-opacity duration-150">
-                        
-                        <!-- Header Detail Lowongan -->
-                        <div class="pb-6 border-b border-[#E2E7ED]">
-                            <div class="flex items-start justify-between gap-4 mb-2">
-                                <div>
-                                    <h2 id="detail-title" class="text-2xl font-extrabold text-[#0B1B2B] leading-tight font-heading">
-                                        -
-                                    </h2>
-                                    <p id="detail-company" class="text-base font-bold text-[#3D4B5C] mt-1">
-                                        -
-                                    </p>
-                                </div>
-
-                                <button
-                                    type="button"
-                                    id="detail-btn-bookmark"
-                                    class="min-h-[44px] px-3.5 py-2 rounded-lg text-sm font-semibold bg-white text-[#3D4B5C] border border-[#C5CFDA] hover:border-[#0C2238] transition-colors flex items-center gap-1.5 cursor-pointer shrink-0"
-                                >
-                                    <x-icon name="anchor" class="w-4 h-4" />
-                                    <span>Simpan</span>
-                                </button>
-                            </div>
-
-                            <!-- Meta Chips -->
-                            <div class="flex flex-wrap items-center gap-y-2 gap-x-4 text-xs text-[#627080] mt-4">
-                                <span class="inline-flex items-center gap-1.5">
-                                    <x-icon name="map-pin" class="w-4 h-4 text-[#C8460B]" />
-                                    <span id="detail-location">-</span>
-                                </span>
-                                <span class="inline-flex items-center gap-1.5 font-bold text-[#0B1B2B]">
-                                    <x-icon name="dollar-sign" class="w-4 h-4 text-[#157F3B]" />
-                                    <span id="detail-salary">-</span>
-                                </span>
-                                <span class="inline-flex items-center gap-1.5">
-                                    <x-icon name="briefcase" class="w-4 h-4 text-[#1B65A6]" />
-                                    <span id="detail-type">-</span>
-                                </span>
-                                <span class="inline-flex items-center gap-1.5 text-[#3D4B5C]">
-                                    <x-icon name="users" class="w-4 h-4 text-[#627080]" />
-                                    <span id="detail-quota">-</span>
-                                </span>
-                            </div>
-
-                            <!-- Tombol Lamar Utama -->
-                            <div class="mt-6 flex items-center gap-3">
-                                <button
-                                    type="button"
-                                    id="detail-btn-apply"
-                                    class="flex-1 min-h-[46px] px-6 py-3 rounded-xl text-sm font-bold bg-[#C8460B] hover:bg-[#993406] text-white transition-all btn-press shadow-xs flex items-center justify-center gap-2 cursor-pointer"
-                                >
-                                    <span>Lamar Sekarang</span>
-                                    <x-icon name="arrow-right" class="w-4 h-4" />
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- ================================================== -->
-                        <!-- PANEL KECOCOKAN KEAHLIAN (MATCHMAKING TELEMETRY)   -->
-                        <!-- ================================================== -->
-                        <div id="detail-match-panel" class="p-5 sm:p-6 rounded-2xl bg-[#F4F6F8] border border-[#E2E7ED] space-y-5">
-                            
-                            <!-- Header Skor -->
-                            <div class="flex items-center justify-between pb-3 border-b border-[#E2E7ED]">
-                                <div>
-                                    <span class="text-xs font-bold uppercase tracking-wider text-[#627080]">Kecocokan Profil Pelamar</span>
-                                    <div class="flex items-center gap-2.5 mt-1">
-                                        <span id="telemetry-score-num" class="text-3xl font-extrabold text-[#0B1B2B] font-heading num-tabular">
-                                            0%
-                                        </span>
-                                        <span id="telemetry-category-label" class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-[#EBF3FB] text-[#1B65A6]">
-                                            Memuat...
-                                        </span>
-                                    </div>
-                                </div>
-                                <div class="text-right">
-                                    <span class="text-[11px] text-[#627080] block">Ambang Kelulusan:</span>
-                                    <span class="text-xs font-bold text-[#157F3B]">80%+ Otomatis Lolos</span>
-                                </div>
-                            </div>
-
-                            <p id="telemetry-explanation-text" class="text-xs text-[#3D4B5C] leading-relaxed">
-                                -
-                            </p>
-
-                            <!-- Bar Meter dengan Penanda 50% dan 80% -->
-                            <div class="space-y-1">
-                                <div class="relative w-full h-3 bg-[#E2E7ED] rounded-full overflow-hidden">
-                                    <div id="telemetry-score-bar" class="h-full rounded-full transition-all duration-700 ease-out bg-[#1B65A6]" style="width: 0%;"></div>
-                                    <!-- 50% marker -->
-                                    <div class="absolute top-0 bottom-0 left-1/2 w-0.5 bg-white shadow-xs" title="Ambang 50% (Cocok)"></div>
-                                    <!-- 80% marker -->
-                                    <div class="absolute top-0 bottom-0 left-[80%] w-0.5 bg-white shadow-xs" title="Ambang 80% (Sangat Cocok)"></div>
-                                </div>
-                                <div class="flex items-center justify-between text-[10px] text-[#627080] font-semibold pt-0.5">
-                                    <span>0%</span>
-                                    <span class="pl-4">50% (Ditinjau)</span>
-                                    <span>80% (Auto-Screening)</span>
-                                    <span>100%</span>
-                                </div>
-                            </div>
-
-                            <!-- Pengelompokan Syarat Keahlian (Wajib, Penting, Nilai Tambah) -->
-                            <div id="telemetry-tiers-container" class="space-y-4 pt-2">
-                                <!-- Diisi via JavaScript -->
-                            </div>
-
-                            <!-- Saran Konkret Peningkatan Skor -->
-                            <div id="telemetry-suggestion-wrap" class="p-3.5 rounded-xl bg-[#FFF3EA] border border-[#C8460B]/20 text-xs text-[#8A2E05] flex items-start gap-2.5 hidden">
-                                <x-icon name="sparkles" class="w-4 h-4 text-[#C8460B] shrink-0 mt-0.5" />
-                                <div id="telemetry-suggestion-text" class="leading-relaxed">
-                                    -
-                                </div>
-                            </div>
-
-                            <!-- Accordion: Bagaimana Skor Dihitung -->
-                            <details class="text-xs text-[#3D4B5C] border-t border-[#E2E7ED] pt-3 group">
-                                <summary class="font-bold text-[#0B1B2B] hover:text-[#C8460B] transition-colors cursor-pointer flex items-center justify-between">
-                                    <span>Bagaimana skor ini dihitung secara matematis?</span>
-                                    <x-icon name="chevron-down" class="w-4 h-4 text-[#627080] group-open:rotate-180 transition-transform" />
-                                </summary>
-                                <div class="pt-2 text-[#627080] leading-relaxed space-y-1.5">
-                                    <p>
-                                        Mesin pemadanan JobHarbour menggunakan formula <strong>Weighted Jaccard Similarity</strong>:
-                                    </p>
-                                    <div class="p-2.5 rounded bg-white font-mono text-[11px] text-[#0B1B2B] border border-[#E2E7ED]">
-                                        Skor = (Σ Bobot Skill Cocok / Σ Seluruh Bobot Syarat) × 100%
-                                    </div>
-                                    <p>
-                                        Bobot: <strong>Wajib (Required) = 3</strong>, <strong>Penting (Important) = 2</strong>, dan <strong>Nilai Tambah (Nice-to-have) = 1</strong>. Algoritma tidak peka terhadap huruf besar/kecil.
-                                    </p>
-                                </div>
-                            </details>
-
-                        </div>
-
-                        <!-- AJAKAN LOGIN UNTUK TAMU (GUEST PROMPT) -->
-                        <div id="detail-guest-prompt" class="p-5 rounded-2xl bg-[#EBF3FB] border border-[#1B65A6]/20 text-left space-y-3 hidden">
-                            <div class="flex items-center gap-2 text-sm font-bold text-[#1B65A6]">
-                                <x-icon name="info" class="w-4 h-4" />
-                                <span>Ingin Tahu Skor Kecocokan Anda?</span>
-                            </div>
-                            <p class="text-xs text-[#3D4B5C] leading-relaxed">
-                                Masuk ke akun pelamar Anda untuk mengaktifkan perhitungan otomatis kecocokan profil Anda terhadap lowongan ini secara instan.
-                            </p>
-                            <a
-                                href="/login"
-                                class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold bg-[#1B65A6] hover:bg-[#134e82] text-white transition-colors"
-                            >
-                                <span>Masuk Sekarang</span>
-                                <x-icon name="arrow-right" class="w-3.5 h-3.5" />
-                            </a>
-                        </div>
-
-                        <!-- Deskripsi Lengkap Lowongan -->
-                        <div class="space-y-3 pt-2">
-                            <h3 class="text-base font-bold text-[#0B1B2B] font-heading">
-                                Deskripsi & Tanggung Jawab Posisi
-                            </h3>
-                            <div id="detail-description" class="text-sm text-[#3D4B5C] leading-relaxed space-y-2">
-                                -
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
+            <div class="mt-5 flex flex-wrap items-center gap-2 min-h-7">
+                <p id="catalog-count" class="font-bold text-[#0B1B2B]" aria-live="polite">Memuat lowongan...</p>
+                <div id="catalog-active-chips" class="flex flex-wrap gap-2"></div>
             </div>
 
-        </div>
-
-    </div>
-
-    <!-- ========================================================== -->
-    <!-- DRAWER DETAIL KHUSUS MOBILE (< 1024px)                     -->
-    <!-- ========================================================== -->
-    <div
-        id="catalog-mobile-drawer"
-        class="lg:hidden fixed inset-0 z-50 bg-[#0C2238]/60 backdrop-blur-xs hidden overflow-y-auto"
-    >
-        <div class="min-h-full flex items-end sm:items-center justify-center p-0 sm:p-4">
-            <div class="w-full max-w-2xl bg-white rounded-t-3xl sm:rounded-2xl p-6 shadow-2xl max-h-[90vh] overflow-y-auto space-y-6">
-                <!-- Close Button Bar -->
-                <div class="flex items-center justify-between pb-3 border-b border-[#E2E7ED]">
-                    <span class="text-xs font-bold uppercase tracking-wider text-[#627080]">Detail Lowongan</span>
-                    <button
-                        type="button"
-                        id="catalog-close-mobile-drawer"
-                        class="p-1.5 rounded-lg text-[#627080] hover:text-[#0B1B2B] hover:bg-[#F4F6F8] cursor-pointer"
-                        aria-label="Tutup detail lowongan"
-                    >
-                        <x-icon name="x" class="w-5 h-5" />
-                    </button>
-                </div>
-
-                <!-- Duplicate Detail Container for Mobile Screen -->
-                <div id="catalog-mobile-detail-inner" class="space-y-6">
-                    <!-- Dinamis diduplikasi dari detail-content jika dibuka -->
-                </div>
+            <div id="catalog-list" class="mt-4 flex flex-col gap-3">
+                @for ($i = 0; $i < 4; $i++)
+                    <div class="h-[132px] rounded-2xl bg-white border border-[#E2E7ED] animate-skeleton"></div>
+                @endfor
             </div>
-        </div>
+
+            <div id="catalog-empty" class="hidden mt-4 rounded-2xl border border-dashed border-[#C5CFDA] bg-white p-10 text-center">
+                <p class="font-bold text-[#0B1B2B]">Tidak ada lowongan yang cocok dengan filter ini</p>
+                <p class="mt-1 text-sm text-[#3D4B5C]">Coba kurangi filter atau ubah kata kunci pencarian.</p>
+                <button type="button" data-reset-filters class="btn-press mt-4 px-4 py-2 rounded-lg bg-[#0C2238] text-white text-sm font-semibold cursor-pointer">Reset filter</button>
+            </div>
+
+            <div id="catalog-error" class="hidden mt-4 rounded-2xl border border-[#F3C5BF] bg-[#FDEEEC] p-8 text-center">
+                <p class="font-bold text-[#B42318]">Lowongan gagal dimuat</p>
+                <p class="mt-1 text-sm text-[#3D4B5C]">Periksa koneksi ke API, lalu coba lagi.</p>
+                <button type="button" onclick="location.reload()" class="btn-press mt-4 px-4 py-2 rounded-lg bg-[#0C2238] text-white text-sm font-semibold cursor-pointer">Coba lagi</button>
+            </div>
+        </main>
     </div>
 
     @push('scripts')

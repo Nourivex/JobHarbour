@@ -10,6 +10,7 @@ export default defineConfig({
                 'resources/js/app.js',
                 'resources/js/pages/home.js',
                 'resources/js/pages/catalog.js',
+                'resources/js/pages/job-detail.js',
                 'resources/js/pages/apply.js',
                 'resources/js/pages/my-dock.js',
                 'resources/js/pages/profile.js',

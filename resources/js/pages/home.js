@@ -295,7 +295,7 @@ function jobCard(job) {
             : `<span class="shrink-0 px-2.5 py-1 rounded-full text-xs font-semibold bg-[#F4F6F8] text-[#627080]">Belum cocok</span>`;
     }
     return `
-        <a href="/catalog?job=${job.id}" class="lift group flex flex-col bg-white rounded-2xl border border-[#E2E7ED] p-5 sm:p-6">
+        <a href="/jobs/${job.id}" class="lift group flex flex-col bg-white rounded-2xl border border-[#E2E7ED] p-5 sm:p-6">
             <div class="flex items-start justify-between gap-3">
                 <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-[#F4F6F8] text-[#3D4B5C]">${esc(empLabel)}</span>
                 ${badge}
