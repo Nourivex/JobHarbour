@@ -408,4 +408,83 @@
 </div>
 </div>
 </div>
+
+<!-- LIVE APPLICATION INTEGRATION (Muhammad Yasir Ilham Nabil) -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const jobId = urlParams.get('job_id') || 1;
+    
+    const fileInput = document.getElementById('cvFileInput');
+    const submitBtn = document.getElementById('submitApplyBtn');
+    const coverLetter = document.getElementById('coverLetterInput');
+    let selectedFile = null;
+
+    if (fileInput) {
+        fileInput.addEventListener('change', function(e) {
+            if (e.target.files && e.target.files[0]) {
+                selectedFile = e.target.files[0];
+                alert('Berkas CV terpilih: ' + selectedFile.name + ' (' + (selectedFile.size / 1024).toFixed(1) + ' KB)');
+            }
+        });
+    }
+
+    if (submitBtn) {
+        submitBtn.addEventListener('click', async function() {
+            const token = localStorage.getItem('jh_token');
+            if (!token) {
+                alert('Perhatian: Anda belum login! Silakan login terlebih dahulu untuk mendapatkan Bearer Token JWT.');
+                window.location.href = '/profile';
+                return;
+            }
+
+            if (!selectedFile) {
+                alert('Silakan pilih berkas CV PDF Anda terlebih dahulu sebelum melamar!');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('job_id', jobId);
+            formData.append('cv_file', selectedFile);
+            if (coverLetter && coverLetter.value.trim()) {
+                formData.append('cover_letter', coverLetter.value.trim());
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="material-symbols-outlined animate-spin text-sm">sync</span> Memproses Lamaran...';
+
+            try {
+                const res = await fetch('/api/applications', {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: formData
+                });
+                const result = await res.json();
+
+                if (res.status === 201 || result.status === 'success') {
+                    alert('🎉 Selamat! Lamaran Anda berhasil dikirim ke dermaga! Skor Kecocokan Keahlian (Weighted Jaccard): ' + (result.data.match_score || 0) + '%');
+                    window.location.href = '/my-dock';
+                } else if (res.status === 409) {
+                    alert('⚠️ Perhatian: Anda sudah pernah melamar lowongan pekerjaan ini sebelumnya (409 Conflict).');
+                } else if (res.status === 422) {
+                    const errs = result.errors ? Object.values(result.errors).flat().join('\n') : result.message;
+                    alert('Validasi Gagal (422):\n' + errs);
+                } else {
+                    alert('Gagal mengirim lamaran: ' + (result.message || 'Error ' + res.status));
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Terjadi kesalahan jaringan saat menghubungi API backend.');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<span class="material-symbols-outlined text-lg">sailing</span> Luncurkan Lamaran ke Dermaga';
+            }
+        });
+    }
+});
+</script>
+
 </body></html>
