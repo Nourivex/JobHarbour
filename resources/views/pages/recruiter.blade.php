@@ -123,73 +123,7 @@
 </head>
 <body class="bg-background text-on-surface antialiased min-h-screen flex flex-col font-body-md text-body-md selection:bg-secondary-fixed selection:text-on-secondary-fixed">
 <!-- TOP NAVIGATION BAR (Shared Component Source of Truth) -->
-<header class="bg-surface-container-lowest/90 dark:bg-inverse-surface/90 backdrop-blur-md border-b border-outline-variant/60 dark:border-outline/40 shadow-sm dark:shadow-none fixed top-0 left-0 right-0 w-full z-50 h-16">
-<div class="max-w-[1600px] mx-auto h-full px-margin-desktop flex items-center justify-between">
-<!-- Brand & Pro Recruiter Deck Identifier -->
-<div class="flex items-center gap-space-xl">
-<a class="text-headline-sm font-headline-sm font-bold tracking-tight text-on-surface dark:text-inverse-on-surface flex items-center gap-2" href="/">
-<span class="w-8 h-8 rounded-lg bg-primary-container text-white flex items-center justify-center shadow-inner">
-<span class="material-symbols-outlined text-lg" data-icon="anchor">anchor</span>
-</span>
-<span>JobHarbour</span>
-</a>
-<!-- Desktop Navigation Items -->
-<nav class="hidden md:flex items-center gap-space-lg">
-<a class="text-on-surface-variant dark:text-surface-variant hover:text-on-surface dark:hover:text-inverse-on-surface transition-colors pb-1 text-label-md font-label-md" href="/">
-            The Anchorage
-          </a>
-<a class="text-on-surface-variant dark:text-surface-variant hover:text-on-surface dark:hover:text-inverse-on-surface transition-colors pb-1 text-label-md font-label-md" href="/">
-            My Dock
-          </a>
-<a class="text-on-surface-variant dark:text-surface-variant hover:text-on-surface dark:hover:text-inverse-on-surface transition-colors pb-1 text-label-md font-label-md" href="/">
-            Captain's Ledger
-          </a>
-<!-- Active Nav Link: Harbour Master -->
-<a class="text-secondary dark:text-secondary-fixed border-b-2 border-secondary dark:border-secondary-fixed font-semibold pb-1 text-label-md font-label-md flex items-center gap-1.5" href="/">
-<span>Harbour Master</span>
-<span class="bg-secondary text-white text-[10px] font-bold px-1.5 py-0.5 rounded tracking-wider uppercase">PRO</span>
-</a>
-</nav>
-</div>
-<!-- Trailing Recruiter Profile & Operational CTAs -->
-<div class="flex items-center gap-space-md">
-<!-- Switch View & Export -->
-<div class="hidden lg:flex items-center gap-1 border-r border-outline-variant/60 pr-space-md mr-1">
-<button class="p-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high rounded-lg transition-colors flex items-center gap-1 text-label-sm font-label-sm" title="Ganti Tampilan Pipeline">
-<span class="material-symbols-outlined text-base" data-icon="view_kanban">view_kanban</span>
-<span class="hidden xl:inline">Board</span>
-</button>
-<button class="p-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high rounded-lg transition-colors flex items-center gap-1 text-label-sm font-label-sm" title="Unduh Laporan Pipeline">
-<span class="material-symbols-outlined text-base" data-icon="download">download</span>
-<span class="hidden xl:inline">Ekspor</span>
-</button>
-</div>
-<!-- Notification Bell -->
-<button aria-label="Notifikasi" class="relative p-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high rounded-lg transition-colors">
-<span class="material-symbols-outlined text-xl" data-icon="notifications">notifications</span>
-<span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-error ring-2 ring-surface-container-lowest"></span>
-</button>
-<!-- Recruiter Profile Badge -->
-<div class="hidden sm:flex items-center gap-2 pl-space-xs pr-space-sm py-1 rounded-full border border-outline-variant/60 bg-surface-container-low hover:bg-surface-container transition-colors">
-<div class="w-7 h-7 rounded-full bg-primary-container text-white flex items-center justify-center font-bold text-xs uppercase">
-            SB
-          </div>
-<div class="flex flex-col text-left">
-<div class="flex items-center gap-1">
-<span class="text-label-sm font-label-sm text-on-surface font-semibold">Capt. HR Lead</span>
-<span class="material-symbols-outlined text-secondary text-xs" data-icon="verified" style="font-variation-settings: 'FILL' 1;" title="Verified Maritime Operator">verified</span>
-</div>
-<span class="text-[10px] text-on-surface-variant leading-none">PT Solusi Bahari Digital</span>
-</div>
-</div>
-<!-- Primary Action: Pasang Lowongan Baru -->
-<button class="bg-secondary hover:bg-on-secondary-container text-white text-label-md font-label-md px-3.5 py-2 rounded-lg flex items-center gap-1.5 shadow-sm transition-all duration-150 active:scale-95">
-<span class="material-symbols-outlined text-lg" data-icon="add">add</span>
-<span class="hidden sm:inline">Pasang Lowongan Baru</span>
-</button>
-</div>
-</div>
-</header>
+@include('layouts.header')
 <!-- MAIN OPERATIONAL WORKSPACE -->
 <main class="flex-1 mt-16 pb-12 w-full max-w-[1600px] mx-auto px-margin-desktop">
 <!-- COMMAND TOOLBAR & DOSSIER HEADER -->

@@ -249,62 +249,7 @@
 <!-- ========================================================================= -->
 <!-- SHARED COMPONENT: TopNavBar                                               -->
 <!-- ========================================================================= -->
-<header class="fixed top-0 left-0 right-0 w-full z-50 bg-surface-container-lowest/90 backdrop-blur-md shadow-sm">
-<div class="max-w-[1600px] mx-auto px-margin-desktop h-16 flex items-center justify-between">
-<!-- Brand Anchor & Identity -->
-<div class="flex items-center gap-6">
-<a class="text-headline-sm font-headline-sm font-bold tracking-tight text-on-surface flex items-center gap-2 transition-all duration-150 active:scale-95" href="/">
-<div class="w-9 h-9 rounded-lg bg-primary-container text-on-primary flex items-center justify-center shadow-sm">
-<span class="material-symbols-outlined text-secondary-container" data-icon="anchor" style="font-variation-settings: 'FILL' 1;">anchor</span>
-</div>
-<span class="flex flex-col">
-<span class="leading-none text-headline-sm font-headline-sm font-bold">JobHarbour</span>
-<span class="text-[10px] tracking-wider text-secondary font-semibold uppercase">Career Launchpad</span>
-</span>
-</a>
-<!-- Desktop Navigation Links (Shared Component Specs) -->
-<nav class="hidden md:flex items-center gap-6 ml-4">
-<!-- Active Nav: The Anchorage -->
-<a class="text-secondary border-b-2 border-secondary font-semibold pb-1 text-label-md font-label-md flex items-center gap-1.5" href="/">
-<span>The Anchorage</span>
-</a>
-<a class="text-on-surface-variant hover:text-on-surface transition-colors pb-1 text-label-md font-label-md" href="/">
-            My Dock
-          </a>
-<a class="text-on-surface-variant hover:text-on-surface transition-colors pb-1 text-label-md font-label-md" href="/">
-            Captain's Ledger
-          </a>
-<a class="text-on-surface-variant hover:text-on-surface transition-colors pb-1 text-label-md font-label-md flex items-center gap-1" href="/">
-            Harbour Master
-            <span class="text-[9px] px-1 py-0.2 bg-surface-container-high rounded text-on-surface-variant">PRO</span>
-</a>
-</nav>
-</div>
-<!-- Trailing Action Cluster -->
-<div class="flex items-center gap-space-md">
-<!-- Notification Icon with Badge -->
-<button class="relative p-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors active:scale-95" title="Notifikasi Dermaga">
-<span class="material-symbols-outlined text-[22px]" data-icon="notifications">notifications</span>
-<span class="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-error rounded-full ring-2 ring-surface-container-lowest"></span>
-</button>
-<!-- Active User Status Pill -->
-<div class="hidden sm:flex items-center gap-2.5 pl-3 pr-2 py-1.5 rounded-full bg-surface-container-low border border-outline-variant/60">
-<span class="material-symbols-outlined text-secondary text-sm" data-icon="anchor" style="font-variation-settings: 'FILL' 1;">anchor</span>
-<div class="flex flex-col text-left">
-<span class="text-label-sm font-label-sm text-on-surface font-semibold leading-tight">Budi Santoso - Pelamar Aktif</span>
-<span class="text-[10px] text-secondary font-medium leading-none">Terverifikasi IMO Tech</span>
-</div>
-<div class="w-7 h-7 rounded-full bg-primary-container text-on-primary flex items-center justify-center text-xs font-bold ring-1 ring-secondary">
-            BS
-          </div>
-</div>
-<!-- Trailing Primary Action -->
-<button class="px-space-md py-2 rounded-lg bg-primary text-on-primary text-label-md font-label-md font-semibold hover:bg-secondary transition-all duration-150 active:scale-95 shadow-sm hidden lg:block">
-          Lamar Sekarang
-        </button>
-</div>
-</div>
-</header>
+@include('layouts.header')
 <!-- Spacer for fixed masthead -->
 <div class="h-16 w-full"></div>
 <!-- ========================================================================= -->

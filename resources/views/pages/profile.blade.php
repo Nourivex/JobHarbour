@@ -117,67 +117,7 @@
 </head>
 <body class="bg-background text-on-surface antialiased min-h-screen flex flex-col font-body-md text-body-md selection:bg-secondary-fixed selection:text-on-secondary-fixed">
 <!-- ==================== SHARED COMPONENT: TopNavBar ==================== -->
-<header class="fixed top-0 left-0 right-0 w-full z-50 bg-surface-container-lowest/90 backdrop-blur-md border-b border-outline-variant/60 shadow-sm h-16">
-<div class="max-w-[1600px] mx-auto h-full px-margin-desktop flex items-center justify-between">
-<!-- Brand Logo & Career Launchpad Subtext -->
-<div class="flex items-center gap-6">
-<a class="flex items-center gap-2.5 group" href="/">
-<div class="w-9 h-9 rounded-lg bg-surface-container-low border border-outline-variant/60 flex items-center justify-center text-secondary group-hover:border-secondary transition-colors">
-<span class="material-symbols-outlined text-[22px]" style="font-variation-settings: 'FILL' 1;">anchor</span>
-</div>
-<div class="flex flex-col">
-<span class="text-headline-sm font-headline-sm font-bold tracking-tight text-on-surface flex items-center gap-1.5">
-              JobHarbour
-            </span>
-<span class="text-coordinate-tag font-coordinate-tag text-secondary tracking-widest leading-none">
-              CAREER LAUNCHPAD
-            </span>
-</div>
-</a>
-<!-- Desktop Navigation Links (Captain's Ledger is Active) -->
-<nav class="hidden md:flex items-center gap-6 ml-4">
-<a class="text-label-md font-label-md text-on-surface-variant hover:text-on-surface transition-colors pb-1" href="/">
-            The Anchorage
-          </a>
-<a class="text-label-md font-label-md text-on-surface-variant hover:text-on-surface transition-colors pb-1" href="/">
-            My Dock
-          </a>
-<!-- Active Item: Captain's Ledger -->
-<a class="text-label-md font-label-md text-secondary border-b-2 border-secondary font-semibold pb-1 flex items-center gap-1.5" href="/">
-            Captain's Ledger
-            <span class="w-1.5 h-1.5 rounded-full bg-secondary inline-block"></span>
-</a>
-<a class="text-label-md font-label-md text-on-surface-variant hover:text-on-surface transition-colors pb-1 flex items-center gap-1" href="/">
-            Harbour Master
-            <span class="bg-surface-container-high text-on-surface text-[10px] font-bold px-1.5 py-0.5 rounded">PRO</span>
-</a>
-</nav>
-</div>
-<!-- Trailing Action Cluster -->
-<div class="flex items-center gap-space-md">
-<!-- Notification Bell with Alert Dot -->
-<button aria-label="Notifikasi" class="relative w-9 h-9 rounded-lg border border-outline-variant/60 flex items-center justify-center text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all active:scale-95" type="button">
-<span class="material-symbols-outlined text-[20px]">notifications</span>
-<span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-secondary ring-2 ring-surface-container-lowest"></span>
-</button>
-<!-- Candidate Profile Pill -->
-<div class="hidden lg:flex items-center gap-2.5 pl-2 pr-3 py-1 bg-surface-container-low border border-outline-variant/60 rounded-full">
-<div class="w-7 h-7 rounded-full bg-primary-container text-inverse-on-surface font-label-md text-xs flex items-center justify-center font-bold">
-            BS
-          </div>
-<div class="flex flex-col text-left">
-<span class="text-label-sm font-label-sm text-on-surface font-semibold leading-tight">Budi Santoso - Pelamar Aktif</span>
-<span class="text-coordinate-tag font-coordinate-tag text-outline text-[9px] uppercase tracking-wider">SEAFARER #82910 • IMO TECH VERIFIED</span>
-</div>
-</div>
-<!-- Primary CTA: Lamar Sekarang -->
-<button class="hidden sm:inline-flex items-center gap-1.5 bg-primary-container hover:bg-secondary text-surface-container-lowest text-label-md font-label-md font-semibold h-10 px-4 rounded-lg transition-all duration-150 active:scale-95 shadow-sm" type="button">
-<span>Lamar Sekarang</span>
-<span class="material-symbols-outlined text-[18px]">arrow_forward</span>
-</button>
-</div>
-</div>
-</header>
+@include('layouts.header')
 <!-- ==================== MAIN CONTENT WRAPPER ==================== -->
 <main class="flex-1 pt-24 pb-space-3xl max-w-[1600px] w-full mx-auto px-margin-desktop">
 <!-- Page Dossier Breadcrumb & Title Section -->

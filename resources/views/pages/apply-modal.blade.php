@@ -140,30 +140,7 @@
 <!-- ==================== BACKGROUND: THE ANCHORAGE JOB PORTAL (BLURRED REALISTIC CATALOG CANVAS) ==================== -->
 <div class="fixed inset-0 w-full h-full pointer-events-none filter blur-sm scale-[1.01] opacity-75 z-0 flex flex-col">
 <!-- TopNavBar (Shared Component implementation) -->
-<header class="bg-surface-container-lowest/90 dark:bg-inverse-surface/90 backdrop-blur-md shadow-sm dark:shadow-none border-b border-outline-variant/60 dark:border-outline/40 h-16 w-full px-margin-desktop max-w-[1600px] mx-auto flex items-center justify-between z-10">
-<div class="flex items-center gap-space-xl">
-<a class="text-headline-sm font-headline-sm font-bold tracking-tight text-on-surface dark:text-inverse-on-surface flex items-center gap-2" href="/">
-<span class="material-symbols-outlined text-secondary text-2xl" data-icon="anchor" style="font-variation-settings: 'FILL' 1;">anchor</span>
-<span>JobHarbour</span>
-</a>
-<nav class="hidden md:flex items-center gap-space-lg text-label-md font-label-md">
-<span class="text-secondary dark:text-secondary-fixed border-b-2 border-secondary dark:border-secondary-fixed font-semibold pb-1">The Anchorage</span>
-<span class="text-on-surface-variant dark:text-surface-variant hover:text-on-surface transition-colors pb-1">My Dock</span>
-<span class="text-on-surface-variant dark:text-surface-variant hover:text-on-surface transition-colors pb-1">Captain's Ledger</span>
-<span class="text-on-surface-variant dark:text-surface-variant hover:text-on-surface transition-colors pb-1">Harbour Master</span>
-</nav>
-</div>
-<div class="flex items-center gap-space-md">
-<button class="p-2 text-on-surface-variant rounded-lg hover:bg-surface-container-high transition-colors">
-<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
-</button>
-<div class="h-6 w-px bg-outline-variant/60"></div>
-<div class="flex items-center gap-space-sm text-label-md font-label-md">
-<div class="w-8 h-8 rounded-full bg-secondary text-white font-bold flex items-center justify-center text-xs">BS</div>
-<span class="text-on-surface font-medium">Budi Santoso - Pelamar Aktif</span>
-</div>
-</div>
-</header>
+@include('layouts.header')
 <!-- Simulated Split View Page Content behind blur -->
 <main class="flex-1 max-w-[1600px] w-full mx-auto px-margin-desktop py-space-xl flex gap-gutter-desktop overflow-hidden">
 <!-- 40% Column Job Feed -->

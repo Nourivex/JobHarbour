@@ -122,63 +122,7 @@
 </head>
 <body class="bg-surface text-on-surface antialiased min-h-screen flex flex-col font-body-md selection:bg-secondary-fixed selection:text-on-secondary-fixed">
 <!-- TOP NAVIGATION DOCK BAR -->
-<header class="fixed top-0 left-0 right-0 w-full z-50 bg-surface-container-lowest/90 backdrop-blur-md border-b border-outline-variant/60 shadow-sm transition-all duration-150">
-<div class="max-w-[1600px] mx-auto px-margin-desktop h-16 flex items-center justify-between">
-<!-- Brand & Left Nav -->
-<div class="flex items-center gap-space-2xl">
-<a class="flex items-center gap-2 text-headline-sm font-headline-sm font-bold tracking-tight text-on-surface" href="/">
-<div class="w-9 h-9 rounded-lg bg-primary-container text-on-primary flex items-center justify-center shadow-sm">
-<span class="material-symbols-outlined text-[20px]" data-weight="fill">anchor</span>
-</div>
-<span class="tracking-tight font-extrabold text-on-surface">JobHarbour</span>
-<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-coordinate-tag uppercase tracking-wider bg-surface-container text-on-surface-variant border border-outline-variant/60 font-semibold ml-1">PORT OPERATIONAL</span>
-</a>
-<!-- Desktop Navigation Links -->
-<nav class="hidden md:flex items-center gap-6">
-<a class="text-on-surface-variant hover:text-on-surface transition-colors pb-1 text-label-md font-label-md" href="/">
-            The Anchorage
-          </a>
-<a class="text-secondary border-b-2 border-secondary font-semibold pb-1 text-label-md font-label-md flex items-center gap-1.5" href="/">
-<span>My Dock</span>
-<span class="w-2 h-2 rounded-full bg-secondary inline-block"></span>
-</a>
-<a class="text-on-surface-variant hover:text-on-surface transition-colors pb-1 text-label-md font-label-md" href="/">
-            Captain's Ledger
-          </a>
-<a class="text-on-surface-variant hover:text-on-surface transition-colors pb-1 text-label-md font-label-md flex items-center gap-1" href="/">
-<span>Harbour Master</span>
-<span class="px-1.5 py-0.2 bg-secondary-fixed text-on-secondary-fixed-variant rounded text-[10px] font-label-sm font-bold tracking-wider">PRO</span>
-</a>
-</nav>
-</div>
-<!-- Right Trailing Cluster -->
-<div class="flex items-center gap-space-lg">
-<!-- Notifications -->
-<button class="relative p-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors" title="Notifikasi Baru">
-<span class="material-symbols-outlined text-[22px]">notifications</span>
-<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full ring-2 ring-surface-container-lowest animate-pulse"></span>
-</button>
-<!-- Candidate Identity Pill -->
-<div class="hidden lg:flex items-center gap-3 pl-3 pr-3.5 py-1.5 rounded-full bg-surface-container border border-outline-variant/60 hover:bg-surface-container-high transition-colors cursor-pointer">
-<div class="relative">
-<div class="w-8 h-8 rounded-full bg-primary-container text-on-primary flex items-center justify-center font-bold text-label-sm ring-1 ring-outline-variant">
-              BS
-            </div>
-<span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-secondary-container rounded-full ring-2 ring-surface-container-lowest"></span>
-</div>
-<div class="flex flex-col text-left">
-<span class="text-label-sm font-label-sm font-semibold text-on-surface leading-tight">Budi Santoso - Pelamar Aktif</span>
-<span class="text-coordinate-tag font-coordinate-tag text-on-surface-variant uppercase tracking-wider text-[10px]">SEAFARER ID #82910 • IMO TECH VERIFIED</span>
-</div>
-</div>
-<!-- Primary Quick CTA -->
-<button class="bg-primary text-on-primary hover:bg-on-primary-fixed-variant transition-all duration-150 px-4 py-2 rounded-lg text-label-md font-label-md flex items-center gap-2 shadow-sm active:scale-95">
-<span class="material-symbols-outlined text-[18px]">search</span>
-<span>Jelajahi Lowongan</span>
-</button>
-</div>
-</div>
-</header>
+@include('layouts.header')
 <!-- MAIN VIEWPORT CONTAINER -->
 <main class="flex-grow pt-24 pb-space-3xl max-w-[1600px] w-full mx-auto px-margin-desktop">
 <!-- BREADCRUMB & HARBOUR TELEMETRY METRIC BANNER -->
