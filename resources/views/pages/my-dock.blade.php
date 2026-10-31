@@ -3,7 +3,7 @@
 <html lang="id"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>JobHarbour · My Dock (Dashboard Pelamar & Linimasa Seleksi)</title>
+<title>JobHarbour - My Dock (Dashboard Pelamar & Linimasa Seleksi)</title>
 <!-- Fonts & Icons -->
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
@@ -122,99 +122,43 @@
 </head>
 <body class="bg-surface text-on-surface antialiased min-h-screen flex flex-col font-body-md selection:bg-secondary-fixed selection:text-on-secondary-fixed">
 <!-- TOP NAVIGATION DOCK BAR -->
-<header class="fixed top-0 left-0 right-0 w-full z-50 bg-surface-container-lowest/90 backdrop-blur-md border-b border-outline-variant/60 shadow-sm transition-all duration-150">
-<div class="max-w-[1600px] mx-auto px-margin-desktop h-16 flex items-center justify-between">
-<!-- Brand & Left Nav -->
-<div class="flex items-center gap-space-2xl">
-<a class="flex items-center gap-2 text-headline-sm font-headline-sm font-bold tracking-tight text-on-surface" href="/">
-<div class="w-9 h-9 rounded-lg bg-primary-container text-on-primary flex items-center justify-center shadow-sm">
-<span class="material-symbols-outlined text-[20px]" data-weight="fill">anchor</span>
-</div>
-<span class="tracking-tight font-extrabold text-on-surface">JobHarbour</span>
-<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-coordinate-tag uppercase tracking-wider bg-surface-container text-on-surface-variant border border-outline-variant/60 font-semibold ml-1">PORT OPERATIONAL</span>
-</a>
-<!-- Desktop Navigation Links -->
-<nav class="hidden md:flex items-center gap-6">
-<a class="text-on-surface-variant hover:text-on-surface transition-colors pb-1 text-label-md font-label-md" href="/">
-            The Anchorage
-          </a>
-<a class="text-secondary border-b-2 border-secondary font-semibold pb-1 text-label-md font-label-md flex items-center gap-1.5" href="/">
-<span>My Dock</span>
-<span class="w-2 h-2 rounded-full bg-secondary inline-block"></span>
-</a>
-<a class="text-on-surface-variant hover:text-on-surface transition-colors pb-1 text-label-md font-label-md" href="/">
-            Captain's Ledger
-          </a>
-<a class="text-on-surface-variant hover:text-on-surface transition-colors pb-1 text-label-md font-label-md flex items-center gap-1" href="/">
-<span>Harbour Master</span>
-<span class="px-1.5 py-0.2 bg-secondary-fixed text-on-secondary-fixed-variant rounded text-[10px] font-label-sm font-bold tracking-wider">PRO</span>
-</a>
-</nav>
-</div>
-<!-- Right Trailing Cluster -->
-<div class="flex items-center gap-space-lg">
-<!-- Notifications -->
-<button class="relative p-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors" title="Notifikasi Baru">
-<span class="material-symbols-outlined text-[22px]">notifications</span>
-<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full ring-2 ring-surface-container-lowest animate-pulse"></span>
-</button>
-<!-- Candidate Identity Pill -->
-<div class="hidden lg:flex items-center gap-3 pl-3 pr-3.5 py-1.5 rounded-full bg-surface-container border border-outline-variant/60 hover:bg-surface-container-high transition-colors cursor-pointer">
-<div class="relative">
-<div class="w-8 h-8 rounded-full bg-primary-container text-on-primary flex items-center justify-center font-bold text-label-sm ring-1 ring-outline-variant">
-              BS
-            </div>
-<span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-secondary-container rounded-full ring-2 ring-surface-container-lowest"></span>
-</div>
-<div class="flex flex-col text-left">
-<span class="text-label-sm font-label-sm font-semibold text-on-surface leading-tight">Budi Santoso - Pelamar Aktif</span>
-<span class="text-coordinate-tag font-coordinate-tag text-on-surface-variant uppercase tracking-wider text-[10px]">SEAFARER ID #82910 • IMO TECH VERIFIED</span>
-</div>
-</div>
-<!-- Primary Quick CTA -->
-<button class="bg-primary text-on-primary hover:bg-on-primary-fixed-variant transition-all duration-150 px-4 py-2 rounded-lg text-label-md font-label-md flex items-center gap-2 shadow-sm active:scale-95">
-<span class="material-symbols-outlined text-[18px]">search</span>
-<span>Jelajahi Lowongan</span>
-</button>
-</div>
-</div>
-</header>
+@include('partials.navbar', ['active' => 'my-dock'])
 <!-- MAIN VIEWPORT CONTAINER -->
-<main class="flex-grow pt-24 pb-space-3xl max-w-[1600px] w-full mx-auto px-margin-desktop">
+<main class="flex-grow pt-6 pb-space-3xl max-w-[1600px] w-full mx-auto px-margin-desktop">
 <!-- BREADCRUMB & HARBOUR TELEMETRY METRIC BANNER -->
 <div class="mb-space-xl flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-outline-variant/40 pb-5">
 <div>
-<div class="flex items-center gap-2 text-coordinate-tag font-coordinate-tag text-on-surface-variant uppercase tracking-widest text-[11px] mb-1">
+<div class="flex items-center gap-2 text-coordinate-tag font-coordinate-tag text-on-surface-variant uppercase tracking-widest text-[11px] mb-1 flex-wrap">
 <span class="flex items-center gap-1 font-bold text-secondary">
 <span class="material-symbols-outlined text-[14px]">explore</span>
             PORT LOG
           </span>
 <span>//</span>
-<span>BUDI SANTOSO (SEAFARER ID #82910)</span>
+<span id="dock-greeting-meta">MEMUAT PROFIL PELAMAR...</span>
 <span>•</span>
-<span class="text-on-surface font-semibold">STATUS: 4 ACTIVE EXPEDITIONS</span>
+<span id="dock-active-expeditions" class="text-on-surface font-semibold">STATUS: 0 LAMARAN</span>
 </div>
-<h1 class="text-headline-lg font-headline-lg text-on-surface font-extrabold tracking-tight">
+<h1 id="dock-greeting-title" class="text-headline-lg font-headline-lg text-on-surface font-extrabold tracking-tight">
           My Dock: Dermaga Lamaran & Status Pelayaran Karier
         </h1>
-<p class="text-body-sm font-body-sm text-on-surface-variant mt-1 max-w-3xl">
+<p id="dock-greeting-subtitle" class="text-body-sm font-body-sm text-on-surface-variant mt-1 max-w-3xl">
           Pantau setiap tahapan seleksi, hasil verifikasi berkas, jadwal wawancara, dan keputusan penerimaan kerja secara transparan.
         </p>
 </div>
 <!-- Quick Triage Action Pills -->
 <div class="flex items-center gap-2 self-start md:self-auto">
-<button class="px-3 py-1.5 bg-surface-container-lowest border border-outline-variant text-on-surface rounded-lg text-label-sm font-label-sm flex items-center gap-1.5 hover:bg-surface-container transition-colors shadow-sm">
-<span class="material-symbols-outlined text-[16px]">tune</span>
-<span>Kompak Tampilan</span>
-</button>
-<button class="px-3 py-1.5 bg-secondary-fixed text-on-secondary-fixed-variant rounded-lg text-label-sm font-label-sm font-semibold flex items-center gap-1.5 hover:bg-secondary-fixed-dim transition-colors">
+<a href="/profile" class="px-3 py-1.5 bg-surface-container-lowest border border-outline-variant text-on-surface rounded-lg text-label-sm font-label-sm flex items-center gap-1.5 hover:bg-surface-container transition-colors shadow-sm">
+<span class="material-symbols-outlined text-[16px]">person</span>
+<span>Kelola Keahlian</span>
+</a>
+<button id="btn-sync-dock" type="button" class="px-3 py-1.5 bg-secondary-fixed text-on-secondary-fixed-variant rounded-lg text-label-sm font-label-sm font-semibold flex items-center gap-1.5 hover:bg-secondary-fixed-dim transition-colors">
 <span class="material-symbols-outlined text-[16px]">sync</span>
 <span>Sinkronisasi Data Port</span>
 </button>
 </div>
 </div>
-<!-- 4 NAUTICAL SUMMARY METRIC CARDS -->
-<section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-gutter-desktop mb-space-2xl">
+<!-- NAUTICAL SUMMARY METRIC CARDS -->
+<section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-gutter-desktop mb-space-2xl">
 <!-- Card 1: Total Lamaran -->
 <div class="bg-surface-container-lowest p-space-lg rounded-xl border border-outline-variant/60 shadow-sm flex flex-col justify-between hover:border-secondary transition-all">
 <div class="flex items-center justify-between mb-3">
@@ -225,17 +169,17 @@
 </div>
 <div>
 <div class="flex items-baseline gap-2">
-<span class="text-headline-lg font-headline-lg font-bold text-on-surface">4</span>
+<span id="stat-total-count" class="text-headline-lg font-headline-lg font-bold text-on-surface">0</span>
 <span class="text-label-md font-label-md text-on-surface-variant">Berkas</span>
 </div>
 <div class="text-label-sm font-label-sm font-semibold text-on-surface mt-0.5">Total Lamaran Terkirim</div>
 </div>
 <div class="mt-4 pt-3 border-t border-outline-variant/40 flex items-center justify-between text-coordinate-tag font-coordinate-tag">
-<span class="px-2 py-0.5 rounded bg-surface-container text-on-surface-variant font-semibold">Semua Armada Aktif</span>
-<span class="text-on-surface-variant">100% Terdaftar</span>
+<span id="stat-total-badge" class="px-2 py-0.5 rounded bg-surface-container text-on-surface-variant font-semibold">Armada Siap</span>
+<span id="stat-total-sub" class="text-on-surface-variant">0 Aktif</span>
 </div>
 </div>
-<!-- Card 2: Screening & Review -->
+<!-- Card 2: Screening & Assessment Aktif -->
 <div class="bg-surface-container-lowest p-space-lg rounded-xl border border-outline-variant/60 shadow-sm flex flex-col justify-between hover:border-secondary transition-all">
 <div class="flex items-center justify-between mb-3">
 <span class="text-coordinate-tag font-coordinate-tag uppercase tracking-wider text-secondary text-[11px]">INSPECTION PHASE</span>
@@ -245,14 +189,14 @@
 </div>
 <div>
 <div class="flex items-baseline gap-2">
-<span class="text-headline-lg font-headline-lg font-bold text-secondary">2</span>
+<span id="stat-screening-count" class="text-headline-lg font-headline-lg font-bold text-secondary">0</span>
 <span class="text-label-md font-label-md text-on-surface-variant">Berkas</span>
 </div>
-<div class="text-label-sm font-label-sm font-semibold text-on-surface mt-0.5">Tahap Screening & Review</div>
+<div class="text-label-sm font-label-sm font-semibold text-on-surface mt-0.5">Screening & Assessment</div>
 </div>
 <div class="mt-4 pt-3 border-t border-outline-variant/40 flex items-center justify-between text-coordinate-tag font-coordinate-tag">
-<span class="px-2 py-0.5 rounded bg-secondary-fixed/50 text-on-secondary-fixed-variant font-semibold">Verifikasi Berkas Berjalan</span>
-<span class="text-secondary font-bold">50% Queue</span>
+<span id="stat-screening-badge" class="px-2 py-0.5 rounded bg-secondary-fixed/50 text-on-secondary-fixed-variant font-semibold">Evaluasi Berkas</span>
+<span id="stat-screening-sub" class="text-secondary font-bold">0% Queue</span>
 </div>
 </div>
 <!-- Card 3: Jadwal Interview Aktif -->
@@ -265,20 +209,19 @@
 </div>
 <div>
 <div class="flex items-baseline gap-2">
-<span class="text-headline-lg font-headline-lg font-bold text-on-tertiary-fixed-variant">1</span>
+<span id="stat-interview-count" class="text-headline-lg font-headline-lg font-bold text-on-tertiary-fixed-variant">0</span>
 <span class="text-label-md font-label-md text-on-surface-variant">Wawancara</span>
 </div>
 <div class="text-label-sm font-label-sm font-semibold text-on-surface mt-0.5">Jadwal Interview Aktif</div>
 </div>
 <div class="mt-4 pt-3 border-t border-outline-variant/40 flex items-center justify-between text-coordinate-tag font-coordinate-tag">
-<span class="px-2 py-0.5 rounded bg-tertiary-fixed text-on-tertiary-fixed-variant font-semibold flex items-center gap-1.5">
-<span class="w-1.5 h-1.5 rounded-full bg-error animate-ping"></span>
-            10 Okt 2026, 10:00 WIB
+<span id="stat-interview-badge" class="px-2 py-0.5 rounded bg-tertiary-fixed text-on-tertiary-fixed-variant font-semibold flex items-center gap-1.5">
+            Belum Terjadwal
           </span>
-<span class="text-error font-bold">Prioritas</span>
+<span id="stat-interview-sub" class="text-on-tertiary-fixed-variant font-bold">Standby</span>
 </div>
 </div>
-<!-- Card 4: Tawaran Kerja (Offering) -->
+<!-- Card 4: Tawaran Kerja (Offering) & Ditolak -->
 <div class="bg-surface-container-lowest p-space-lg rounded-xl border border-outline-variant/60 shadow-sm flex flex-col justify-between hover:border-secondary transition-all">
 <div class="flex items-center justify-between mb-3">
 <span class="text-coordinate-tag font-coordinate-tag uppercase tracking-wider text-on-surface-variant text-[11px]">FINAL PORT HARBOUR</span>
@@ -288,414 +231,174 @@
 </div>
 <div>
 <div class="flex items-baseline gap-2">
-<span class="text-headline-lg font-headline-lg font-bold text-on-surface">1</span>
+<span id="stat-offering-count" class="text-headline-lg font-headline-lg font-bold text-on-surface">0</span>
 <span class="text-label-md font-label-md text-on-surface-variant">Tawaran</span>
 </div>
-<div class="text-label-sm font-label-sm font-semibold text-on-surface mt-0.5">Tawaran Kerja (Offering)</div>
+<div class="text-label-sm font-label-sm font-semibold text-on-surface mt-0.5">Offering & Keputusan Akhir</div>
 </div>
 <div class="mt-4 pt-3 border-t border-outline-variant/40 flex items-center justify-between text-coordinate-tag font-coordinate-tag">
-<span class="px-2 py-0.5 rounded bg-surface-container text-on-surface-variant font-semibold">Menunggu Keputusan Kapten</span>
-<span class="text-on-surface font-bold">1 Valid</span>
+<span id="stat-offering-badge" class="px-2 py-0.5 rounded bg-surface-container text-on-surface-variant font-semibold">0 Offering</span>
+<span id="stat-rejected-sub" class="text-on-surface-variant font-bold">0 Ditolak</span>
+</div>
+</div>
+<!-- Card 5: Rata-rata Skor Kecocokan -->
+<div class="bg-surface-container-lowest p-space-lg rounded-xl border border-outline-variant/60 shadow-sm flex flex-col justify-between hover:border-secondary transition-all">
+<div class="flex items-center justify-between mb-3">
+<span class="text-coordinate-tag font-coordinate-tag uppercase tracking-wider text-secondary text-[11px]">ANCHOR FIT ENGINE</span>
+<div class="w-8 h-8 rounded-lg bg-secondary-fixed text-on-secondary-fixed-variant flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]" data-weight="fill">anchor</span>
+</div>
+</div>
+<div>
+<div class="flex items-baseline gap-2">
+<span id="stat-avg-score" class="text-headline-lg font-headline-lg font-bold text-secondary">0%</span>
+<span class="text-label-md font-label-md text-on-surface-variant">Match</span>
+</div>
+<div class="text-label-sm font-label-sm font-semibold text-on-surface mt-0.5">Rata-Rata Skor Kecocokan</div>
+</div>
+<div class="mt-4 pt-3 border-t border-outline-variant/40 flex items-center justify-between text-coordinate-tag font-coordinate-tag">
+<span id="stat-avg-badge" class="px-2 py-0.5 rounded bg-secondary-fixed/50 text-on-secondary-fixed-variant font-semibold">Weighted Jaccard</span>
+<span id="stat-avg-sub" class="text-on-surface-variant font-bold">-</span>
 </div>
 </div>
 </section>
 <!-- DUAL COMPONENT MAIN WORKSPACE (Desktop Split Grid: 62% Applications Table + 38% Voyage Pipeline Stepper) -->
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter-desktop items-start">
-<!-- LEFT SECTION: DAFTAR BERKAS LAMARAN AKTIF (62% => col-span-7 or 8, using 7.5 ratio => lg:col-span-7) -->
+<!-- LEFT SECTION: DAFTAR BERKAS LAMARAN AKTIF -->
 <section class="lg:col-span-7 flex flex-col gap-space-lg">
-<!-- Header & Search Toolbar Panel -->
-<div class="bg-surface-container-lowest p-space-lg rounded-xl border border-outline-variant/60 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+<!-- Header, Search & Filter Tabs Panel -->
+<div class="bg-surface-container-lowest p-space-lg rounded-xl border border-outline-variant/60 shadow-sm flex flex-col gap-4">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
 <div class="flex items-center gap-2">
 <div class="w-2.5 h-2.5 rounded-full bg-secondary"></div>
-<h2 class="text-headline-sm font-headline-sm text-on-surface font-bold">Daftar Berkas Lamaran Aktif</h2>
-<span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant text-label-sm font-label-sm font-bold">
-              4 Ekspedisi
+<h2 class="text-headline-sm font-headline-sm text-on-surface font-bold">Daftar Berkas Lamaran</h2>
+<span id="apps-count-pill" class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant text-label-sm font-label-sm font-bold">
+              0 Ekspedisi
             </span>
 </div>
 <!-- Controls: Input Search & Dropdown -->
 <div class="flex items-center gap-2">
 <div class="relative">
 <span class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-outline text-[18px]">search</span>
-<input class="pl-8 pr-3 py-1.5 text-body-sm font-body-sm bg-surface-container-low border border-outline-variant/60 rounded-lg text-on-surface focus:outline-none focus:border-secondary w-48 sm:w-56" placeholder="Cari perusahaan / posisi..." type="text" value="Backend Engineer"/>
+<input id="filter-search-input" class="pl-8 pr-3 py-1.5 text-body-sm font-body-sm bg-surface-container-low border border-outline-variant/60 rounded-lg text-on-surface focus:outline-none focus:border-secondary w-48 sm:w-56" placeholder="Cari perusahaan / posisi..." type="text" value=""/>
 </div>
-<select class="py-1.5 px-3 text-body-sm font-body-sm bg-surface-container-low border border-outline-variant/60 rounded-lg text-on-surface focus:outline-none focus:border-secondary">
-<option>Semua Status</option>
-<option>Screening</option>
-<option selected="">Interview</option>
-<option>Offering</option>
+<select id="filter-status-select" class="py-1.5 px-3 text-body-sm font-body-sm bg-surface-container-low border border-outline-variant/60 rounded-lg text-on-surface focus:outline-none focus:border-secondary">
+<option value="all">Semua Status</option>
+<option value="screening">Screening</option>
+<option value="assessment">Assessment</option>
+<option value="interview">Interview</option>
+<option value="offering">Offering</option>
+<option value="rejected">Ditolak</option>
+<option value="canceled">Dibatalkan</option>
 </select>
 </div>
 </div>
+<!-- Filter Tabs per Status -->
+<div id="status-filter-tabs" class="flex items-center gap-1.5 overflow-x-auto pb-1 border-t border-outline-variant/40 pt-3">
+<button type="button" data-status-tab="all" class="px-3 py-1.5 rounded-lg text-label-sm font-label-sm font-semibold bg-secondary text-on-secondary transition-colors shrink-0">
+            Semua
+          </button>
+<button type="button" data-status-tab="screening" class="px-3 py-1.5 rounded-lg text-label-sm font-label-sm font-medium bg-surface-container text-on-surface-variant hover:text-on-surface transition-colors shrink-0">
+            Screening
+          </button>
+<button type="button" data-status-tab="assessment" class="px-3 py-1.5 rounded-lg text-label-sm font-label-sm font-medium bg-surface-container text-on-surface-variant hover:text-on-surface transition-colors shrink-0">
+            Assessment
+          </button>
+<button type="button" data-status-tab="interview" class="px-3 py-1.5 rounded-lg text-label-sm font-label-sm font-medium bg-surface-container text-on-surface-variant hover:text-on-surface transition-colors shrink-0">
+            Interview
+          </button>
+<button type="button" data-status-tab="offering" class="px-3 py-1.5 rounded-lg text-label-sm font-label-sm font-medium bg-surface-container text-on-surface-variant hover:text-on-surface transition-colors shrink-0">
+            Offering
+          </button>
+<button type="button" data-status-tab="rejected" class="px-3 py-1.5 rounded-lg text-label-sm font-label-sm font-medium bg-surface-container text-on-surface-variant hover:text-on-surface transition-colors shrink-0">
+            Ditolak / Batal
+          </button>
+</div>
+</div>
 <!-- APPLICATIONS LIST CONTAINER -->
-<div class="space-y-3.5">
-<!-- ITEM 1 (SELECTED / ACTIVE FOCUS STATE) -->
-<article class="bg-surface-container-lowest rounded-xl border-2 border-secondary p-space-lg shadow-md relative overflow-hidden transition-all duration-150">
-<!-- Left Accent Anchor Rail -->
-<div class="absolute left-0 top-0 bottom-0 w-1.5 bg-secondary"></div>
-<div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3 pl-2">
-<div class="space-y-1">
-<div class="flex items-center gap-2 flex-wrap">
-<span class="px-2 py-0.5 rounded text-[10px] font-coordinate-tag uppercase tracking-wider bg-secondary-fixed text-on-secondary-fixed-variant font-bold">
-                    BERTH 04 • ACTIVE SELECTION
-                  </span>
-<span class="text-coordinate-tag font-coordinate-tag text-on-surface-variant">DIDAFTARKAN 28 SEP 2026</span>
+<div id="applications-list-container" class="space-y-3.5">
+<!-- Diisi secara dinamis oleh public/js/pages/my-dock.js -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant/60 p-space-xl text-center text-on-surface-variant">
+<span class="material-symbols-outlined animate-spin text-[28px] text-secondary mb-2">progress_activity</span>
+<p class="text-body-md font-medium">Memuat daftar berkas lamaran dari pelabuhan...</p>
 </div>
-<h3 class="text-headline-sm font-headline-sm font-bold text-on-surface">
-                  Backend Engineer (Microservices)
-                </h3>
-<p class="text-body-sm font-body-sm text-on-surface-variant flex items-center gap-2">
-<span class="font-medium text-on-surface">PT Solusi Bahari Digital</span>
-<span>•</span>
-<span>Tegal (Hybrid)</span>
-</p>
-</div>
-<!-- Anchor Fit Match Signal Score -->
-<div class="flex sm:flex-col items-center sm:items-end justify-between gap-1 bg-surface-container-low sm:bg-transparent p-2 sm:p-0 rounded-lg">
-<div class="flex items-center gap-1.5 px-2.5 py-1 rounded bg-secondary-fixed text-on-secondary-fixed-variant font-bold text-label-sm border border-secondary/20">
-<span class="material-symbols-outlined text-[15px]" data-weight="fill">anchor</span>
-<span>92% Anchor Fit</span>
-</div>
-<span class="text-coordinate-tag font-coordinate-tag text-secondary font-bold text-[10px] uppercase tracking-wider">Sangat Cocok</span>
-</div>
-</div>
-<!-- Telemetry Bar -->
-<div class="my-3 pl-2">
-<div class="w-full bg-surface-container rounded-full h-1.5 overflow-hidden flex">
-<div class="bg-secondary w-[92%] h-full"></div>
-<div class="bg-surface-container-high w-[8%] h-full"></div>
-</div>
-</div>
-<!-- Bottom Row: Status Badge, CV Chip, Navigation Action -->
-<div class="pt-3 border-t border-outline-variant/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3 pl-2">
-<div class="flex items-center gap-2 flex-wrap">
-<!-- Status Badge -->
-<div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-tertiary-fixed text-on-tertiary-fixed-variant text-label-sm font-label-sm font-semibold border border-tertiary-fixed-dim/40">
-<span class="material-symbols-outlined text-[15px]">event</span>
-<span>Tahap 3: Wawancara Tim Teknis</span>
-</div>
-<!-- CV Verified Chip -->
-<div class="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-surface-container text-on-surface text-coordinate-tag font-coordinate-tag border border-outline-variant/60">
-<span class="material-symbols-outlined text-[14px] text-error">picture_as_pdf</span>
-<span>CV_Budi_Santoso_2026.pdf</span>
-<span class="material-symbols-outlined text-[13px] text-secondary ml-0.5" data-weight="fill">verified</span>
-</div>
-</div>
-<!-- Button CTA -->
-<button class="px-3.5 py-1.5 rounded-lg bg-secondary text-on-secondary text-label-sm font-label-sm font-semibold flex items-center justify-center gap-1.5 shadow-sm hover:bg-on-secondary-fixed-variant transition-colors self-end sm:self-auto">
-<span>Linimasa Terpilih</span>
-<span class="material-symbols-outlined text-[16px]">arrow_forward</span>
-</button>
-</div>
-</article>
-<!-- ITEM 2: Fullstack Web Developer -->
-<article class="bg-surface-container-lowest rounded-xl border border-outline-variant/60 p-space-lg shadow-sm hover:border-outline transition-all">
-<div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
-<div class="space-y-1">
-<div class="flex items-center gap-2 flex-wrap">
-<span class="px-2 py-0.5 rounded text-[10px] font-coordinate-tag uppercase tracking-wider bg-surface-container text-on-surface-variant font-semibold">
-                    BERTH 02
-                  </span>
-<span class="text-coordinate-tag font-coordinate-tag text-on-surface-variant">DIDAFTARKAN 25 SEP 2026</span>
-</div>
-<h3 class="text-headline-sm font-headline-sm font-bold text-on-surface">
-                  Fullstack Web Developer
-                </h3>
-<p class="text-body-sm font-body-sm text-on-surface-variant flex items-center gap-2">
-<span class="font-medium text-on-surface">PT Merpati Logistik Bahari</span>
-<span>•</span>
-<span>Semarang (On-site)</span>
-</p>
-</div>
-<div class="flex sm:flex-col items-center sm:items-end justify-between gap-1">
-<div class="flex items-center gap-1.5 px-2.5 py-1 rounded bg-surface-container text-on-surface-variant font-bold text-label-sm border border-outline-variant/60">
-<span class="material-symbols-outlined text-[15px]">anchor</span>
-<span>84% Match</span>
-</div>
-<span class="text-coordinate-tag font-coordinate-tag text-on-surface-variant text-[10px] uppercase tracking-wider">Kompeten</span>
-</div>
-</div>
-<div class="pt-3 mt-3 border-t border-outline-variant/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-<div class="flex items-center gap-2 flex-wrap">
-<div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-secondary-fixed/40 text-on-secondary-fixed-variant text-label-sm font-label-sm font-semibold border border-outline-variant/40">
-<span class="material-symbols-outlined text-[15px]">code_blocks</span>
-<span>Tahap 2: Assessment Teknis</span>
-</div>
-<div class="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-surface-container text-on-surface text-coordinate-tag font-coordinate-tag">
-<span class="material-symbols-outlined text-[14px] text-error">picture_as_pdf</span>
-<span>CV_Budi_Santoso_2026.pdf</span>
-</div>
-</div>
-<button class="px-3.5 py-1.5 rounded-lg border border-outline-variant text-on-surface hover:bg-surface-container text-label-sm font-label-sm font-medium flex items-center justify-center gap-1.5 transition-colors self-end sm:self-auto">
-<span>Lihat Detail</span>
-<span class="material-symbols-outlined text-[16px]">visibility</span>
-</button>
-</div>
-</article>
-<!-- ITEM 3: Cloud DevOps & Infrastructure -->
-<article class="bg-surface-container-lowest rounded-xl border border-outline-variant/60 p-space-lg shadow-sm hover:border-outline transition-all">
-<div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
-<div class="space-y-1">
-<div class="flex items-center gap-2 flex-wrap">
-<span class="px-2 py-0.5 rounded text-[10px] font-coordinate-tag uppercase tracking-wider bg-surface-container-highest text-on-surface font-semibold">
-                    BERTH 01 • OFFERING READY
-                  </span>
-<span class="text-coordinate-tag font-coordinate-tag text-on-surface-variant">DIDAFTARKAN 15 SEP 2026</span>
-</div>
-<h3 class="text-headline-sm font-headline-sm font-bold text-on-surface">
-                  Cloud DevOps & Infrastructure
-                </h3>
-<p class="text-body-sm font-body-sm text-on-surface-variant flex items-center gap-2">
-<span class="font-medium text-on-surface">PT Bahari Solusi</span>
-<span>•</span>
-<span>Jakarta (Remote)</span>
-</p>
-</div>
-<div class="flex sm:flex-col items-center sm:items-end justify-between gap-1">
-<div class="flex items-center gap-1.5 px-2.5 py-1 rounded bg-surface-container text-on-surface-variant font-bold text-label-sm border border-outline-variant/60">
-<span class="material-symbols-outlined text-[15px]">anchor</span>
-<span>88% Match</span>
-</div>
-<span class="text-coordinate-tag font-coordinate-tag text-on-surface font-bold text-[10px] uppercase tracking-wider">Prioritas</span>
-</div>
-</div>
-<div class="pt-3 mt-3 border-t border-outline-variant/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-<div class="flex items-center gap-2 flex-wrap">
-<div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-surface-container-high text-on-surface text-label-sm font-label-sm font-bold border border-outline-variant">
-<span class="material-symbols-outlined text-[15px]" data-weight="fill">contract</span>
-<span>Tahap 4: Penawaran Kerja (Offering)</span>
-</div>
-<div class="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-surface-container text-on-surface text-coordinate-tag font-coordinate-tag">
-<span class="material-symbols-outlined text-[14px] text-error">picture_as_pdf</span>
-<span>CV_Budi_Santoso_2026.pdf</span>
-</div>
-</div>
-<button class="px-3.5 py-1.5 rounded-lg bg-primary-container text-on-primary hover:bg-on-primary-fixed-variant text-label-sm font-label-sm font-semibold flex items-center justify-center gap-1.5 transition-colors self-end sm:self-auto">
-<span class="material-symbols-outlined text-[16px]">rate_review</span>
-<span>Review Penawaran</span>
-</button>
-</div>
-</article>
-<!-- ITEM 4: Frontend Developer (React/TypeScript) -->
-<article class="bg-surface-container-lowest rounded-xl border border-outline-variant/60 p-space-lg shadow-sm hover:border-outline transition-all">
-<div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
-<div class="space-y-1">
-<div class="flex items-center gap-2 flex-wrap">
-<span class="px-2 py-0.5 rounded text-[10px] font-coordinate-tag uppercase tracking-wider bg-surface-container text-on-surface-variant font-semibold">
-                    BERTH 05
-                  </span>
-<span class="text-coordinate-tag font-coordinate-tag text-on-surface-variant">DIDAFTARKAN 02 OKT 2026</span>
-</div>
-<h3 class="text-headline-sm font-headline-sm font-bold text-on-surface">
-                  Frontend Developer (React/TypeScript)
-                </h3>
-<p class="text-body-sm font-body-sm text-on-surface-variant flex items-center gap-2">
-<span class="font-medium text-on-surface">PT Armada Pelabuhan Mandiri</span>
-<span>•</span>
-<span>Tegal</span>
-</p>
-</div>
-<div class="flex sm:flex-col items-center sm:items-end justify-between gap-1">
-<div class="flex items-center gap-1.5 px-2.5 py-1 rounded bg-surface-container text-on-surface-variant font-bold text-label-sm border border-outline-variant/60">
-<span class="material-symbols-outlined text-[15px]">anchor</span>
-<span>71% Match</span>
-</div>
-<span class="text-coordinate-tag font-coordinate-tag text-on-surface-variant text-[10px] uppercase tracking-wider">Cukup</span>
-</div>
-</div>
-<div class="pt-3 mt-3 border-t border-outline-variant/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-<div class="flex items-center gap-2 flex-wrap">
-<div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-surface-container text-on-surface-variant text-label-sm font-label-sm font-semibold border border-outline-variant/60">
-<span class="material-symbols-outlined text-[15px]">hourglass_top</span>
-<span>Tahap 1: Screening Berkas</span>
-</div>
-<div class="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-surface-container text-on-surface text-coordinate-tag font-coordinate-tag">
-<span class="material-symbols-outlined text-[14px] text-error">picture_as_pdf</span>
-<span>CV_Budi_Santoso_2026.pdf</span>
-</div>
-</div>
-<!-- Destructive Action -->
-<button class="px-3.5 py-1.5 rounded-lg text-error hover:bg-error-container text-label-sm font-label-sm font-medium flex items-center justify-center gap-1 transition-colors self-end sm:self-auto">
-<span class="material-symbols-outlined text-[15px]">shield</span>
-<span>Batalkan Lamaran</span>
-</button>
-</div>
-</article>
 </div>
 <!-- Pagination or Bottom Notice -->
-<div class="p-3 bg-surface-container rounded-lg flex items-center justify-between text-body-sm font-body-sm text-on-surface-variant">
-<span class="text-coordinate-tag font-coordinate-tag uppercase tracking-wider">MENAMPILKAN 4 DARI 4 BERKAS AKTIF</span>
+<div class="p-3 bg-surface-container rounded-lg flex flex-col sm:flex-row items-center justify-between gap-2 text-body-sm font-body-sm text-on-surface-variant">
+<span id="applications-footer-count" class="text-coordinate-tag font-coordinate-tag uppercase tracking-wider">MENAMPILKAN 0 DARI 0 BERKAS LAMARAN</span>
 <span class="flex items-center gap-1 text-label-sm font-label-sm text-on-surface">
 <span class="material-symbols-outlined text-[16px] text-secondary">security</span>
-            Seluruh berkas dilindungi Protokol Pelaut IMO
+            Transparansi Seleksi Berbasis Weighted Jaccard Similarity
           </span>
 </div>
 </section>
 <!-- RIGHT SECTION: VOYAGE PIPELINE STEPPER DRAWER (38% => lg:col-span-5) -->
 <aside class="lg:col-span-5 sticky top-20">
-<div class="bg-surface-container-lowest rounded-xl border border-outline-variant/60 shadow-sm overflow-hidden">
+<div id="pipeline-drawer-card" class="bg-surface-container-lowest rounded-xl border border-outline-variant/60 shadow-sm overflow-hidden">
 <!-- Stepper Drawer Header -->
-<div class="p-space-lg bg-primary-container text-on-primary">
+<div id="pipeline-drawer-header" class="p-space-lg bg-primary-container text-on-primary">
 <div class="flex items-center justify-between mb-2">
 <span class="px-2 py-0.5 rounded text-[10px] font-coordinate-tag uppercase tracking-wider bg-surface-container-lowest/15 text-primary-fixed font-bold flex items-center gap-1">
 <span class="material-symbols-outlined text-[12px]">directions_boat</span>
-                VOYAGE TRACKER // EXPRESS ENTRY
+                VOYAGE TRACKER // PIPELINE SERVICE
               </span>
-<span class="text-coordinate-tag font-coordinate-tag text-primary-fixed-dim uppercase tracking-widest text-[11px]">BERTH 04</span>
+<span id="drawer-berth-code" class="text-coordinate-tag font-coordinate-tag text-primary-fixed-dim uppercase tracking-widest text-[11px]">BERTH --</span>
 </div>
-<h3 class="text-headline-sm font-headline-sm font-bold text-on-primary">
-              Backend Engineer (Microservices)
+<h3 id="drawer-job-title" class="text-headline-sm font-headline-sm font-bold text-on-primary">
+              Pilih Berkas Lamaran
             </h3>
-<p class="text-body-sm font-body-sm text-primary-fixed-dim mt-0.5">
-              PT Solusi Bahari Digital • Tegal (Hybrid)
+<p id="drawer-job-company" class="text-body-sm font-body-sm text-primary-fixed-dim mt-0.5">
+              Klik salah satu berkas di sebelah kiri untuk memantau linimasa seleksi.
             </p>
 <div class="mt-3 pt-3 border-t border-on-primary-fixed-variant/50 flex items-center justify-between">
 <span class="text-coordinate-tag font-coordinate-tag text-primary-fixed uppercase tracking-wider">SKOR KECOCOKAN REGISTRI</span>
-<span class="px-2 py-0.5 rounded bg-secondary-fixed text-on-secondary-fixed-variant font-bold text-label-sm">92% Anchor Fit</span>
+<span id="drawer-match-badge" class="px-2 py-0.5 rounded bg-secondary-fixed text-on-secondary-fixed-variant font-bold text-label-sm">-</span>
+</div>
+</div>
+<!-- MATCHED & MISSING SKILLS BREAKDOWN -->
+<div id="drawer-skills-section" class="p-space-lg border-b border-outline-variant/50 bg-surface-container-low/60 hidden">
+<div class="flex items-center justify-between mb-2">
+<span class="text-coordinate-tag font-coordinate-tag uppercase tracking-wider text-on-surface-variant text-[11px]">RINCIAN PEMADANAN KEAHLIAN</span>
+<span id="drawer-match-category" class="text-coordinate-tag font-coordinate-tag uppercase tracking-wider text-secondary font-bold text-[10px]">-</span>
+</div>
+<div class="space-y-2.5">
+<div>
+<div class="text-label-sm font-label-sm text-on-surface font-semibold mb-1 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-emerald-600">check_circle</span>
+<span>Keahlian Cocok (Matched Skills)</span>
+</div>
+<div id="drawer-matched-skills" class="flex flex-wrap gap-1.5"></div>
+</div>
+<div>
+<div class="text-label-sm font-label-sm text-on-surface font-semibold mb-1 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-amber-600">error</span>
+<span>Keahlian Belum Terpenuhi (Missing Skills)</span>
+</div>
+<div id="drawer-missing-skills" class="flex flex-wrap gap-1.5"></div>
+</div>
 </div>
 </div>
 <!-- VERTICAL STEPPER WITH NAUTICAL CONNECTING TRACK -->
-<div class="p-space-lg relative space-y-6">
-<!-- Continuous Line Rail -->
-<div class="absolute left-[33px] top-6 bottom-10 w-0.5 bg-outline-variant/50 z-0"></div>
-<!-- STEP 1: Screening Berkas (COMPLETED) -->
-<div class="relative z-10 flex gap-3.5">
-<div class="w-8 h-8 rounded-full bg-surface-container-highest border-2 border-outline flex items-center justify-center text-on-surface shrink-0">
-<span class="material-symbols-outlined text-[16px] font-bold" data-weight="fill">check</span>
-</div>
-<div class="flex-grow pt-0.5">
-<div class="flex items-center justify-between">
-<h4 class="text-label-md font-label-md font-bold text-on-surface">Screening Berkas & Verifikasi CV</h4>
-<span class="px-2 py-0.5 rounded text-[10px] font-coordinate-tag bg-surface-container text-on-surface-variant font-bold">LOLOS</span>
-</div>
-<div class="text-coordinate-tag font-coordinate-tag text-on-surface-variant mt-0.5">
-                  Selesai pada 01 Okt 2026 • 14:30 WIB
-                </div>
-<!-- Recruiter Note Quote -->
-<div class="mt-2 p-2.5 rounded-lg bg-surface-container-low border border-outline-variant/60 text-body-sm font-body-sm text-on-surface-variant italic">
-                  “Kualifikasi teknis dan berkas CV terverifikasi lengkap sesuai standar IMO-Crew.”
-                </div>
-</div>
-</div>
-<!-- STEP 2: Review Teknis & Tes Koding (COMPLETED) -->
-<div class="relative z-10 flex gap-3.5">
-<div class="w-8 h-8 rounded-full bg-surface-container-highest border-2 border-outline flex items-center justify-center text-on-surface shrink-0">
-<span class="material-symbols-outlined text-[16px] font-bold" data-weight="fill">check</span>
-</div>
-<div class="flex-grow pt-0.5">
-<div class="flex items-center justify-between">
-<h4 class="text-label-md font-label-md font-bold text-on-surface">Review Teknis & Tes Koding</h4>
-<span class="px-2 py-0.5 rounded text-[10px] font-coordinate-tag bg-surface-container text-on-surface-variant font-bold">SKOR 92/100</span>
-</div>
-<div class="text-coordinate-tag font-coordinate-tag text-on-surface-variant mt-0.5">
-                  Lolos pada 04 Okt 2026 • Evaluator Lead System
-                </div>
-<!-- Recruiter Note Quote -->
-<div class="mt-2 p-2.5 rounded-lg bg-surface-container-low border border-outline-variant/60 text-body-sm font-body-sm text-on-surface-variant italic">
-                  “Hasil implementasi REST API dan pemahaman arsitektur database microservices memuaskan.”
-                </div>
-</div>
-</div>
-<!-- STEP 3: Wawancara Tim Teknis (ACTIVE / CURRENT PORT) -->
-<div class="relative z-10 flex gap-3.5">
-<!-- Pulsing Active Anchor Node -->
-<div class="relative shrink-0">
-<div class="w-8 h-8 rounded-full bg-tertiary-fixed border-2 border-tertiary-fixed-dim text-on-tertiary-fixed-variant flex items-center justify-center shadow-md">
-<span class="material-symbols-outlined text-[18px]" data-weight="fill">anchor</span>
-</div>
-<span class="absolute -inset-1 rounded-full bg-tertiary-fixed-dim opacity-40 animate-ping"></span>
-</div>
-<div class="flex-grow pt-0.5">
-<div class="flex items-center justify-between">
-<h4 class="text-label-md font-label-md font-bold text-on-tertiary-fixed-variant">
-                    Wawancara Tim Teknis & HR (Interview)
-                  </h4>
-<span class="px-2 py-0.5 rounded text-[10px] font-coordinate-tag bg-tertiary-fixed text-on-tertiary-fixed-variant font-bold border border-tertiary-fixed-dim/60">
-                    CURRENT PORT
-                  </span>
-</div>
-<div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-tertiary-fixed/60 text-on-tertiary-fixed-variant font-coordinate-tag font-bold text-[11px] mt-1.5">
-<span class="material-symbols-outlined text-[13px]">alarm</span>
-<span>Dijadwalkan: 10 Okt 2026, 10:00 WIB</span>
-</div>
-<!-- Video Call Box Card -->
-<div class="mt-3 p-3 rounded-lg bg-surface border border-outline-variant/60 space-y-2.5">
-<div class="flex items-center justify-between text-body-sm font-body-sm">
-<span class="font-semibold text-on-surface flex items-center gap-1.5">
-<span class="material-symbols-outlined text-[18px] text-secondary">videocam</span>
-                      Google Meet Ruang Interview
-                    </span>
-<span class="text-coordinate-tag font-coordinate-tag text-secondary font-bold">ONLINE</span>
-</div>
-<!-- Meet link snippet -->
-<div class="flex items-center justify-between p-2 rounded bg-surface-container border border-outline-variant/60 text-coordinate-tag font-coordinate-tag text-on-surface-variant">
-<span class="truncate">meet.google.com/jobharbour-interview</span>
-<button class="text-secondary hover:underline font-bold text-[11px] ml-2 shrink-0 flex items-center gap-0.5">
-<span class="material-symbols-outlined text-[13px]">content_copy</span>
-                      Salin
-                    </button>
-</div>
-<a class="w-full py-2 rounded-lg bg-secondary text-on-secondary text-label-sm font-label-sm font-semibold flex items-center justify-center gap-1.5 hover:bg-on-secondary-fixed-variant transition-colors shadow-sm" href="/">
-<span class="material-symbols-outlined text-[16px]">open_in_new</span>
-<span>Buka Ruang Meet</span>
-</a>
-<!-- Interviewer Details -->
-<div class="pt-2 border-t border-outline-variant/40 space-y-1 text-coordinate-tag font-coordinate-tag text-on-surface-variant text-[11px]">
-<div class="flex items-center justify-between">
-<span>PENGUJI MARITIM TECH:</span>
-<span class="font-bold text-on-surface">Capt. Hendra Wijaya (VP Eng.)</span>
-</div>
-<div class="flex items-center justify-between">
-<span>HARBOUR RECRUITER:</span>
-<span class="font-bold text-on-surface">Sarah L. (Talent Acquisition)</span>
-</div>
-</div>
-<!-- Note -->
-<div class="p-2 bg-tertiary-fixed/30 rounded text-body-sm font-body-sm text-on-tertiary-fixed-variant text-[11px] flex items-start gap-1.5">
-<span class="material-symbols-outlined text-[14px] shrink-0 mt-0.5">info</span>
-<span>Harap siapkan demo repo GitHub microservice dan arsitektur Docker terkini.</span>
-</div>
-</div>
-</div>
-</div>
-<!-- STEP 4: Offering (UPCOMING) -->
-<div class="relative z-10 flex gap-3.5 opacity-60">
-<div class="w-8 h-8 rounded-full bg-surface-container border-2 border-outline-variant flex items-center justify-center text-outline shrink-0">
-<span class="material-symbols-outlined text-[16px]">description</span>
-</div>
-<div class="flex-grow pt-0.5">
-<h4 class="text-label-md font-label-md font-semibold text-on-surface">
-                  Penawaran Kerja & Negosiasi Kontrak (Offering)
-                </h4>
-<div class="text-coordinate-tag font-coordinate-tag text-on-surface-variant mt-0.5">
-                  Estimasi: 14 - 16 Okt 2026
-                </div>
-</div>
-</div>
-<!-- STEP 5: Final Port Onboarding (UPCOMING) -->
-<div class="relative z-10 flex gap-3.5 opacity-60">
-<div class="w-8 h-8 rounded-full bg-surface-container border-2 border-outline-variant flex items-center justify-center text-outline shrink-0">
-<span class="material-symbols-outlined text-[16px]">flag</span>
-</div>
-<div class="flex-grow pt-0.5">
-<h4 class="text-label-md font-label-md font-semibold text-on-surface">
-                  Keberangkatan / Resmi Bergabung (Onboarding)
-                </h4>
-<div class="text-coordinate-tag font-coordinate-tag text-on-surface-variant mt-0.5">
-                  Target Pelayaran: 01 Nov 2026
-                </div>
-</div>
+<div id="drawer-timeline-body" class="p-space-lg relative space-y-6">
+<div class="text-center py-8 text-on-surface-variant">
+<span class="material-symbols-outlined text-[32px] text-outline mb-2">timeline</span>
+<p class="text-body-sm font-body-sm">Pilih berkas lamaran untuk menampilkan tahapan seleksi.</p>
 </div>
 </div>
 <!-- BOTTOM ACTION BAR OF DRAWER -->
-<div class="p-space-lg bg-surface-container-low border-t border-outline-variant/60 flex flex-col gap-2">
-<button class="w-full py-2.5 px-3 rounded-lg border border-outline-variant/80 bg-surface-container-lowest hover:bg-surface-container text-on-surface text-label-md font-label-md font-semibold flex items-center justify-center gap-2 transition-colors shadow-sm">
-<span class="material-symbols-outlined text-[18px]">chat</span>
-<span>Kirim Pesan ke HR Port Master</span>
+<div id="drawer-actions-bar" class="p-space-lg bg-surface-container-low border-t border-outline-variant/60 flex flex-col gap-2">
+<button id="btn-drawer-download-cv" type="button" class="w-full py-2.5 px-3 rounded-lg border border-outline-variant/80 bg-surface-container-lowest hover:bg-surface-container text-on-surface text-label-md font-label-md font-semibold flex items-center justify-center gap-2 transition-colors shadow-sm hidden">
+<span class="material-symbols-outlined text-[18px] text-error">picture_as_pdf</span>
+<span>Lihat / Unduh CV Lamaran (PDF)</span>
 </button>
-<button class="w-full py-2 px-3 rounded-lg text-on-surface-variant hover:text-on-surface text-label-sm font-label-sm font-medium flex items-center justify-center gap-1.5 transition-colors">
-<span class="material-symbols-outlined text-[16px]">download</span>
-<span>Unduh Manifes Seleksi (PDF)</span>
+<button id="btn-drawer-cancel-app" type="button" class="w-full py-2 px-3 rounded-lg text-error hover:bg-error-container/60 border border-error/30 text-label-sm font-label-sm font-semibold flex items-center justify-center gap-1.5 transition-colors hidden">
+<span class="material-symbols-outlined text-[16px]">cancel</span>
+<span>Batalkan Pengajuan Lamaran</span>
 </button>
+<a href="/catalog" class="w-full py-2 px-3 rounded-lg text-on-surface-variant hover:text-on-surface text-label-sm font-label-sm font-medium flex items-center justify-center gap-1.5 transition-colors">
+<span class="material-symbols-outlined text-[16px]">travel_explore</span>
+<span>Cari Lowongan Lain di The Anchorage</span>
+</a>
 </div>
 </div>
 </aside>
@@ -710,23 +413,22 @@
       </span>
 <span class="hidden sm:inline text-outline-variant">|</span>
 <p class="text-body-sm font-body-sm text-on-surface-variant text-center sm:text-left">
-        © 2025 JobHarbour. Hak Cipta Dilindungi Undang-Undang. Pelabuhan Karir & Talenta Maritim Indonesia.
+        © 2026 JobHarbour - Universitas Harkat Negeri, Tegal. Pelabuhan Karir & Talenta Indonesia.
       </p>
 </div>
-<!-- Links from JSON -->
+<!-- Links -->
 <div class="flex items-center gap-6 text-label-sm font-label-sm flex-wrap justify-center">
-<a class="text-on-surface-variant hover:text-secondary transition-colors" href="/">
-        Ketentuan Layanan
+<a class="text-on-surface-variant hover:text-secondary transition-colors" href="/catalog">
+        The Anchorage (Lowongan)
       </a>
-<a class="text-on-surface-variant hover:text-secondary transition-colors" href="/">
-        Kebijakan Privasi
+<a class="text-on-surface-variant hover:text-secondary transition-colors" href="/my-dock">
+        My Dock (Lamaran)
       </a>
-<a class="text-on-surface-variant hover:text-secondary transition-colors" href="/">
-        Daftar Pelabuhan
-      </a>
-<a class="text-on-surface-variant hover:text-secondary transition-colors" href="/">
-        Bantuan Kapten
+<a class="text-on-surface-variant hover:text-secondary transition-colors" href="/profile">
+        Captain's Ledger (Profil)
       </a>
 </div>
 </footer>
+<script src="/js/jh-api.js"></script>
+<script src="/js/pages/my-dock.js"></script>
 </body></html>

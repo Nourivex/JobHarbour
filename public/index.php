@@ -3,6 +3,15 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 
+// Jika dijalankan melalui PHP built-in server (cli-server), layani file statis (.js, .css, gambar) secara langsung
+if (PHP_SAPI === 'cli-server') {
+    $uri = urldecode(parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/');
+    $staticPath = __DIR__.$uri;
+    if ($uri !== '/' && is_file($staticPath)) {
+        return false;
+    }
+}
+
 define('LARAVEL_START', microtime(true));
 
 // Determine if the application is in maintenance mode...

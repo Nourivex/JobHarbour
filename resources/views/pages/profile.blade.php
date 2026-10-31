@@ -10,7 +10,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Plus Jakarta Sans:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
 <!-- Material Symbols Outlined -->
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <!-- Tailwind CSS CDN -->
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <!-- Tailwind Configuration -->
@@ -107,7 +106,7 @@
             "body-md": ["0.9375rem", { "lineHeight": "1.5", "letterSpacing": "0em", "fontWeight": "400" }],
             "label-md": ["0.875rem", { "lineHeight": "1.25", "letterSpacing": "0.01em", "fontWeight": "600" }],
             "body-sm": ["0.8125rem", { "lineHeight": "1.45", "letterSpacing": "0.005em", "fontWeight": "400" }],
-            "headline-md": ["1.375rem", { "lineHeight": "1.35", "letterSpacing": "-0.1em", "fontWeight": "600" }],
+            "headline-md": ["1.375rem", { "lineHeight": "1.35", "letterSpacing": "-0.01em", "fontWeight": "600" }],
             "headline-lg": ["2rem", { "lineHeight": "1.25", "letterSpacing": "-0.02em", "fontWeight": "700" }]
           }
         },
@@ -117,75 +116,15 @@
 </head>
 <body class="bg-background text-on-surface antialiased min-h-screen flex flex-col font-body-md text-body-md selection:bg-secondary-fixed selection:text-on-secondary-fixed">
 <!-- ==================== SHARED COMPONENT: TopNavBar ==================== -->
-<header class="fixed top-0 left-0 right-0 w-full z-50 bg-surface-container-lowest/90 backdrop-blur-md border-b border-outline-variant/60 shadow-sm h-16">
-<div class="max-w-[1600px] mx-auto h-full px-margin-desktop flex items-center justify-between">
-<!-- Brand Logo & Career Launchpad Subtext -->
-<div class="flex items-center gap-6">
-<a class="flex items-center gap-2.5 group" href="/">
-<div class="w-9 h-9 rounded-lg bg-surface-container-low border border-outline-variant/60 flex items-center justify-center text-secondary group-hover:border-secondary transition-colors">
-<span class="material-symbols-outlined text-[22px]" style="font-variation-settings: 'FILL' 1;">anchor</span>
-</div>
-<div class="flex flex-col">
-<span class="text-headline-sm font-headline-sm font-bold tracking-tight text-on-surface flex items-center gap-1.5">
-              JobHarbour
-            </span>
-<span class="text-coordinate-tag font-coordinate-tag text-secondary tracking-widest leading-none">
-              CAREER LAUNCHPAD
-            </span>
-</div>
-</a>
-<!-- Desktop Navigation Links (Captain's Ledger is Active) -->
-<nav class="hidden md:flex items-center gap-6 ml-4">
-<a class="text-label-md font-label-md text-on-surface-variant hover:text-on-surface transition-colors pb-1" href="/">
-            The Anchorage
-          </a>
-<a class="text-label-md font-label-md text-on-surface-variant hover:text-on-surface transition-colors pb-1" href="/">
-            My Dock
-          </a>
-<!-- Active Item: Captain's Ledger -->
-<a class="text-label-md font-label-md text-secondary border-b-2 border-secondary font-semibold pb-1 flex items-center gap-1.5" href="/">
-            Captain's Ledger
-            <span class="w-1.5 h-1.5 rounded-full bg-secondary inline-block"></span>
-</a>
-<a class="text-label-md font-label-md text-on-surface-variant hover:text-on-surface transition-colors pb-1 flex items-center gap-1" href="/">
-            Harbour Master
-            <span class="bg-surface-container-high text-on-surface text-[10px] font-bold px-1.5 py-0.5 rounded">PRO</span>
-</a>
-</nav>
-</div>
-<!-- Trailing Action Cluster -->
-<div class="flex items-center gap-space-md">
-<!-- Notification Bell with Alert Dot -->
-<button aria-label="Notifikasi" class="relative w-9 h-9 rounded-lg border border-outline-variant/60 flex items-center justify-center text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all active:scale-95" type="button">
-<span class="material-symbols-outlined text-[20px]">notifications</span>
-<span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-secondary ring-2 ring-surface-container-lowest"></span>
-</button>
-<!-- Candidate Profile Pill -->
-<div class="hidden lg:flex items-center gap-2.5 pl-2 pr-3 py-1 bg-surface-container-low border border-outline-variant/60 rounded-full">
-<div class="w-7 h-7 rounded-full bg-primary-container text-inverse-on-surface font-label-md text-xs flex items-center justify-center font-bold">
-            BS
-          </div>
-<div class="flex flex-col text-left">
-<span class="text-label-sm font-label-sm text-on-surface font-semibold leading-tight">Budi Santoso - Pelamar Aktif</span>
-<span class="text-coordinate-tag font-coordinate-tag text-outline text-[9px] uppercase tracking-wider">SEAFARER #82910 • IMO TECH VERIFIED</span>
-</div>
-</div>
-<!-- Primary CTA: Lamar Sekarang -->
-<button class="hidden sm:inline-flex items-center gap-1.5 bg-primary-container hover:bg-secondary text-surface-container-lowest text-label-md font-label-md font-semibold h-10 px-4 rounded-lg transition-all duration-150 active:scale-95 shadow-sm" type="button">
-<span>Lamar Sekarang</span>
-<span class="material-symbols-outlined text-[18px]">arrow_forward</span>
-</button>
-</div>
-</div>
-</header>
+@include('partials.navbar', ['active' => 'profile'])
 <!-- ==================== MAIN CONTENT WRAPPER ==================== -->
-<main class="flex-1 pt-24 pb-space-3xl max-w-[1600px] w-full mx-auto px-margin-desktop">
+<main class="flex-1 pt-6 pb-space-3xl max-w-[1600px] w-full mx-auto px-margin-desktop">
 <!-- Page Dossier Breadcrumb & Title Section -->
 <section class="mb-space-xl">
 <!-- Coordinate Breadcrumb -->
 <div class="inline-flex items-center gap-2 px-3 py-1 bg-surface-container-low border border-outline-variant/70 rounded text-coordinate-tag font-coordinate-tag text-on-surface-variant mb-space-sm uppercase">
 <span class="material-symbols-outlined text-[14px] text-secondary" style="font-variation-settings: 'FILL' 1;">anchor</span>
-<span>SEAFARER DOSSIER // BUDI SANTOSO (ID #82910) • VERIFIED TALENT REGISTRY</span>
+<span id="dossier-breadcrumb">SEAFARER DOSSIER // MEMUAT PROFIL...</span>
 </div>
 <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-space-lg">
 <div>
@@ -193,16 +132,16 @@
             Captain's Ledger: Profil Talenta &amp; Kalibrasi Keahlian
           </h1>
 <p class="text-body-md font-body-md text-on-surface-variant mt-1.5 max-w-3xl">
-            Kelola portofolio, keahlian teknis, dan preferensi pelayaran kariermu. Setiap pembaruan skill akan otomatis mengkalibrasi ulang skor matchmaking pada seluruh katalog lowongan.
+            Kelola portofolio, keahlian teknis, dan preferensi pelayaran kariermu. Setiap pembaruan skill akan otomatis mengkalibrasi ulang skor matchmaking pada seluruh katalog lowongan secara real-time.
           </p>
 </div>
 <!-- Top Header Action CTAs -->
 <div class="flex items-center gap-3 shrink-0">
-<button class="inline-flex items-center gap-2 bg-surface-container-lowest border border-outline-variant/80 hover:bg-surface-container-low hover:border-secondary text-on-surface text-label-md font-label-md h-10 px-4 rounded-lg transition-all active:scale-95 shadow-sm" type="button">
-<span class="material-symbols-outlined text-[18px] text-on-surface-variant">visibility</span>
-<span>Preview Profil Publik (Port View)</span>
-</button>
-<button class="inline-flex items-center gap-2 bg-secondary hover:bg-on-secondary-container text-on-secondary text-label-md font-label-md font-semibold h-10 px-5 rounded-lg transition-all active:scale-95 shadow-sm" type="button">
+<a class="inline-flex items-center gap-2 bg-surface-container-lowest border border-outline-variant/80 hover:bg-surface-container-low hover:border-secondary text-on-surface text-label-md font-label-md h-10 px-4 rounded-lg transition-all active:scale-95 shadow-sm" href="/my-dock">
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant">dock_to_right</span>
+<span>Pantau Lamaran (My Dock)</span>
+</a>
+<button class="inline-flex items-center gap-2 bg-secondary hover:bg-on-secondary-container text-on-secondary text-label-md font-label-md font-semibold h-10 px-5 rounded-lg transition-all active:scale-95 shadow-sm" id="btn-save-all" type="button">
 <span class="material-symbols-outlined text-[18px]">verified</span>
 <span>Simpan Pembaruan Profil</span>
 </button>
@@ -213,12 +152,12 @@
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter-desktop">
 <!-- ==================== LEFT COLUMN (38% -> 5 cols lg) ==================== -->
 <div class="lg:col-span-5 space-y-gutter-desktop">
-<!-- Profile Header Dossier Card -->
-<div class="bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-space-xl shadow-none">
+<!-- Profile Header Dossier Card + Statistik Profil -->
+<div class="bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-space-xl shadow-none space-y-space-lg">
 <div class="flex items-start gap-4">
 <div class="relative shrink-0">
-<div class="w-16 h-16 rounded-xl bg-primary-container text-surface-container-lowest font-headline-md font-bold flex items-center justify-center border-2 border-outline-variant/40 shadow-sm">
-                BS
+<div class="w-16 h-16 rounded-xl bg-secondary text-on-secondary font-headline-md font-bold flex items-center justify-center border-2 border-outline-variant/40 shadow-sm text-xl" data-jh-user-initials="" id="profile-avatar-initials">
+                JH
               </div>
 <span class="absolute -bottom-1.5 -right-1.5 bg-secondary text-on-secondary w-6 h-6 rounded-full flex items-center justify-center border-2 border-surface-container-lowest" title="Verified Maritime Seafarer">
 <span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">anchor</span>
@@ -228,142 +167,137 @@
 <div class="flex items-center gap-2 mb-1">
 <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-secondary-fixed/50 text-on-secondary-fixed text-label-sm font-label-sm">
 <span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
-                  Siap Berlayar (Open to Work)
-                </span>
+<span id="profile-role-badge">Siap Berlayar (Open to Work)</span>
+</span>
 </div>
-<h2 class="text-headline-sm font-headline-sm text-on-surface truncate">Budi Santoso</h2>
-<p class="text-body-sm font-body-sm text-on-surface-variant font-medium">Senior Backend &amp; Microservices Engineer</p>
+<h2 class="text-headline-sm font-headline-sm text-on-surface truncate" id="profile-display-name">Memuat...</h2>
+<p class="text-body-sm font-body-sm text-on-surface-variant font-medium truncate" id="profile-display-email">-</p>
 <div class="flex items-center gap-2 mt-2 pt-2 border-t border-outline-variant/40 text-coordinate-tag font-coordinate-tag text-outline">
-<span>SEAFARER ID: #82910</span>
+<span id="profile-display-id">SEAFARER ID: #-</span>
 <span>•</span>
-<span class="text-secondary font-semibold">RANK: LEAD ENGINE MASTER</span>
+<span class="text-secondary font-semibold" id="profile-display-location">LOKASI BELUM DIATUR</span>
 </div>
 </div>
 </div>
+<!-- Statistik Profil (Jumlah Skill, Jumlah Lamaran, Rata-rata Match Score) -->
+<div class="grid grid-cols-3 gap-2.5 pt-2 border-t border-outline-variant/40">
+<div class="bg-surface-container-low/70 border border-outline-variant/60 rounded-lg p-3 text-center">
+<p class="text-headline-sm font-headline-sm font-bold text-secondary" id="stat-skills-count">0</p>
+<p class="text-coordinate-tag font-coordinate-tag text-outline uppercase mt-0.5">KEAHLIAN AKTIF</p>
 </div>
-<!-- Location & Contact Logistics Card -->
+<div class="bg-surface-container-low/70 border border-outline-variant/60 rounded-lg p-3 text-center">
+<p class="text-headline-sm font-headline-sm font-bold text-on-surface" id="stat-applications-count">0</p>
+<p class="text-coordinate-tag font-coordinate-tag text-outline uppercase mt-0.5">TOTAL LAMARAN</p>
+</div>
+<div class="bg-surface-container-low/70 border border-outline-variant/60 rounded-lg p-3 text-center">
+<p class="text-headline-sm font-headline-sm font-bold text-secondary" id="stat-avg-score">0%</p>
+<p class="text-coordinate-tag font-coordinate-tag text-outline uppercase mt-0.5">RATA-RATA MATCH</p>
+</div>
+</div>
+</div>
+
+<!-- Form Edit Biodata & Ringkasan Eksekutif (PUT /api/profile) -->
+<form class="bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-space-xl space-y-space-md" id="profile-biodata-form">
+<div class="flex items-center justify-between pb-2 border-b border-outline-variant/40">
+<h3 class="text-label-md font-label-md text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-secondary">badge</span>
+              Biodata &amp; Koordinat Kontak
+            </h3>
+<span class="text-coordinate-tag font-coordinate-tag text-outline">PUT /API/PROFILE</span>
+</div>
+
+<div class="space-y-3.5">
+<div>
+<label class="block text-label-sm font-label-sm text-on-surface mb-1" for="input-name">Nama Lengkap</label>
+<div class="relative">
+<span class="material-symbols-outlined text-[18px] text-outline absolute left-3 top-1/2 -translate-y-1/2">person</span>
+<input class="w-full h-10 pl-9 pr-3 bg-surface-container-lowest border border-outline-variant rounded-lg text-body-sm font-body-sm text-on-surface focus:outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/15" id="input-name" name="name" placeholder="Nama lengkap kamu" required="" type="text"/>
+</div>
+</div>
+
+<div>
+<label class="block text-label-sm font-label-sm text-outline mb-1" for="input-email">Email Operasional (Read-Only)</label>
+<div class="relative">
+<span class="material-symbols-outlined text-[18px] text-outline absolute left-3 top-1/2 -translate-y-1/2">alternate_email</span>
+<input class="w-full h-10 pl-9 pr-3 bg-surface-container-low border border-outline-variant/60 rounded-lg text-body-sm font-body-sm text-on-surface-variant cursor-not-allowed" disabled="" id="input-email" type="email"/>
+</div>
+</div>
+
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+<div>
+<label class="block text-label-sm font-label-sm text-on-surface mb-1" for="input-phone">Komunikasi Seluler (Telepon)</label>
+<div class="relative">
+<span class="material-symbols-outlined text-[18px] text-outline absolute left-3 top-1/2 -translate-y-1/2">call</span>
+<input class="w-full h-10 pl-9 pr-3 bg-surface-container-lowest border border-outline-variant rounded-lg text-body-sm font-body-sm text-on-surface focus:outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/15" id="input-phone" name="phone" placeholder="0812xxxx" type="text"/>
+</div>
+</div>
+
+<div>
+<label class="block text-label-sm font-label-sm text-on-surface mb-1" for="input-location">Homebase / Pangkalan (Kota)</label>
+<div class="relative">
+<span class="material-symbols-outlined text-[18px] text-outline absolute left-3 top-1/2 -translate-y-1/2">location_on</span>
+<input class="w-full h-10 pl-9 pr-3 bg-surface-container-lowest border border-outline-variant rounded-lg text-body-sm font-body-sm text-on-surface focus:outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/15" id="input-location" name="location" placeholder="Tegal, Jawa Tengah" type="text"/>
+</div>
+</div>
+</div>
+
+<div>
+<label class="block text-label-sm font-label-sm text-on-surface mb-1" for="input-bio">Ringkasan Eksekutif &amp; Visi Karier (Bio)</label>
+<textarea class="w-full p-3 bg-surface-container-lowest border border-outline-variant rounded-lg text-body-sm font-body-sm text-on-surface focus:outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/15 leading-relaxed" id="input-bio" name="bio" placeholder="Ceritakan pengalaman kerja, fokus keahlian, dan aspirasi kariermu..." rows="4"></textarea>
+</div>
+</div>
+
+<div class="pt-2 flex items-center justify-between gap-3 border-t border-outline-variant/40">
+<span class="text-coordinate-tag font-coordinate-tag text-outline" id="biodata-sync-status">TERHUBUNG KE AUTH &amp; PROFILE SERVICE</span>
+<button class="inline-flex items-center gap-1.5 bg-secondary hover:bg-on-secondary-container text-on-secondary text-label-sm font-label-sm font-semibold h-9 px-4 rounded-lg transition-all active:scale-95 shadow-sm" id="btn-save-biodata" type="submit">
+<span class="material-symbols-outlined text-[16px]">save</span>
+<span>Simpan Biodata</span>
+</button>
+</div>
+</form>
+
+<!-- Ringkasan Koordinat & Kontak Wilayah (Live Preview Card) -->
 <div class="bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-space-xl space-y-space-md">
 <div class="flex items-center justify-between pb-2 border-b border-outline-variant/40">
 <h3 class="text-label-md font-label-md text-on-surface flex items-center gap-2">
 <span class="material-symbols-outlined text-[18px] text-secondary">explore</span>
-              Koordinat &amp; Kontak Wilayah
+              Pratinjau Dossier Publik
             </h3>
-<span class="text-coordinate-tag font-coordinate-tag text-outline">MARITIME REGION 04</span>
+<span class="text-coordinate-tag font-coordinate-tag text-outline">LIVE DOSSIER</span>
 </div>
 <div class="space-y-3">
 <div class="flex items-start gap-3">
 <span class="material-symbols-outlined text-[18px] text-outline mt-0.5">location_on</span>
 <div>
 <p class="text-label-sm font-label-sm text-outline">Homebase / Pangkalan</p>
-<p class="text-body-sm font-body-sm text-on-surface font-medium">Tegal, Jawa Tengah (Area Pelabuhan)</p>
+<p class="text-body-sm font-body-sm text-on-surface font-medium" id="preview-location">-</p>
 </div>
 </div>
 <div class="flex items-start gap-3">
 <span class="material-symbols-outlined text-[18px] text-outline mt-0.5">alternate_email</span>
 <div>
 <p class="text-label-sm font-label-sm text-outline">Email Operasional</p>
-<p class="text-body-sm font-body-sm text-on-surface font-medium">budi@jobharbour.id</p>
+<p class="text-body-sm font-body-sm text-on-surface font-medium" id="preview-email">-</p>
 </div>
 </div>
 <div class="flex items-start gap-3">
 <span class="material-symbols-outlined text-[18px] text-outline mt-0.5">call</span>
 <div>
 <p class="text-label-sm font-label-sm text-outline">Komunikasi Seluler</p>
-<p class="text-body-sm font-body-sm text-on-surface font-medium">+62 812-3456-7890</p>
+<p class="text-body-sm font-body-sm text-on-surface font-medium" id="preview-phone">-</p>
 </div>
 </div>
-<div class="flex items-start gap-3 pt-1 border-t border-outline-variant/40">
-<span class="material-symbols-outlined text-[18px] text-secondary mt-0.5">sailing</span>
+<div class="flex items-start gap-3 pt-2 border-t border-outline-variant/40">
+<span class="material-symbols-outlined text-[18px] text-secondary mt-0.5">description</span>
 <div>
-<p class="text-label-sm font-label-sm text-outline">Dermaga Pilihan (Port of Preference)</p>
-<p class="text-body-sm font-body-sm text-on-surface font-semibold">Tegal (Homebase), Semarang, Hybrid/Remote</p>
-</div>
-</div>
-</div>
-</div>
-<!-- Executive Summary & Bio -->
-<div class="bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-space-xl">
-<div class="flex items-center justify-between pb-2 mb-3 border-b border-outline-variant/40">
-<h3 class="text-label-md font-label-md text-on-surface flex items-center gap-2">
-<span class="material-symbols-outlined text-[18px] text-secondary">description</span>
-              Ringkasan Eksekutif &amp; Visi Karier
-            </h3>
-<button aria-label="Sunting Ringkasan" class="text-outline hover:text-secondary p-1 rounded hover:bg-surface-container-low transition-colors" type="button">
-<span class="material-symbols-outlined text-[16px]">edit</span>
-</button>
-</div>
-<p class="text-body-sm font-body-sm text-on-surface-variant leading-relaxed">
-            Pengembang perangkat lunak dengan pengalaman 4 tahun membangun REST API microservices skala tinggi dengan Laravel, MariaDB, Docker, dan Redis. Senang memecahkan arsitektur sistem dan data-driven matchmaking.
-          </p>
-</div>
-<!-- Active CV Document Widget -->
-<div class="bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-space-xl">
-<div class="flex items-center justify-between mb-3">
-<h3 class="text-label-md font-label-md text-on-surface flex items-center gap-2">
-<span class="material-symbols-outlined text-[18px] text-secondary">inventory_2</span>
-              Dokumen CV Aktif
-            </h3>
-<span class="inline-flex items-center gap-1 text-[11px] font-label-sm font-semibold text-secondary bg-secondary-fixed/40 px-2 py-0.5 rounded">
-<span class="material-symbols-outlined text-[13px]">verified_user</span>
-              Terverifikasi via Ledger Maritim
-            </span>
-</div>
-<div class="border border-outline-variant/80 rounded-lg p-3 bg-surface-container-low/50 flex items-center justify-between gap-3">
-<div class="flex items-center gap-3 min-w-0">
-<div class="w-10 h-10 rounded-lg bg-surface-container-highest flex items-center justify-center text-secondary shrink-0">
-<span class="material-symbols-outlined text-[24px]">picture_as_pdf</span>
-</div>
-<div class="min-w-0">
-<p class="text-label-sm font-label-sm text-on-surface font-semibold truncate">CV_Budi_Santoso_Backend_2026.pdf</p>
-<p class="text-coordinate-tag font-coordinate-tag text-outline">1.4 MB • DIPERBARUI 3 HARI LALU</p>
-</div>
-</div>
-<a class="shrink-0 p-2 text-outline hover:text-secondary hover:bg-surface-container-highest rounded transition-colors" href="/" title="Unduh Berkas">
-<span class="material-symbols-outlined text-[20px]">download</span>
-</a>
-</div>
-<div class="mt-3 flex items-center justify-between gap-2 pt-2">
-<button class="w-full inline-flex items-center justify-center gap-2 bg-surface-container-lowest border border-outline-variant hover:border-secondary hover:bg-surface-container-low text-on-surface text-label-sm font-label-sm h-9 px-3 rounded-lg transition-colors" type="button">
-<span class="material-symbols-outlined text-[16px]">upload_file</span>
-              Ganti Berkas / Unggah Baru
-            </button>
-</div>
-</div>
-<!-- Education & Formal Certification -->
-<div class="bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-space-xl space-y-space-md">
-<div class="flex items-center justify-between pb-2 border-b border-outline-variant/40">
-<h3 class="text-label-md font-label-md text-on-surface flex items-center gap-2">
-<span class="material-symbols-outlined text-[18px] text-secondary">school</span>
-              Pendidikan &amp; Sertifikasi Bahari
-            </h3>
-<span class="text-coordinate-tag font-coordinate-tag text-outline">CREDENTIALS</span>
-</div>
-<div class="space-y-3">
-<div>
-<p class="text-label-sm font-label-sm text-on-surface font-semibold">S1 Teknik Informatika</p>
-<p class="text-body-sm font-body-sm text-on-surface-variant">Universitas Harkat Negeri (Tegal)</p>
-<div class="flex items-center gap-2 mt-1 text-coordinate-tag font-coordinate-tag text-outline">
-<span>LULUS 2021</span>
-<span>•</span>
-<span class="text-on-surface font-semibold">IPK: 3.82 / 4.00</span>
-</div>
-</div>
-<div class="pt-2 border-t border-outline-variant/40">
-<p class="text-coordinate-tag font-coordinate-tag text-outline mb-2">LISENSI &amp; KOMPETENSI TEKNOLOGI</p>
-<div class="flex flex-wrap gap-1.5">
-<span class="inline-flex items-center gap-1 px-2 py-1 bg-surface-container-low border border-outline-variant/80 rounded text-label-sm font-label-sm text-on-surface font-medium">
-<span class="material-symbols-outlined text-[13px] text-secondary">verified</span>
-                  BNSP Software Architecture
-                </span>
-<span class="inline-flex items-center gap-1 px-2 py-1 bg-surface-container-low border border-outline-variant/80 rounded text-label-sm font-label-sm text-on-surface font-medium">
-<span class="material-symbols-outlined text-[13px] text-secondary">verified</span>
-                  Docker Certified Associate
-                </span>
+<p class="text-label-sm font-label-sm text-outline">Ringkasan Eksekutif</p>
+<p class="text-body-sm font-body-sm text-on-surface-variant leading-relaxed" id="preview-bio">-</p>
 </div>
 </div>
 </div>
 </div>
 </div>
+
 <!-- ==================== RIGHT COLUMN (62% -> 7 cols lg) ==================== -->
 <div class="lg:col-span-7 space-y-gutter-desktop">
 <!-- Hero Card: The Lighthouse Radar Simulator -->
@@ -378,11 +312,11 @@
               </div>
 <h2 class="text-headline-md font-headline-md text-on-surface">The Lighthouse Radar Simulator</h2>
 <p class="text-body-sm font-body-sm text-on-surface-variant mt-1">
-                Kalibrasi otomatis matriks kecocokan dengan armada pelabuhan berdasarkan algoritma Weighted Jaccard Index.
+                Kalibrasi otomatis matriks kecocokan dengan armada pelabuhan berdasarkan algoritma Weighted Jaccard Similarity.
               </p>
 </div>
 <div class="shrink-0 bg-surface-container-low border border-secondary/40 rounded-xl p-3 text-center sm:text-right">
-<span class="text-display-lg-mobile font-display-lg-mobile text-secondary font-extrabold leading-none">92%</span>
+<span class="text-display-lg-mobile font-display-lg-mobile text-secondary font-extrabold leading-none" id="radar-avg-score">0%</span>
 <p class="text-coordinate-tag font-coordinate-tag text-outline uppercase tracking-wider mt-1">RATA-RATA MATCH SCORE</p>
 </div>
 </div>
@@ -393,20 +327,18 @@
 <span class="w-2 h-2 rounded-full bg-secondary"></span>
                 Tingkat Kecocokan Portfolio Saat Ini
               </span>
-<span class="text-secondary font-bold">38 Lowongan Aktif (&gt;80% Match)</span>
+<span class="text-secondary font-bold" id="radar-high-match-label">Memuat lowongan...</span>
 </div>
 <!-- 5-segment telemetry bar -->
-<div class="grid grid-cols-5 gap-1.5 h-3">
-<div class="bg-secondary rounded-l"></div>
-<div class="bg-secondary"></div>
-<div class="bg-secondary"></div>
-<div class="bg-secondary"></div>
-<div class="bg-surface-container-highest rounded-r relative overflow-hidden">
-<div class="w-3/5 h-full bg-secondary"></div>
+<div class="grid grid-cols-5 gap-1.5 h-3" id="radar-telemetry-bar">
+<div class="bg-surface-container-highest rounded-l overflow-hidden"><div class="h-full bg-secondary transition-all duration-300" style="width: 0%"></div></div>
+<div class="bg-surface-container-highest overflow-hidden"><div class="h-full bg-secondary transition-all duration-300" style="width: 0%"></div></div>
+<div class="bg-surface-container-highest overflow-hidden"><div class="h-full bg-secondary transition-all duration-300" style="width: 0%"></div></div>
+<div class="bg-surface-container-highest overflow-hidden"><div class="h-full bg-secondary transition-all duration-300" style="width: 0%"></div></div>
+<div class="bg-surface-container-highest rounded-r overflow-hidden"><div class="h-full bg-secondary transition-all duration-300" style="width: 0%"></div></div>
 </div>
-</div>
-<p class="text-body-sm font-body-sm text-on-surface-variant pt-1">
-              Dengan <strong>12 keahlian aktif</strong> ini, profilmu memiliki skor kecocokan tertinggi pada sektor <em>Logistik Pelabuhan</em> dan <em>Fleet Management</em> di Dermaga Tegal, Semarang, dan Bandung.
+<p class="text-body-sm font-body-sm text-on-surface-variant pt-1" id="radar-summary-text">
+              Memuat simulasi kecocokan keahlian dengan katalog lowongan aktif...
             </p>
 </div>
 <!-- Radar Recommendations Pill Cluster -->
@@ -414,243 +346,92 @@
 <div class="flex items-center justify-between mb-2">
 <span class="text-label-sm font-label-sm text-on-surface font-semibold flex items-center gap-1.5">
 <span class="material-symbols-outlined text-[16px] text-secondary">trending_up</span>
-                Rekomendasi Skill Pelayaran Berikutnya (Tingkatkan Skor Match)
+                Rekomendasi Skill Pelayaran Berikutnya (Klik untuk Tambah &amp; Tingkatkan Skor)
               </span>
 <span class="text-coordinate-tag font-coordinate-tag text-outline">AUTO-SIMULATE</span>
 </div>
-<div class="flex flex-wrap gap-2">
-<button class="group inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container-low hover:bg-secondary-fixed/50 border border-outline-variant hover:border-secondary transition-all text-label-sm font-label-sm text-on-surface active:scale-95" type="button">
-<span class="material-symbols-outlined text-[15px] text-secondary group-hover:rotate-90 transition-transform">add</span>
-<span>Kubernetes</span>
-<span class="text-[11px] font-bold text-secondary bg-surface-container-lowest px-1.5 py-0.2 rounded border border-secondary/30">+15% Match</span>
-</button>
-<button class="group inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container-low hover:bg-secondary-fixed/50 border border-outline-variant hover:border-secondary transition-all text-label-sm font-label-sm text-on-surface active:scale-95" type="button">
-<span class="material-symbols-outlined text-[15px] text-secondary group-hover:rotate-90 transition-transform">add</span>
-<span>Go Microservices</span>
-<span class="text-[11px] font-bold text-secondary bg-surface-container-lowest px-1.5 py-0.2 rounded border border-secondary/30">+12% Match</span>
-</button>
-<button class="group inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container-low hover:bg-secondary-fixed/50 border border-outline-variant hover:border-secondary transition-all text-label-sm font-label-sm text-on-surface active:scale-95" type="button">
-<span class="material-symbols-outlined text-[15px] text-secondary group-hover:rotate-90 transition-transform">add</span>
-<span>PostgreSQL</span>
-<span class="text-[11px] font-bold text-secondary bg-surface-container-lowest px-1.5 py-0.2 rounded border border-secondary/30">+8% Match</span>
-</button>
-<button class="group inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container-low hover:bg-secondary-fixed/50 border border-outline-variant hover:border-secondary transition-all text-label-sm font-label-sm text-on-surface active:scale-95" type="button">
-<span class="material-symbols-outlined text-[15px] text-secondary group-hover:rotate-90 transition-transform">add</span>
-<span>Apache Kafka</span>
-<span class="text-[11px] font-bold text-secondary bg-surface-container-lowest px-1.5 py-0.2 rounded border border-secondary/30">+6% Match</span>
-</button>
+<div class="flex flex-wrap gap-2" id="radar-recommended-skills">
+<span class="text-body-sm text-on-surface-variant">Menganalisis kebutuhan skill dari lowongan aktif...</span>
 </div>
 </div>
 </div>
+
 <!-- Interactive Technical Skills Matrix Box -->
 <div class="bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-space-xl space-y-space-lg">
-<div class="flex items-center justify-between pb-3 border-b border-outline-variant/40">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-outline-variant/40">
 <div>
 <h3 class="text-headline-sm font-headline-sm text-on-surface flex items-center gap-2">
 <span class="material-symbols-outlined text-[20px] text-secondary">hub</span>
                 Kumpulan Keahlian Aktif (Technical Skills Matrix)
               </h3>
-<p class="text-body-sm font-body-sm text-on-surface-variant">Klik tanda silang untuk melepaskan skill atau gunakan bilah masukan di bawah.</p>
+<p class="text-body-sm font-body-sm text-on-surface-variant">Klik tanda silang untuk melepas skill atau tambahkan skill baru di bawah. Skor kecocokan dihitung ulang otomatis.</p>
 </div>
-<span class="inline-flex items-center px-2.5 py-1 rounded-full bg-surface-container-low border border-outline-variant text-label-sm font-label-sm text-on-surface font-semibold shrink-0">
-              12 Skills Terdaftar
-            </span>
+<div class="flex items-center gap-2 shrink-0">
+<span class="inline-flex items-center px-2.5 py-1 rounded-full bg-surface-container-low border border-outline-variant text-label-sm font-label-sm text-on-surface font-semibold" id="skills-count-badge">
+                0 Skills Terdaftar
+              </span>
+<button class="inline-flex items-center gap-1.5 bg-secondary hover:bg-on-secondary-container text-on-secondary text-label-sm font-label-sm font-semibold h-9 px-3.5 rounded-lg transition-all active:scale-95 shadow-sm" id="btn-save-skills" type="button">
+<span class="material-symbols-outlined text-[16px]">cloud_upload</span>
+<span>Simpan Skills</span>
+</button>
+</div>
 </div>
 <!-- Add Skill Bar -->
 <div class="flex items-center gap-2">
 <div class="relative flex-1">
-<span class="material-symbols-outlined text-[18px] text-outline absolute left-3.5 top-1/2 -translate-y-1/2">search</span>
-<input class="w-full h-11 pl-10 pr-4 bg-surface-container-lowest border border-outline-variant rounded-lg text-body-md font-body-md text-on-surface placeholder:text-outline focus:outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/15 transition-all" placeholder="+ Tambah skill baru lalu tekan Enter (misal: RabbitMQ, Go, GraphQL)..." type="text"/>
+<span class="material-symbols-outlined text-[18px] text-outline absolute left-3.5 top-1/2 -translate-y-1/2">add_Moderator</span>
+<input class="w-full h-11 pl-10 pr-4 bg-surface-container-lowest border border-outline-variant rounded-lg text-body-md font-body-md text-on-surface placeholder:text-outline focus:outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/15 transition-all" id="skill-input" placeholder="+ Ketik skill baru lalu tekan Enter (misal: Docker, Go, PostgreSQL)..." type="text"/>
 </div>
-<button class="h-11 px-5 bg-secondary hover:bg-on-secondary-container text-on-secondary font-label-md text-label-md rounded-lg transition-all shrink-0 flex items-center gap-1.5 shadow-sm active:scale-95" type="button">
+<button class="h-11 px-5 bg-secondary hover:bg-on-secondary-container text-on-secondary font-label-md text-label-md rounded-lg transition-all shrink-0 flex items-center gap-1.5 shadow-sm active:scale-95" id="btn-add-skill" type="button">
 <span class="material-symbols-outlined text-[18px]">add_circle</span>
               Tambah
             </button>
 </div>
-<!-- Categorized Skill Groups -->
-<div class="space-y-space-lg">
-<!-- Group 1: Backend & Database -->
+<!-- Unsaved Skills Notice -->
+<div class="hidden items-center justify-between gap-2 px-3.5 py-2 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-body-sm" id="skills-dirty-banner">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">info</span>
+<span>Daftar keahlian telah diubah di simulator. Klik <strong>Simpan Skills</strong> untuk menyimpan permanen ke server.</span>
+</div>
+<button class="text-label-sm font-semibold underline hover:no-underline shrink-0" id="btn-save-skills-inline" type="button">Simpan Sekarang</button>
+</div>
+<!-- Active Skills Chips List -->
 <div class="space-y-2">
 <div class="flex items-center justify-between">
 <span class="text-coordinate-tag font-coordinate-tag text-outline uppercase tracking-wider flex items-center gap-1.5">
 <span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
-                  GROUP 1 — BACKEND &amp; DATABASE
-                </span>
-<span class="text-coordinate-tag font-coordinate-tag text-outline">CORE ARCHITECTURE</span>
+                DAFTAR KEAHLIAN AKTIF PENGGUNA (PUT /API/PROFILE/SKILLS)
+              </span>
+<span class="text-coordinate-tag font-coordinate-tag text-outline">MINIMAL 1 SKILL</span>
 </div>
-<div class="flex flex-wrap gap-2">
-<!-- PHP -->
-<span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-container-low border border-outline-variant/80 text-body-sm font-body-sm text-on-surface group">
-<span class="font-medium">PHP</span>
-<span class="text-[10px] font-label-sm font-semibold bg-surface-container-highest px-1.5 py-0.5 rounded text-on-surface-variant">Advanced</span>
-<button aria-label="Hapus PHP" class="text-outline hover:text-error transition-colors flex items-center" type="button">
-<span class="material-symbols-outlined text-[15px]">close</span>
-</button>
-</span>
-<!-- Laravel 13.x -->
-<span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-container-low border border-secondary/50 text-body-sm font-body-sm text-on-surface group">
-<span class="font-medium">Laravel 13.x</span>
-<span class="text-[10px] font-label-sm font-semibold bg-secondary-fixed text-on-secondary-fixed px-1.5 py-0.5 rounded">Advanced</span>
-<button aria-label="Hapus Laravel" class="text-outline hover:text-error transition-colors flex items-center" type="button">
-<span class="material-symbols-outlined text-[15px]">close</span>
-</button>
-</span>
-<!-- MySQL / MariaDB -->
-<span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-container-low border border-outline-variant/80 text-body-sm font-body-sm text-on-surface group">
-<span class="font-medium">MySQL / MariaDB</span>
-<span class="text-[10px] font-label-sm font-semibold bg-surface-container-highest px-1.5 py-0.5 rounded text-on-surface-variant">Advanced</span>
-<button aria-label="Hapus MySQL" class="text-outline hover:text-error transition-colors flex items-center" type="button">
-<span class="material-symbols-outlined text-[15px]">close</span>
-</button>
-</span>
-<!-- Redis -->
-<span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-container-low border border-outline-variant/80 text-body-sm font-body-sm text-on-surface group">
-<span class="font-medium">Redis</span>
-<span class="text-[10px] font-label-sm font-semibold bg-surface-container px-1.5 py-0.5 rounded text-on-surface-variant">Intermediate</span>
-<button aria-label="Hapus Redis" class="text-outline hover:text-error transition-colors flex items-center" type="button">
-<span class="material-symbols-outlined text-[15px]">close</span>
-</button>
-</span>
-<!-- RESTful API Architecture -->
-<span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-container-low border border-outline-variant/80 text-body-sm font-body-sm text-on-surface group">
-<span class="font-medium">RESTful API Architecture</span>
-<span class="text-[10px] font-label-sm font-semibold bg-surface-container-highest px-1.5 py-0.5 rounded text-on-surface-variant">Advanced</span>
-<button aria-label="Hapus RESTful API" class="text-outline hover:text-error transition-colors flex items-center" type="button">
-<span class="material-symbols-outlined text-[15px]">close</span>
-</button>
-</span>
-</div>
-</div>
-<!-- Group 2: DevOps & Infrastructure -->
-<div class="space-y-2 pt-2 border-t border-outline-variant/30">
-<div class="flex items-center justify-between">
-<span class="text-coordinate-tag font-coordinate-tag text-outline uppercase tracking-wider flex items-center gap-1.5">
-<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
-                  GROUP 2 — DEVOPS &amp; INFRASTRUCTURE
-                </span>
-<span class="text-coordinate-tag font-coordinate-tag text-outline">CONTAINER &amp; HOSTING</span>
-</div>
-<div class="flex flex-wrap gap-2">
-<!-- Docker -->
-<span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-container-low border border-outline-variant/80 text-body-sm font-body-sm text-on-surface group">
-<span class="font-medium">Docker</span>
-<span class="text-[10px] font-label-sm font-semibold bg-surface-container px-1.5 py-0.5 rounded text-on-surface-variant">Intermediate</span>
-<button aria-label="Hapus Docker" class="text-outline hover:text-error transition-colors flex items-center" type="button">
-<span class="material-symbols-outlined text-[15px]">close</span>
-</button>
-</span>
-<!-- Linux Server -->
-<span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-container-low border border-outline-variant/80 text-body-sm font-body-sm text-on-surface group">
-<span class="font-medium">Linux Server</span>
-<span class="text-[10px] font-label-sm font-semibold bg-surface-container px-1.5 py-0.5 rounded text-on-surface-variant">Intermediate</span>
-<button aria-label="Hapus Linux Server" class="text-outline hover:text-error transition-colors flex items-center" type="button">
-<span class="material-symbols-outlined text-[15px]">close</span>
-</button>
-</span>
-<!-- Git / GitHub Actions -->
-<span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-container-low border border-outline-variant/80 text-body-sm font-body-sm text-on-surface group">
-<span class="font-medium">Git / GitHub Actions</span>
-<span class="text-[10px] font-label-sm font-semibold bg-surface-container-highest px-1.5 py-0.5 rounded text-on-surface-variant">Advanced</span>
-<button aria-label="Hapus Git Actions" class="text-outline hover:text-error transition-colors flex items-center" type="button">
-<span class="material-symbols-outlined text-[15px]">close</span>
-</button>
-</span>
-</div>
-</div>
-<!-- Group 3: Frontend Essentials -->
-<div class="space-y-2 pt-2 border-t border-outline-variant/30">
-<div class="flex items-center justify-between">
-<span class="text-coordinate-tag font-coordinate-tag text-outline uppercase tracking-wider flex items-center gap-1.5">
-<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
-                  GROUP 3 — FRONTEND ESSENTIALS
-                </span>
-<span class="text-coordinate-tag font-coordinate-tag text-outline">UI INTEGRATION</span>
-</div>
-<div class="flex flex-wrap gap-2">
-<!-- Tailwind CSS -->
-<span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-container-low border border-outline-variant/80 text-body-sm font-body-sm text-on-surface group">
-<span class="font-medium">Tailwind CSS</span>
-<span class="text-[10px] font-label-sm font-semibold bg-surface-container px-1.5 py-0.5 rounded text-on-surface-variant">Intermediate</span>
-<button aria-label="Hapus Tailwind" class="text-outline hover:text-error transition-colors flex items-center" type="button">
-<span class="material-symbols-outlined text-[15px]">close</span>
-</button>
-</span>
-<!-- JavaScript / Vue.js -->
-<span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-container-low border border-outline-variant/80 text-body-sm font-body-sm text-on-surface group">
-<span class="font-medium">JavaScript / Vue.js</span>
-<span class="text-[10px] font-label-sm font-semibold bg-surface-container px-1.5 py-0.5 rounded text-on-surface-variant">Intermediate</span>
-<button aria-label="Hapus Vue.js" class="text-outline hover:text-error transition-colors flex items-center" type="button">
-<span class="material-symbols-outlined text-[15px]">close</span>
-</button>
-</span>
+<div class="flex flex-wrap gap-2 pt-1" id="skills-chips-container">
+<span class="text-body-sm text-on-surface-variant">Memuat keahlian...</span>
 </div>
 </div>
 </div>
-</div>
-<!-- Soft Skills & Maritime Leadership -->
-<div class="bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-space-xl space-y-space-md">
-<div class="flex items-center justify-between pb-2 border-b border-outline-variant/40">
+
+<!-- Rekomendasi Lowongan Terbaik (Live Matchmaking Feed) -->
+<div class="bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-space-xl space-y-space-lg">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-outline-variant/40">
 <div>
 <h3 class="text-headline-sm font-headline-sm text-on-surface flex items-center gap-2">
-<span class="material-symbols-outlined text-[20px] text-secondary">groups</span>
-                Karakteristik Awak &amp; Kepemimpinan Tim
+<span class="material-symbols-outlined text-[20px] text-secondary">explore</span>
+                Rekomendasi Lowongan Terbaik (Live Matchmaking)
               </h3>
-<p class="text-body-sm font-body-sm text-on-surface-variant">Keahlian non-teknis yang divalidasi oleh rekan kerja dan riwayat docking proyek.</p>
-</div>
-</div>
-<div class="flex flex-wrap gap-2">
-<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container-low border border-outline-variant text-label-md font-label-md text-on-surface">
-<span class="material-symbols-outlined text-[16px] text-secondary">psychology</span>
-              Problem Solving
-            </span>
-<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container-low border border-outline-variant text-label-md font-label-md text-on-surface">
-<span class="material-symbols-outlined text-[16px] text-secondary">rule</span>
-              Code Review &amp; Clean Architecture
-            </span>
-<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container-low border border-outline-variant text-label-md font-label-md text-on-surface">
-<span class="material-symbols-outlined text-[16px] text-secondary">handshake</span>
-              Team Collaboration
-            </span>
-<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container-low border border-outline-variant text-label-md font-label-md text-on-surface">
-<span class="material-symbols-outlined text-[16px] text-secondary">speed</span>
-              Agile / Scrum Sprint Leadership
-            </span>
-<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container-low border border-outline-variant text-label-md font-label-md text-on-surface">
-<span class="material-symbols-outlined text-[16px] text-secondary">emergency</span>
-              Incident Response
-            </span>
-</div>
-</div>
-<!-- Salary Expectations & Working Preference -->
-<div class="bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-space-xl">
-<div class="flex items-center justify-between pb-3 mb-space-md border-b border-outline-variant/40">
-<h3 class="text-headline-sm font-headline-sm text-on-surface flex items-center gap-2">
-<span class="material-symbols-outlined text-[20px] text-secondary">payments</span>
-              Ekspektasi Kompensasi &amp; Modalitas Kerja
-            </h3>
-<span class="text-coordinate-tag font-coordinate-tag text-outline">CONFIDENTIAL DISPATCH</span>
-</div>
-<div class="grid grid-cols-1 sm:grid-cols-2 gap-space-lg">
-<div class="bg-surface-container-low/60 border border-outline-variant/70 rounded-lg p-space-md">
-<span class="text-label-sm font-label-sm text-outline flex items-center gap-1.5 mb-1">
-<span class="material-symbols-outlined text-[16px]">account_balance_wallet</span>
-                Rentang Gaji yang Diharapkan
-              </span>
-<p class="text-headline-sm font-headline-sm text-on-surface font-bold">
-                Rp 12.000.000 - Rp 18.000.000
+<p class="text-body-sm font-body-sm text-on-surface-variant">
+                Diurutkan otomatis berdasarkan skor Weighted Jaccard tertinggi terhadap keahlianmu saat ini. Klik chip skill yang kurang untuk langsung menambahkannya!
               </p>
-<p class="text-coordinate-tag font-coordinate-tag text-secondary mt-0.5">PER BULAN (GROSS/NEGOTIABLE)</p>
 </div>
-<div class="bg-surface-container-low/60 border border-outline-variant/70 rounded-lg p-space-md">
-<span class="text-label-sm font-label-sm text-outline flex items-center gap-1.5 mb-1">
-<span class="material-symbols-outlined text-[16px]">work</span>
-                Modalitas &amp; Jadwal Operasi
-              </span>
-<p class="text-body-md font-body-md text-on-surface font-semibold">
-                Hybrid atau Full Remote
-              </p>
-<p class="text-coordinate-tag font-coordinate-tag text-on-surface-variant mt-0.5">3 HARI KANTOR / 2 HARI REMOTE</p>
+<a class="text-label-sm font-label-sm text-secondary hover:underline shrink-0 flex items-center gap-1" href="/catalog">
+<span>Buka Katalog Lengkap</span>
+<span class="material-symbols-outlined text-[16px]">open_in_new</span>
+</a>
 </div>
+
+<div class="space-y-3" id="recommended-jobs-container">
+<div class="p-6 text-center text-on-surface-variant bg-surface-container-low/50 rounded-lg border border-outline-variant/50">
+              Memuat rekomendasi lowongan dan menghitung skor kecocokan...
+            </div>
 </div>
 </div>
 </div>
@@ -667,24 +448,26 @@
         </span>
 <span class="hidden sm:inline text-outline">•</span>
 <p class="text-body-sm font-body-sm text-on-surface-variant">
-          © 2025 JobHarbour. Hak Cipta Dilindungi Undang-Undang. Pelabuhan Karir &amp; Talenta Maritim Indonesia.
+          © 2026 JobHarbour - Kelompok 4 Universitas Harkat Negeri (Tegal). Pelabuhan Karir &amp; Talenta Indonesia.
         </p>
 </div>
-<!-- Links from JSON -->
+<!-- Links -->
 <div class="flex items-center flex-wrap justify-center gap-6">
-<a class="text-label-sm font-label-sm text-on-surface-variant hover:text-on-surface transition-colors" href="/">
-          Ketentuan Layanan
+<a class="text-label-sm font-label-sm text-on-surface-variant hover:text-on-surface transition-colors" href="/catalog">
+          The Anchorage (Katalog)
         </a>
-<a class="text-label-sm font-label-sm text-on-surface-variant hover:text-on-surface transition-colors" href="/">
-          Kebijakan Privasi
+<a class="text-label-sm font-label-sm text-on-surface-variant hover:text-on-surface transition-colors" href="/my-dock">
+          My Dock (Lamaran)
         </a>
-<a class="text-label-sm font-label-sm text-on-surface-variant hover:text-on-surface transition-colors" href="/">
-          Daftar Pelabuhan
+<a class="text-label-sm font-label-sm text-on-surface-variant hover:text-on-surface transition-colors" href="/profile">
+          Captain's Ledger (Profil)
         </a>
-<a class="text-label-sm font-label-sm text-on-surface-variant hover:text-on-surface transition-colors" href="/">
-          Bantuan Kapten
+<a class="text-label-sm font-label-sm text-on-surface-variant hover:text-on-surface transition-colors" href="/recruiter">
+          Harbour Master (Recruiter)
         </a>
 </div>
 </div>
 </footer>
+<script src="/js/jh-api.js"></script>
+<script src="/js/pages/profile.js"></script>
 </body></html>

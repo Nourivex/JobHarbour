@@ -101,4 +101,67 @@ class ProfileSkillController extends Controller
             'updated_at' => $targetUser->updated_at->toIso8601String(),
         ], 'Data keahlian (skills) pada profil pengguna berhasil diperbarui.');
     }
+
+    /**
+     * Auth & Profile Service: Memperbarui biodata profil pengguna (nama, telepon, bio, lokasi, skills).
+     *
+     * Method  : PUT / PATCH
+     * Endpoint: /api/profile
+     * Headers : Authorization: Bearer <token>, Content-Type: application/json
+     */
+    public function updateProfile(Request $request): JsonResponse
+    {
+        $currentUser = $request->attributes->get('auth_user') ?? $request->user();
+
+        $validator = Validator::make($request->all(), [
+            'name' => 'sometimes|required|string|max:255',
+            'phone' => 'nullable|string|max:30',
+            'bio' => 'nullable|string|max:1000',
+            'location' => 'nullable|string|max:100',
+            'skills' => 'nullable|array',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->validationErrorResponse($validator->errors(), 'Data profil tidak valid.');
+        }
+
+        if ($request->has('name')) {
+            $currentUser->name = $request->input('name');
+        }
+        if ($request->has('phone')) {
+            $currentUser->phone = $request->input('phone');
+        }
+        if ($request->has('bio')) {
+            $currentUser->bio = $request->input('bio');
+        }
+        if ($request->has('location')) {
+            $currentUser->location = $request->input('location');
+        }
+        if ($request->has('skills') && is_array($request->input('skills'))) {
+            $rawSkills = $request->input('skills');
+            $formattedSkills = [];
+            foreach ($rawSkills as $skill) {
+                if (is_string($skill) && trim($skill) !== '') {
+                    $formattedSkills[] = trim($skill);
+                } elseif (is_array($skill) && ! empty($skill['name'])) {
+                    $formattedSkills[] = trim($skill['name']);
+                }
+            }
+            $currentUser->skills = array_values(array_unique($formattedSkills, SORT_REGULAR));
+        }
+
+        $currentUser->save();
+
+        return $this->successResponse([
+            'id' => $currentUser->id,
+            'name' => $currentUser->name,
+            'email' => $currentUser->email,
+            'role' => $currentUser->role,
+            'phone' => $currentUser->phone,
+            'bio' => $currentUser->bio,
+            'location' => $currentUser->location,
+            'skills' => $currentUser->skills ?? [],
+            'updated_at' => $currentUser->updated_at->toIso8601String(),
+        ], 'Profil pengguna berhasil diperbarui.');
+    }
 }

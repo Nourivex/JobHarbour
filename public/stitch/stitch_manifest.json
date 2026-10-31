@@ -1,0 +1,110 @@
+[
+  {
+    "id": "69ef5983c1b74b5d9bb53e58ce7fa5a1",
+    "slug": "my-dock",
+    "title": "Lamaran Saya - JobHarbour Applications",
+    "requestedTitle": "My Dock - Dashboard Pelamar & Linimasa Seleksi",
+    "deviceType": "DESKTOP",
+    "htmlPath": "public/stitch/69ef5983c1b74b5d9bb53e58ce7fa5a1_my-dock.html",
+    "bladePath": "resources/views/stitch/my-dock.blade.php",
+    "imagePath": "public/images/stitch/69ef5983c1b74b5d9bb53e58ce7fa5a1_my-dock.jpg",
+    "htmlDownloadUrl": "https://stitch.googleapis.com/v1/projects/9362254443119260640/files/17075478494065967611:download",
+    "imageDownloadUrl": "https://stitch.googleapis.com/v1/projects/9362254443119260640/files/826554019405284662:download"
+  },
+  {
+    "id": "a7c84a5b2a1540b4bbf56240f2af4b98",
+    "slug": "captains-ledger",
+    "title": "Profil Karier - JobHarbour Career Profile",
+    "requestedTitle": "Captain's Ledger - Profil Talenta & Kalibrasi Keahlian",
+    "deviceType": "DESKTOP",
+    "htmlPath": "public/stitch/a7c84a5b2a1540b4bbf56240f2af4b98_captains-ledger.html",
+    "bladePath": "resources/views/stitch/captains-ledger.blade.php",
+    "imagePath": "public/images/stitch/a7c84a5b2a1540b4bbf56240f2af4b98_captains-ledger.jpg",
+    "htmlDownloadUrl": "https://stitch.googleapis.com/v1/projects/9362254443119260640/files/3887244171302972797:download",
+    "imageDownloadUrl": "https://stitch.googleapis.com/v1/projects/9362254443119260640/files/10397540301226744434:download"
+  },
+  {
+    "id": "112b05d515c0452d86d32f5a6a77a24d",
+    "slug": "embarkation-dock",
+    "title": "Formulir Lamaran - JobHarbour Apply Modal",
+    "requestedTitle": "Embarkation Dock - Quick Apply Modal",
+    "deviceType": "DESKTOP",
+    "htmlPath": "public/stitch/112b05d515c0452d86d32f5a6a77a24d_embarkation-dock.html",
+    "bladePath": "resources/views/stitch/embarkation-dock.blade.php",
+    "imagePath": "public/images/stitch/112b05d515c0452d86d32f5a6a77a24d_embarkation-dock.png",
+    "htmlDownloadUrl": "https://stitch.googleapis.com/v1/projects/9362254443119260640/files/14007493172000077030:download",
+    "imageDownloadUrl": "https://stitch.googleapis.com/v1/projects/9362254443119260640/files/screenshot_00065edd9a5b0d700503c16131122552:download"
+  },
+  {
+    "id": "2d2faf399c534380bba9bdaafb41e89c",
+    "slug": "harbour-master-deck",
+    "title": "Dashboard Rekrutmen - JobHarbour Pipeline",
+    "requestedTitle": "Harbour Master Deck - Dashboard Rekruter & Pipeline Seleksi",
+    "deviceType": "DESKTOP",
+    "htmlPath": "public/stitch/2d2faf399c534380bba9bdaafb41e89c_harbour-master-deck.html",
+    "bladePath": "resources/views/stitch/harbour-master-deck.blade.php",
+    "imagePath": "public/images/stitch/2d2faf399c534380bba9bdaafb41e89c_harbour-master-deck.jpg",
+    "htmlDownloadUrl": "https://stitch.googleapis.com/v1/projects/9362254443119260640/files/16629984059904807378:download",
+    "imageDownloadUrl": "https://stitch.googleapis.com/v1/projects/9362254443119260640/files/17376241980046904352:download"
+  },
+  {
+    "id": "c85cc0df36d74a6bb260698b25c7e0e5",
+    "slug": "recruitment-pipeline",
+    "title": "Dashboard Rekrutmen - JobHarbour Pipeline",
+    "requestedTitle": "Dashboard Rekrutmen - JobHarbour Pipeline",
+    "deviceType": "DESKTOP",
+    "htmlPath": "public/stitch/c85cc0df36d74a6bb260698b25c7e0e5_recruitment-pipeline.html",
+    "bladePath": "resources/views/stitch/recruitment-pipeline.blade.php",
+    "imagePath": "public/images/stitch/c85cc0df36d74a6bb260698b25c7e0e5_recruitment-pipeline.png",
+    "htmlDownloadUrl": "https://stitch.googleapis.com/v1/projects/9362254443119260640/files/c85cc0df36d74a6bb260698b25c7e0e5:download",
+    "imageDownloadUrl": "https://stitch.googleapis.com/v1/projects/9362254443119260640/files/screenshot_00065eddbeac629b0332eb6370176df6:download"
+  },
+  {
+    "id": "3660da1120924ff4b6e30c60f2bd92f6",
+    "slug": "my-dock-v2",
+    "title": "My Dock - Dashboard Pelamar & Linimasa Seleksi",
+    "requestedTitle": "My Dock - Dashboard Pelamar (Variant 2)",
+    "deviceType": "DESKTOP",
+    "htmlPath": "public/stitch/3660da1120924ff4b6e30c60f2bd92f6_my-dock-v2.html",
+    "bladePath": "resources/views/stitch/my-dock-v2.blade.php",
+    "imagePath": "public/images/stitch/3660da1120924ff4b6e30c60f2bd92f6_my-dock-v2.png",
+    "htmlDownloadUrl": "https://stitch.googleapis.com/v1/projects/9362254443119260640/files/a33d8b96483c4fb89fba71f1e2f9e7c9:download",
+    "imageDownloadUrl": "https://stitch.googleapis.com/v1/projects/9362254443119260640/files/49332ebf747e4e1ea8b7d3ad25907202:download"
+  },
+  {
+    "id": "12e57e897567452a8ef83c8e279673ff",
+    "slug": "captains-ledger-v2",
+    "title": "Captain's Ledger - Profil Talenta & Kalibrasi Keahlian",
+    "requestedTitle": "Captain's Ledger - Profil Talenta (Variant 2)",
+    "deviceType": "DESKTOP",
+    "htmlPath": "public/stitch/12e57e897567452a8ef83c8e279673ff_captains-ledger-v2.html",
+    "bladePath": "resources/views/stitch/captains-ledger-v2.blade.php",
+    "imagePath": "public/images/stitch/12e57e897567452a8ef83c8e279673ff_captains-ledger-v2.png",
+    "htmlDownloadUrl": "https://stitch.googleapis.com/v1/projects/9362254443119260640/files/30144c2b6d074a38a5aac24cd8a7e0fc:download",
+    "imageDownloadUrl": "https://stitch.googleapis.com/v1/projects/9362254443119260640/files/2f6ccde5f135408580e2012a299d9d9f:download"
+  },
+  {
+    "id": "c1db732526a54b2c961bc2e24067f951",
+    "slug": "embarkation-dock-v2",
+    "title": "Embarkation Dock - Quick Apply Modal",
+    "requestedTitle": "Embarkation Dock - Quick Apply (Variant 2)",
+    "deviceType": "DESKTOP",
+    "htmlPath": "public/stitch/c1db732526a54b2c961bc2e24067f951_embarkation-dock-v2.html",
+    "bladePath": "resources/views/stitch/embarkation-dock-v2.blade.php",
+    "imagePath": "public/images/stitch/c1db732526a54b2c961bc2e24067f951_embarkation-dock-v2.png",
+    "htmlDownloadUrl": "https://stitch.googleapis.com/v1/projects/9362254443119260640/files/d13098a6c40640f783a92f03b9a09e51:download",
+    "imageDownloadUrl": "https://stitch.googleapis.com/v1/projects/9362254443119260640/files/5dc8c90d28554a8f9cbb0381a78c0c7b:download"
+  },
+  {
+    "id": "9b32193fb68e40da9f15ac00b3673030",
+    "slug": "harbour-master-deck-v2",
+    "title": "Harbour Master Deck - Dashboard Rekruter & Pipeline Seleksi",
+    "requestedTitle": "Harbour Master Deck - Recruiter Dashboard (Variant 2)",
+    "deviceType": "DESKTOP",
+    "htmlPath": "public/stitch/9b32193fb68e40da9f15ac00b3673030_harbour-master-deck-v2.html",
+    "bladePath": "resources/views/stitch/harbour-master-deck-v2.blade.php",
+    "imagePath": "public/images/stitch/9b32193fb68e40da9f15ac00b3673030_harbour-master-deck-v2.png",
+    "htmlDownloadUrl": "https://stitch.googleapis.com/v1/projects/9362254443119260640/files/4a735560ec1141a295eb0a360df0155a:download",
+    "imageDownloadUrl": "https://stitch.googleapis.com/v1/projects/9362254443119260640/files/bc05db4a5a0c47269dc06d211bc9e27b:download"
+  }
+]
