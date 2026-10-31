@@ -47,7 +47,11 @@ class ApplicationController extends Controller
     {
         $currentUser = $request->attributes->get('auth_user') ?? $request->user();
 
-        $query = Application::with(['jobVacancy:id,title,company,location', 'pipelineTimeline']);
+        $query = Application::with([
+            'jobVacancy:id,title,company,location',
+            'applicant:id,name,email,phone,bio,location,skills',
+            'pipelineTimeline',
+        ]);
 
         // Jika pelamar, hanya tampilkan lamaran milik dirinya sendiri
         if ($currentUser->role === 'applicant') {

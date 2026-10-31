@@ -3,7 +3,8 @@
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    // Landing page = katalog lowongan (sudah tersambung ke API /api/jobs)
+    return view('pages.catalog');
 });
 
 Route::get('/docs', function () {
@@ -25,6 +26,11 @@ Route::get('/api/docs/openapi.yaml', function () {
 })->name('swagger.spec');
 
 // Halaman-halaman Frontend Modern Harbour Tech
+// Catatan: semua halaman ini ngobrol ke backend lewat REST API (/api/*) pakai public/js/jh-api.js
+Route::get('/login', function () {
+    return view('pages.login');
+})->name('login');
+
 Route::get('/catalog', function () {
     return view('pages.catalog');
 })->name('page.catalog');
@@ -44,4 +50,31 @@ Route::get('/profile', function () {
 Route::get('/recruiter', function () {
     return view('pages.recruiter');
 })->name('page.recruiter');
+
+// Stitch Screens Showcase & Previews
+Route::get('/stitch', function () {
+    $manifestPath = public_path('stitch/stitch_manifest.json');
+    $screens = file_exists($manifestPath) ? json_decode(file_get_contents($manifestPath), true) : [];
+    return view('stitch.index', compact('screens'));
+})->name('stitch.index');
+
+Route::get('/stitch/{slug}', function ($slug) {
+    if (view()->exists("stitch.{$slug}")) {
+        return view("stitch.{$slug}");
+    }
+    abort(404, "Screen {$slug} tidak ditemukan.");
+})->name('stitch.screen');
+
+// Fallback melayani file statis JS di public/js jika server meneruskan request ke router Laravel
+Route::get('/js/{path}', function (string $path) {
+    $fullPath = public_path('js/'.$path);
+    abort_unless(is_file($fullPath), 404);
+
+    return response(file_get_contents($fullPath), 200, [
+        'Content-Type' => 'application/javascript; charset=utf-8',
+        'Cache-Control' => 'no-store, no-cache, must-revalidate',
+    ]);
+})->where('path', '.*');
+
+
 

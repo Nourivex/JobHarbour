@@ -27,4 +27,7 @@ Homestead.yaml
 Thumbs.db
 /materi
 *.pdf
+/scratch
+file.env
+
 

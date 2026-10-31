@@ -92,6 +92,10 @@ Route::prefix('auth')->group(function () {
 });
 
 Route::middleware('jwt.auth')->group(function () {
+    // Method PUT/PATCH: Memperbarui biodata profil & keahlian pengguna
+    Route::put('/profile', [ProfileSkillController::class, 'updateProfile']);
+    Route::patch('/profile', [ProfileSkillController::class, 'updateProfile']);
+
     // Method PUT: Menyimpan atau memperbarui kumpulan data keahlian (skills) di profil pengguna
     Route::put('/profile/skills', [ProfileSkillController::class, 'updateSkills']);
     Route::put('/users/{id}/skills', [ProfileSkillController::class, 'updateSkills']);
