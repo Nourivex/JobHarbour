@@ -336,13 +336,14 @@
 <!-- Search Input with icon -->
 <div class="md:col-span-5 flex items-center gap-2.5 px-3 py-2 bg-surface-container-lowest rounded-xl border border-outline-variant/60 focus-within:border-secondary transition-all">
 <span class="material-symbols-outlined text-on-surface-variant text-xl" data-icon="search">search</span>
-<input class="w-full bg-transparent border-0 p-0 text-body-md font-body-md text-on-surface placeholder:text-outline focus:ring-0 focus:outline-none" placeholder="Cari posisi, keahlian, atau perusahaan (cth: Backend, DevOps)..." type="text"/>
+<input class="w-full bg-transparent border-0 p-0 text-body-md font-body-md text-on-surface placeholder:text-outline focus:ring-0 focus:outline-none" id="searchInput" placeholder="Cari posisi, keahlian, atau perusahaan (cth: Backend, DevOps)..." type="text"/>
 </div>
 <!-- Location Selector -->
 <div class="md:col-span-3 flex items-center gap-2 px-3 py-2 bg-surface-container-lowest rounded-xl border border-outline-variant/60 focus-within:border-secondary transition-all">
 <span class="material-symbols-outlined text-secondary text-xl" data-icon="location_on">location_on</span>
-<select class="w-full bg-transparent border-0 p-0 text-body-md font-body-md text-on-surface focus:ring-0 focus:outline-none cursor-pointer">
-<option selected="" value="tegal">Tegal (Jawa Tengah)</option>
+<select id="locationSelect" class="w-full bg-transparent border-0 p-0 text-body-md font-body-md text-on-surface focus:ring-0 focus:outline-none cursor-pointer">
+<option value="">Semua Pelabuhan (Lokasi)</option>
+<option value="Tegal">Tegal (Jawa Tengah)</option>
 <option value="semarang">Semarang</option>
 <option value="bandung">Bandung</option>
 <option value="jakarta">Jakarta</option>
@@ -362,7 +363,7 @@
 </div>
 <!-- Search CTA Button -->
 <div class="md:col-span-2">
-<button class="w-full h-11 px-4 rounded-xl bg-secondary text-on-secondary font-headline-sm text-sm font-semibold flex items-center justify-center gap-2 hover:bg-on-secondary-container transition-all shadow-sm active:scale-95">
+<button id="searchBtn" type="button" class="w-full h-11 px-4 rounded-xl bg-secondary text-on-secondary font-headline-sm text-sm font-semibold flex items-center justify-center gap-2 hover:bg-on-secondary-container transition-all shadow-sm active:scale-95">
 <span class="material-symbols-outlined text-lg" data-icon="explore">explore</span>
 <span>Berlayar (Cari)</span>
 </button>
@@ -398,7 +399,7 @@
 <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-4 mb-4 border-b border-outline-variant/60">
 <div class="flex items-center gap-2">
 <span class="material-symbols-outlined text-secondary" data-icon="view_kanban">view_kanban</span>
-<h2 class="text-headline-sm font-headline-sm text-on-surface font-semibold">148 Lowongan Aktif di Dermaga</h2>
+<h2 class="text-headline-sm font-headline-sm text-on-surface font-semibold"><span id="activeJobCounter">Memuat Lowongan...</span></h2>
 <span class="text-xs px-2 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed font-semibold">Live Telemetry</span>
 </div>
 <div class="flex items-center gap-3">
@@ -423,7 +424,7 @@
 <!-- ===================================================================== -->
 <!-- LEFT COLUMN: Job Vacancy Master List (40% width)                      -->
 <!-- ===================================================================== -->
-<div class="lg:col-span-5 space-y-space-md">
+<div id="jobListContainer" class="lg:col-span-5 space-y-space-md">
 <!-- CARD 1 (Selected State) -->
 <article class="relative p-space-lg rounded-xl bg-surface-container-lowest border-2 border-secondary shadow-[0_4px_16px_-4px_rgba(2,132,199,0.12)] cursor-pointer transition-all">
 <!-- Active Left Anchor Indicator Rail -->
@@ -611,7 +612,7 @@
 <!-- ===================================================================== -->
 <!-- RIGHT COLUMN: Sticky Rich Detail View (60% width)                     -->
 <!-- ===================================================================== -->
-<div class="lg:col-span-7 sticky top-20">
+<div id="jobDetailContainer" class="lg:col-span-7 space-y-space-md sticky top-24">
 <div class="bg-surface-container-lowest border border-outline-variant/80 rounded-2xl p-space-xl shadow-sm">
 <!-- Detail Header Section -->
 <div class="border-b border-outline-variant/60 pb-space-lg">
@@ -898,4 +899,120 @@
 </div>
 </div>
 </footer>
+
+<!-- LIVE CATALOG INTEGRATION (M. Fahren Andrean Rangkuti) -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let currentJobs = [];
+    let selectedJobId = null;
+
+    const listContainer = document.getElementById('jobListContainer');
+    const detailContainer = document.getElementById('jobDetailContainer');
+    const searchInput = document.getElementById('searchInput');
+    const locationSelect = document.getElementById('locationSelect');
+    const searchBtn = document.getElementById('searchBtn');
+    const counterSpan = document.getElementById('activeJobCounter');
+
+    async function fetchJobs() {
+        if (listContainer) {
+            listContainer.innerHTML = ;
+        }
+
+        try {
+            const params = new URLSearchParams();
+            if (searchInput && searchInput.value.trim()) params.append('search', searchInput.value.trim());
+            if (locationSelect && locationSelect.value.trim()) params.append('location', locationSelect.value.trim());
+
+            const res = await fetch('/api/jobs?' + params.toString(), {
+                headers: { 'Accept': 'application/json' }
+            });
+            const json = await res.json();
+            
+            if (json.status === 'success' && Array.isArray(json.data)) {
+                currentJobs = json.data;
+                if (counterSpan) {
+                    counterSpan.textContent = ;
+                }
+                renderJobList(currentJobs);
+                if (currentJobs.length > 0) {
+                    selectJob(currentJobs[0].id);
+                } else {
+                    renderEmptyDetail();
+                }
+            }
+        } catch (err) {
+            console.error('Gagal mengambil katalog lowongan:', err);
+            if (listContainer) {
+                listContainer.innerHTML = ;
+            }
+        }
+    }
+
+    function formatRupiah(num) {
+        if (!num) return 'Dirahasiakan';
+        return 'Rp ' + Number(num).toLocaleString('id-ID');
+    }
+
+    function renderJobList(jobs) {
+        if (!listContainer) return;
+        if (jobs.length === 0) {
+            listContainer.innerHTML = ;
+            return;
+        }
+
+        listContainer.innerHTML = jobs.map(job => {
+            const isSelected = job.id === selectedJobId;
+            const borderClass = isSelected ? 'border-2 border-secondary shadow-lg' : 'border border-outline-variant/60 hover:border-secondary/60';
+            const companyInitials = (job.company || 'JH').split(' ').map(n=>n[0]).slice(0,2).join('').toUpperCase();
+            
+            const skillsHtml = (job.requirements || []).slice(0, 3).map(r => ).join('');
+
+            return ;
+        }).join('');
+    }
+
+    function renderEmptyDetail() {
+        if (!detailContainer) return;
+        detailContainer.innerHTML = ;
+    }
+
+    window.selectJob = function(jobId) {
+        selectedJobId = jobId;
+        renderJobList(currentJobs);
+
+        const job = currentJobs.find(j => j.id === jobId);
+        if (!job || !detailContainer) return;
+
+        const companyInitials = (job.company || 'JH').split(' ').map(n=>n[0]).slice(0,2).join('').toUpperCase();
+
+        const reqsHtml = (job.requirements || []).map(r => {
+            const weightBadge = r.weight === 3 ? 
+                '<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-error-container text-on-error-container">Wajib (Weight 3)</span>' :
+                (r.weight === 2 ? 
+                    '<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-amber-100 text-amber-800">Penting (Weight 2)</span>' : 
+                    '<span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-surface-container-high text-on-surface-variant">Nilai Tambah (1)</span>');
+
+            return ;
+        }).join('');
+
+        detailContainer.innerHTML = ;
+    };
+
+    if (searchBtn) {
+        searchBtn.addEventListener('click', fetchJobs);
+    }
+    if (searchInput) {
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') fetchJobs();
+        });
+    }
+    if (locationSelect) {
+        locationSelect.addEventListener('change', fetchJobs);
+    }
+
+    // Initial fetch
+    fetchJobs();
+});
+</script>
+
 </body></html>
