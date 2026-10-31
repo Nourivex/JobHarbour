@@ -553,6 +553,347 @@
 }
 
 /* ------------------------------------------------------------------ */
+/* Halaman Masuk / Daftar                                              */
+/* ------------------------------------------------------------------ */
+.auth-photo { animation: heroZoom 1800ms cubic-bezier(0.23, 1, 0.32, 1) both; }
+
+.auth-beacon {
+    left: var(--beacon-x, 74%);
+    top: var(--beacon-y, 53%);
+    width: 110px;
+    height: 110px;
+    background: radial-gradient(circle, rgba(255, 200, 130, 0.6) 0%, rgba(255, 160, 80, 0.2) 40%, transparent 70%);
+    animation: beacon 4s ease-in-out infinite;
+}
+
+/* Teks panel gambar berganti dengan memudar dan bergeser naik */
+.auth-visual-copy {
+    transition: opacity 360ms cubic-bezier(0.23, 1, 0.32, 1), transform 360ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.auth-visual-copy[aria-hidden="true"] {
+    opacity: 0;
+    transform: translateY(12px);
+    pointer-events: none;
+}
+
+/* Tab dengan penanda yang bergeser */
+.auth-tab {
+    padding: 0.85rem 0.5rem;
+    font-weight: 600;
+    color: var(--color-text-tertiary);
+    cursor: pointer;
+    transition: color 200ms ease;
+}
+
+.auth-tab:hover { color: var(--color-text-primary); }
+.auth-tab[aria-selected="true"] { color: var(--color-orange-harbour); }
+
+.auth-tab-indicator {
+    position: absolute;
+    left: 0;
+    bottom: -1px;
+    width: 50%;
+    height: 3px;
+    border-radius: 3px;
+    background: var(--color-orange-bright);
+    transition: transform 320ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+[data-mode="register"] .auth-tab-indicator { transform: translateX(100%); }
+
+/* Panel form: yang lama keluar ke satu sisi, yang baru masuk dari sisi lain */
+.auth-panels { transition: height 320ms cubic-bezier(0.23, 1, 0.32, 1); }
+.auth-panels.is-animating { overflow: hidden; }
+
+@keyframes panelOut {
+    to { opacity: 0; transform: translateX(calc(var(--dir, 1) * -24px)); }
+}
+
+@keyframes panelIn {
+    from { opacity: 0; transform: translateX(calc(var(--dir, 1) * 24px)); }
+    to { opacity: 1; transform: none; }
+}
+
+.auth-panel.is-leaving { animation: panelOut 150ms ease-in forwards; }
+.auth-panel.is-entering { animation: panelIn 320ms cubic-bezier(0.23, 1, 0.32, 1) both; }
+
+/* Kolom input */
+.auth-label {
+    display: block;
+    margin-bottom: 0.45rem;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    transition: color 150ms ease;
+}
+
+.auth-input {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    height: 3rem;
+    padding: 0 0.9rem;
+    border: 1px solid var(--color-border-strong);
+    border-radius: 0.8rem;
+    background: #FFFFFF;
+    transition: border-color 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
+}
+
+.auth-input:hover { border-color: #A9B6C4; }
+
+.auth-input input {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    font-size: 15px;
+    color: var(--color-text-primary);
+}
+
+.auth-input input::placeholder { color: #8C98A8; }
+.auth-input-icon { color: #8C98A8; flex-shrink: 0; transition: color 180ms ease, transform 180ms ease; }
+
+/* Fokus: tepi oranye, cahaya lembut, ikon ikut berwarna */
+.auth-input:focus-within {
+    border-color: var(--color-orange-bright);
+    box-shadow: 0 0 0 4px rgba(242, 106, 27, 0.14);
+}
+
+.auth-input:focus-within .auth-input-icon { color: var(--color-orange-harbour); transform: scale(1.08); }
+.auth-field:focus-within .auth-label { color: var(--color-orange-harbour); }
+
+/* Tanda centang saat kolom valid */
+.auth-valid {
+    flex-shrink: 0;
+    color: var(--color-status-success);
+    opacity: 0;
+    transform: scale(0.6);
+    transition: opacity 200ms ease, transform 260ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.auth-field.is-valid .auth-valid { opacity: 1; transform: scale(1); }
+
+/* Kolom bermasalah */
+.auth-field.is-invalid .auth-input { border-color: var(--color-status-failed); }
+.auth-field.is-invalid .auth-input:focus-within { box-shadow: 0 0 0 4px rgba(180, 35, 24, 0.12); }
+.auth-field.is-invalid .auth-input-icon { color: var(--color-status-failed); }
+
+.auth-error {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-status-failed);
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transform: translateY(-4px);
+    transition: max-height 220ms ease, opacity 200ms ease, transform 200ms ease, margin 200ms ease;
+}
+
+.auth-error.is-shown { max-height: 4rem; opacity: 1; transform: none; margin-top: 0.4rem; }
+
+/* Kilatan singkat saat kolom diisi otomatis oleh akun demo */
+@keyframes fillFlash {
+    0% { background-color: #FFF1E6; box-shadow: 0 0 0 4px rgba(242, 106, 27, 0.2); }
+    100% { background-color: #FFFFFF; box-shadow: 0 0 0 0 rgba(242, 106, 27, 0); }
+}
+
+.auth-input.is-filled { animation: fillFlash 900ms ease-out; }
+
+/* Tombol mata */
+.auth-eye {
+    width: 2.25rem;
+    height: 2.25rem;
+    margin-right: -0.4rem;
+    display: grid;
+    place-items: center;
+    border-radius: 0.5rem;
+    color: #627080;
+    cursor: pointer;
+}
+
+.auth-eye:hover { color: var(--color-text-primary); background: var(--color-canvas); }
+.auth-eye svg { grid-area: 1 / 1; transition: opacity 160ms ease, transform 200ms ease; }
+.auth-eye .eye-open { opacity: 0; transform: scale(0.7) rotate(-20deg); }
+.auth-eye[aria-pressed="true"] .eye-open { opacity: 1; transform: none; }
+.auth-eye[aria-pressed="true"] .eye-closed { opacity: 0; transform: scale(0.7) rotate(20deg); }
+
+/* Tombol kirim: memuat, berhasil, goyang saat gagal */
+.auth-submit {
+    width: 100%;
+    height: 3.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.8rem;
+    background: var(--color-orange-bright);
+    color: #FFFFFF;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 14px 26px -16px rgba(242, 106, 27, 0.95);
+    transition: background-color 200ms ease, transform 120ms ease, box-shadow 200ms ease;
+}
+
+.auth-submit:hover { background: #FF7D33; }
+.auth-submit:disabled { cursor: default; }
+.auth-submit.is-loading { background: #E0743A; }
+.auth-submit.is-success { background: var(--color-status-success); box-shadow: 0 14px 26px -16px rgba(21, 127, 59, 0.9); }
+.auth-submit-label { animation: fadeInFast 180ms ease-out; }
+
+.auth-spinner {
+    width: 1.1rem;
+    height: 1.1rem;
+    border-radius: 9999px;
+    border: 2.5px solid rgba(255, 255, 255, 0.35);
+    border-top-color: #FFFFFF;
+    animation: spin 700ms linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-6px); }
+    40% { transform: translateX(5px); }
+    60% { transform: translateX(-3px); }
+    80% { transform: translateX(2px); }
+}
+
+.is-shaking { animation: shake 360ms ease-in-out; }
+
+/* Kartu pilihan peran */
+.role-card {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.8rem 0.9rem;
+    border: 1px solid var(--color-border-strong);
+    border-radius: 0.9rem;
+    background: #FFFFFF;
+    color: var(--color-text-primary);
+    cursor: pointer;
+    transition: border-color 200ms ease, background-color 200ms ease, box-shadow 200ms ease;
+}
+
+.role-card:hover { border-color: #A9B6C4; }
+
+.role-dot {
+    width: 1.1rem;
+    height: 1.1rem;
+    flex-shrink: 0;
+    border-radius: 9999px;
+    border: 2px solid #A9B6C4;
+    display: grid;
+    place-items: center;
+    transition: border-color 200ms ease;
+}
+
+.role-dot::after {
+    content: "";
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 9999px;
+    background: var(--color-orange-bright);
+    transform: scale(0);
+    transition: transform 240ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.role-icon { color: #627080; transition: color 200ms ease; }
+
+.role-card:has(input:checked) {
+    border-color: var(--color-orange-bright);
+    background: #FFF6EF;
+    box-shadow: 0 0 0 3px rgba(242, 106, 27, 0.12);
+}
+
+.role-card:has(input:checked) .role-dot { border-color: var(--color-orange-bright); }
+.role-card:has(input:checked) .role-dot::after { transform: scale(1); }
+.role-card:has(input:checked) .role-icon { color: var(--color-orange-harbour); }
+.role-card:has(input:focus-visible) { outline: 2px solid var(--color-orange-harbour); outline-offset: 2px; }
+
+/* Indikator kekuatan sandi */
+.pw-strength span {
+    height: 6px;
+    border-radius: 6px;
+    background: #E2E7ED;
+    transition: background-color 250ms ease;
+}
+
+.pw-strength[data-level="1"] span:nth-child(-n+1) { background: #B42318; }
+.pw-strength[data-level="2"] span:nth-child(-n+2) { background: #E0890F; }
+.pw-strength[data-level="3"] span:nth-child(-n+3) { background: #1B65A6; }
+.pw-strength[data-level="4"] span { background: #157F3B; }
+
+#pw-strength-label[data-level="1"] { color: #B42318; }
+#pw-strength-label[data-level="2"] { color: #B26B00; }
+#pw-strength-label[data-level="3"] { color: #1B65A6; }
+#pw-strength-label[data-level="4"] { color: #157F3B; }
+
+/* Chip skill */
+.auth-input-chips { gap: 0.4rem; padding-top: 0.4rem; padding-bottom: 0.4rem; }
+.auth-input-chips input { height: 2.1rem; }
+
+.skill-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.3rem 0.4rem 0.3rem 0.7rem;
+    border-radius: 0.55rem;
+    background: var(--color-canvas);
+    border: 1px solid var(--color-border-subtle);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+}
+
+.skill-chip button {
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 0.35rem;
+    display: grid;
+    place-items: center;
+    color: #627080;
+    cursor: pointer;
+}
+
+.skill-chip button:hover { background: #E2E7ED; color: var(--color-status-failed); }
+
+@keyframes chipPop {
+    from { opacity: 0; transform: scale(0.85); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.skill-chip.is-new { animation: chipPop 220ms cubic-bezier(0.34, 1.56, 0.64, 1); }
+.skill-chip.is-removing { opacity: 0; transform: scale(0.85); transition: opacity 140ms ease, transform 140ms ease; }
+
+.auth-check {
+    width: 1.15rem;
+    height: 1.15rem;
+    flex-shrink: 0;
+    accent-color: var(--color-orange-bright);
+    cursor: pointer;
+}
+
+/* Akun demo */
+.demo-btn { transition: border-color 180ms ease, background-color 180ms ease, transform 120ms ease, box-shadow 180ms ease; }
+.demo-btn:hover { border-color: var(--color-orange-bright); box-shadow: 0 8px 18px -14px rgba(242, 106, 27, 0.9); }
+.demo-btn.is-picked { border-color: var(--color-orange-bright); background: #FFF6EF; }
+
+@media (max-width: 767px) {
+    .demo-options { display: none; }
+    .demo-options.is-open { display: grid; margin-top: 0.25rem; animation: heroIn 260ms cubic-bezier(0.23, 1, 0.32, 1); }
+    #demo-toggle[aria-expanded="true"] .demo-chevron { transform: rotate(180deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .auth-visual-copy, .auth-panels, .auth-tab-indicator, .auth-error { transition: none; }
+}
+
+/* ------------------------------------------------------------------ */
 /* Mode malam: memetakan palet terang ke palet gelap.                  */
 /* Ditulis di luar @layer agar menang atas utilitas Tailwind.          */
 /* ------------------------------------------------------------------ */
@@ -611,3 +952,19 @@ html.dark body { background-color: #0B111C; color: #E8EDF4; }
 .dark .score-ring { background: conic-gradient(var(--ring, #5BCB82) var(--deg, 0deg), #243045 0); }
 .dark .score-ring::before { background: #121A28; }
 .dark .company-tile { filter: saturate(0.9) brightness(0.92); }
+.dark .auth-body { background: #070C14; }
+.dark .auth-input { background: #0E1522; border-color: #31405A; }
+.dark .auth-input:hover { border-color: #4A5E7A; }
+.dark .auth-input.is-filled { animation: none; }
+.dark .auth-eye:hover { background: #182233; }
+.dark .role-card { background: #0E1522; border-color: #31405A; color: #E8EDF4; }
+.dark .role-card:has(input:checked) { background: #2A1A0E; }
+.dark .skill-chip { background: #182233; border-color: #31405A; color: #E8EDF4; }
+.dark .pw-strength span { background: #243045; }
+.dark .demo-btn.is-picked { background: #2A1A0E; }
+.dark .auth-label { color: #E8EDF4; }
+.dark .auth-field:focus-within .auth-label { color: #FF8A4C; }
+.dark .auth-input input { color: #E8EDF4; }
+.dark .auth-tab:hover { color: #E8EDF4; }
+.dark [class~="bg-[#F8FAFC]"] { background-color: #0E1522; }
+.dark .skill-chip button:hover { background: #243045; }

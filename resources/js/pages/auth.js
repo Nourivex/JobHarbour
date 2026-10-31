@@ -1,234 +1,434 @@
-import JH, { auth, util, toast, showError, setLoading } from '../api.js';
+import JH, { auth, jobs, util, toast } from '../api.js';
 
-document.addEventListener('DOMContentLoaded', () => {
-    // 1. Tangani URL query param: ?tab=register atau ?next=...
-    const urlParams = new URLSearchParams(window.location.search);
-    const tabParam = urlParams.get('tab');
-    const nextUrl = urlParams.get('next');
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const params = new URLSearchParams(window.location.search);
+const nextUrl = params.get('next');
 
-    const tabLoginBtn = document.getElementById('tab-login-btn');
-    const tabRegisterBtn = document.getElementById('tab-register-btn');
-    const loginFormWrap = document.getElementById('login-form-wrap');
-    const registerFormWrap = document.getElementById('register-form-wrap');
+const shell = document.getElementById('auth-shell');
+const panelsWrap = document.getElementById('auth-panels');
+const panels = {
+    login: document.getElementById('panel-login'),
+    register: document.getElementById('panel-register'),
+};
+const tabs = {
+    login: document.getElementById('tab-login-btn'),
+    register: document.getElementById('tab-register-btn'),
+};
+let mode = 'login';
+let switching = false;
 
-    function switchTab(tab) {
-        if (tab === 'register') {
-            tabRegisterBtn.classList.add('border-[#C8460B]', 'text-[#C8460B]');
-            tabRegisterBtn.classList.remove('border-transparent', 'text-[#627080]');
-            tabLoginBtn.classList.remove('border-[#C8460B]', 'text-[#C8460B]');
-            tabLoginBtn.classList.add('border-transparent', 'text-[#627080]');
+// ------------------------------------------------------------------ perpindahan Masuk / Daftar
+function setModeAttributes(next) {
+    shell.dataset.mode = next;
+    Object.entries(tabs).forEach(([key, tab]) => {
+        if (!tab) return;
+        const on = key === next;
+        tab.setAttribute('aria-selected', String(on));
+        tab.tabIndex = on ? 0 : -1;
+    });
+    document.querySelectorAll('[data-visual]').forEach((el) => {
+        el.setAttribute('aria-hidden', String(el.dataset.visual !== next));
+    });
+    const url = new URL(window.location.href);
+    if (next === 'register') url.searchParams.set('tab', 'register');
+    else url.searchParams.delete('tab');
+    history.replaceState(null, '', url);
+}
 
-            loginFormWrap.classList.add('hidden');
-            registerFormWrap.classList.remove('hidden');
-        } else {
-            tabLoginBtn.classList.add('border-[#C8460B]', 'text-[#C8460B]');
-            tabLoginBtn.classList.remove('border-transparent', 'text-[#627080]');
-            tabRegisterBtn.classList.remove('border-[#C8460B]', 'text-[#C8460B]');
-            tabRegisterBtn.classList.add('border-transparent', 'text-[#627080]');
+function switchMode(next, animate = true) {
+    if (next === mode || switching) return;
+    const from = panels[mode];
+    const to = panels[next];
+    const dir = next === 'register' ? 1 : -1;
+    mode = next;
+    setModeAttributes(next);
+    clearAllErrors();
 
-            loginFormWrap.classList.remove('hidden');
-            registerFormWrap.classList.add('hidden');
-        }
-        clearFieldErrors();
+    if (!animate || reduceMotion) {
+        from.hidden = true;
+        to.hidden = false;
+        return;
     }
 
-    if (tabParam === 'register') {
-        switchTab('register');
-    }
+    // Kunci tinggi area form, lalu animasikan ke tinggi panel baru supaya kartu tidak melompat
+    switching = true;
+    panelsWrap.style.height = `${panelsWrap.offsetHeight}px`;
+    panelsWrap.classList.add('is-animating');
+    from.style.setProperty('--dir', dir);
+    from.classList.add('is-leaving');
 
-    tabLoginBtn?.addEventListener('click', () => switchTab('login'));
-    tabRegisterBtn?.addEventListener('click', () => switchTab('register'));
+    setTimeout(() => {
+        from.hidden = true;
+        from.classList.remove('is-leaving');
+        to.hidden = false;
+        to.style.setProperty('--dir', dir);
+        to.classList.add('is-entering');
+        panelsWrap.style.height = `${to.offsetHeight}px`;
+        setTimeout(() => {
+            panelsWrap.style.height = '';
+            panelsWrap.classList.remove('is-animating');
+            positionBeacon();
+            to.classList.remove('is-entering');
+            switching = false;
+        }, 340);
+    }, 150);
+}
 
-    // 2. Helper bersihkan dan tampilkan error per-field
-    function clearFieldErrors() {
-        document.querySelectorAll('[data-field-error]').forEach((el) => {
-            el.textContent = '';
-            el.classList.add('hidden');
-        });
-        document.querySelectorAll('input').forEach((input) => {
-            input.classList.remove('border-[#B42318]');
-        });
-    }
-
-    function showFieldErrors(errors) {
-        clearFieldErrors();
-        if (!errors || typeof errors !== 'object') return;
-        Object.entries(errors).forEach(([field, messages]) => {
-            const errEl = document.querySelector(`[data-field-error="${field}"]`);
-            const inputEl = document.querySelector(`[name="${field}"]`);
-            if (errEl) {
-                const text = Array.isArray(messages) ? messages[0] : String(messages);
-                errEl.textContent = text;
-                errEl.classList.remove('hidden');
-            }
-            if (inputEl) {
-                inputEl.classList.add('border-[#B42318]');
-            }
-        });
-    }
-
-    // 3. Tampilkan / Sembunyikan Kata Sandi
-    document.querySelectorAll('[data-toggle-password]').forEach((btn) => {
-        btn.addEventListener('click', () => {
-            const targetId = btn.getAttribute('data-toggle-password');
-            const input = document.getElementById(targetId);
-            if (!input) return;
-            const isPassword = input.type === 'password';
-            input.type = isPassword ? 'text' : 'password';
-            const iconEye = btn.querySelector('[data-icon-eye]');
-            const iconEyeOff = btn.querySelector('[data-icon-eye-off]');
-            if (iconEye && iconEyeOff) {
-                iconEye.classList.toggle('hidden', isPassword);
-                iconEyeOff.classList.toggle('hidden', !isPassword);
-            }
+function initModeSwitch() {
+    Object.entries(tabs).forEach(([key, tab]) => {
+        tab?.addEventListener('click', () => switchMode(key));
+        tab?.addEventListener('keydown', (e) => {
+            if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+            const other = key === 'login' ? 'register' : 'login';
+            switchMode(other);
+            tabs[other].focus();
         });
     });
+    document.querySelectorAll('[data-switch]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+            switchMode(btn.dataset.switch);
+            window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+        });
+    });
+    // Tombol kembali di ponsel: dari Daftar kembali ke Masuk, dari Masuk ke beranda
+    document.getElementById('mobile-back')?.addEventListener('click', (e) => {
+        if (mode === 'register') {
+            e.preventDefault();
+            switchMode('login');
+        }
+    });
 
-    // 4. Tombol Demo Account
+    if (params.get('tab') === 'register') {
+        panels.login.hidden = true;
+        panels.register.hidden = false;
+        mode = 'register';
+        setModeAttributes('register');
+    }
+}
+
+// ------------------------------------------------------------------ validasi per kolom
+const VALIDATORS = {
+    email: (v) => (!v ? 'Alamat email wajib diisi.' : /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ? '' : 'Format email belum benar, contoh: nama@domain.com.'),
+    password: (v) => (!v ? 'Kata sandi wajib diisi.' : v.length < 6 ? 'Kata sandi minimal 6 karakter.' : ''),
+    required: (v) => (v ? '' : 'Kolom ini wajib diisi.'),
+    phone: (v) => (!v || /^[0-9+\-\s]{8,20}$/.test(v) ? '' : 'Nomor HP hanya berisi angka, 8 sampai 20 digit.'),
+};
+
+function setFieldState(field, message, showValid = true) {
+    const error = field.querySelector('[data-field-error]');
+    field.classList.toggle('is-invalid', Boolean(message));
+    field.classList.toggle('is-valid', !message && showValid);
+    const input = field.querySelector('input');
+    input?.setAttribute('aria-invalid', String(Boolean(message)));
+    if (error) {
+        error.textContent = message || '';
+        error.classList.toggle('is-shown', Boolean(message));
+    }
+}
+
+function validateField(field) {
+    const rule = field.dataset.validate;
+    const input = field.querySelector('input');
+    if (!rule || !input) return true;
+    const value = input.value.trim();
+    const message = VALIDATORS[rule](rule === 'password' ? input.value : value);
+    // Kolom opsional yang kosong tidak diberi tanda centang
+    setFieldState(field, message, Boolean(value));
+    return !message;
+}
+
+function validateForm(form) {
+    let firstInvalid = null;
+    form.querySelectorAll('.auth-field[data-validate]').forEach((field) => {
+        if (!validateField(field) && !firstInvalid) firstInvalid = field.querySelector('input');
+    });
+    return firstInvalid;
+}
+
+function initLiveValidation() {
+    document.querySelectorAll('.auth-field[data-validate]').forEach((field) => {
+        const input = field.querySelector('input');
+        input.addEventListener('blur', () => {
+            if (input.value !== '' || field.classList.contains('is-invalid')) validateField(field);
+        });
+        input.addEventListener('input', () => {
+            // Setelah sempat salah, kolom dicek ulang sambil mengetik supaya pesan hilang begitu benar
+            if (field.classList.contains('is-invalid') || field.classList.contains('is-valid')) validateField(field);
+        });
+    });
+}
+
+function clearAllErrors() {
+    document.querySelectorAll('.auth-field').forEach((f) => f.classList.remove('is-invalid'));
+    document.querySelectorAll('[data-field-error]').forEach((el) => {
+        el.textContent = '';
+        el.classList.remove('is-shown');
+    });
+}
+
+function showServerErrors(form, errors) {
+    let first = null;
+    Object.entries(errors || {}).forEach(([name, messages]) => {
+        const error = form.querySelector(`[data-field-error="${name}"]`);
+        const field = error?.closest('.auth-field');
+        const text = Array.isArray(messages) ? messages[0] : String(messages);
+        if (field) {
+            setFieldState(field, text, false);
+            if (!first) first = field.querySelector('input');
+        } else if (error) {
+            error.textContent = text;
+            error.classList.add('is-shown');
+        }
+    });
+    first?.focus();
+}
+
+// ------------------------------------------------------------------ tombol kirim
+function setSubmitState(btn, state, text) {
+    const label = btn.querySelector('.auth-submit-label');
+    if (!btn.dataset.idle) btn.dataset.idle = label.innerHTML;
+    btn.classList.remove('is-loading', 'is-success');
+    btn.disabled = state === 'loading' || state === 'success';
+    btn.setAttribute('aria-busy', String(state === 'loading'));
+    if (state === 'loading') {
+        btn.classList.add('is-loading');
+        label.innerHTML = `<span class="auth-spinner" aria-hidden="true"></span>${text}`;
+    } else if (state === 'success') {
+        btn.classList.add('is-success');
+        label.innerHTML = `<svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg>${text}`;
+    } else {
+        label.innerHTML = btn.dataset.idle;
+    }
+}
+
+function shake(el) {
+    if (reduceMotion) return;
+    el.classList.remove('is-shaking');
+    void el.offsetWidth; // mulai ulang animasi
+    el.classList.add('is-shaking');
+    el.addEventListener('animationend', () => el.classList.remove('is-shaking'), { once: true });
+}
+
+function redirectAfterAuth(user) {
+    const target = nextUrl ? decodeURIComponent(nextUrl) : JH.homeFor(user);
+    setTimeout(() => { window.location.href = target; }, reduceMotion ? 200 : 700);
+}
+
+// ------------------------------------------------------------------ form masuk
+function initLogin() {
+    const form = document.getElementById('login-form');
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = form.querySelector('.auth-submit');
+        const firstInvalid = validateForm(form);
+        if (firstInvalid) {
+            shake(btn);
+            firstInvalid.focus();
+            return;
+        }
+        setSubmitState(btn, 'loading', 'Memeriksa akun...');
+        try {
+            const user = await auth.login(document.getElementById('login-email').value.trim(), document.getElementById('login-password').value);
+            setSubmitState(btn, 'success', `Halo, ${(user.name || '').split(' ')[0]}! Mengalihkan...`);
+            redirectAfterAuth(user);
+        } catch (err) {
+            setSubmitState(btn, 'idle');
+            shake(btn);
+            if (err.errors) showServerErrors(form, err.errors);
+            else {
+                const field = form.querySelector('[data-validate="password"]');
+                setFieldState(field, err.message || 'Email atau kata sandi salah.', false);
+                form.querySelector('[data-validate="email"]').classList.add('is-invalid');
+            }
+        }
+    });
+
+    // Akun demo: isi kolom, beri kilatan singkat, lalu fokus ke tombol Masuk
     document.querySelectorAll('[data-demo-email]').forEach((btn) => {
         btn.addEventListener('click', () => {
-            const email = btn.getAttribute('data-demo-email');
-            const pass = btn.getAttribute('data-demo-password') || 'password123';
-            switchTab('login');
-            const emailInput = document.getElementById('login-email');
-            const passInput = document.getElementById('login-password');
-            if (emailInput) emailInput.value = email;
-            if (passInput) passInput.value = pass;
-            toast(`Mengisi akun demo ${email}`, 'info', 2000);
-        });
-    });
-
-    // 5. Submit Form Login
-    const loginForm = document.getElementById('login-form');
-    loginForm?.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        clearFieldErrors();
-
-        const btn = loginForm.querySelector('button[type="submit"]');
-        const email = document.getElementById('login-email')?.value.trim();
-        const password = document.getElementById('login-password')?.value;
-
-        if (!email || !password) {
-            toast('Harap isi alamat email dan kata sandi.', 'warning');
-            return;
-        }
-
-        setLoading(btn, true, 'Sedang Masuk...');
-        try {
-            const user = await auth.login(email, password);
-            toast(`Selamat datang kembali, ${user.name}!`, 'success');
-
-            setTimeout(() => {
-                if (nextUrl) {
-                    window.location.href = decodeURIComponent(nextUrl);
-                } else {
-                    window.location.href = JH.homeFor(user);
-                }
-            }, 600);
-        } catch (err) {
-            setLoading(btn, false);
-            if (err.errors) {
-                showFieldErrors(err.errors);
-            } else {
-                toast(err.message || 'Alamat email atau kata sandi tidak valid.', 'error');
-            }
-        }
-    });
-
-    // 6. Kelola input tag skill pada form registrasi
-    const registerSkills = [];
-    const skillInput = document.getElementById('reg-skill-input');
-    const skillChipsContainer = document.getElementById('reg-skills-chips');
-    const btnAddSkill = document.getElementById('reg-btn-add-skill');
-
-    function renderSkillChips() {
-        if (!skillChipsContainer) return;
-        if (!registerSkills.length) {
-            skillChipsContainer.innerHTML = '<span class="text-xs text-[#627080]">Belum ada keahlian ditambahkan (opsional).</span>';
-            return;
-        }
-        skillChipsContainer.innerHTML = registerSkills.map((s, idx) => `
-            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-[#FFF3EA] text-[#8A2E05] border border-[#C8460B]/20">
-                <span>${util.escapeHtml(s)}</span>
-                <button type="button" data-remove-skill="${idx}" class="hover:text-[#B42318] cursor-pointer" aria-label="Hapus skill ${util.escapeHtml(s)}">
-                    &times;
-                </button>
-            </span>
-        `).join('');
-
-        skillChipsContainer.querySelectorAll('[data-remove-skill]').forEach((b) => {
-            b.addEventListener('click', () => {
-                const i = Number(b.getAttribute('data-remove-skill'));
-                registerSkills.splice(i, 1);
-                renderSkillChips();
+            switchMode('login');
+            const email = document.getElementById('login-email');
+            const pass = document.getElementById('login-password');
+            email.value = btn.dataset.demoEmail;
+            pass.value = 'password123';
+            [email, pass].forEach((input) => {
+                const box = input.closest('.auth-input');
+                box.classList.remove('is-filled');
+                void box.offsetWidth;
+                box.classList.add('is-filled');
+                validateField(input.closest('.auth-field'));
             });
+            document.querySelectorAll('[data-demo-email]').forEach((b) => b.classList.toggle('is-picked', b === btn));
+            form.querySelector('.auth-submit').focus({ preventScroll: true });
         });
-    }
+    });
 
-    function addSkillFromInput() {
-        if (!skillInput) return;
-        const val = skillInput.value.trim();
-        if (!val) return;
-        const lower = val.toLowerCase();
-        if (!registerSkills.some((s) => s.toLowerCase() === lower)) {
-            registerSkills.push(val);
-            renderSkillChips();
+    // Di ponsel, pilihan akun demo dibuka lewat tombol "Coba Akun Demo"
+    const toggle = document.getElementById('demo-toggle');
+    const options = document.getElementById('demo-options');
+    toggle?.addEventListener('click', () => {
+        if (window.matchMedia('(min-width: 768px)').matches) return;
+        const open = toggle.getAttribute('aria-expanded') !== 'true';
+        toggle.setAttribute('aria-expanded', String(open));
+        options.classList.toggle('is-open', open);
+    });
+}
+
+// ------------------------------------------------------------------ form daftar
+function passwordStrength(pw) {
+    if (!pw) return { level: 0, label: '-' };
+    if (pw.length < 6) return { level: 1, label: 'Lemah' };
+    let points = 1;
+    if (pw.length >= 10) points += 1;
+    if (/[a-z]/.test(pw) && /[A-Z]/.test(pw)) points += 1;
+    if (/\d/.test(pw)) points += 1;
+    if (/[^A-Za-z0-9]/.test(pw)) points += 1;
+    if (points <= 2) return { level: 2, label: 'Sedang' };
+    if (points === 3) return { level: 3, label: 'Kuat' };
+    return { level: 4, label: 'Sangat kuat' };
+}
+
+function initRegister() {
+    const form = document.getElementById('register-form');
+    const skills = [];
+    const chips = document.getElementById('reg-skills-chips');
+    const skillInput = document.getElementById('reg-skill-input');
+
+    // Indikator kekuatan sandi
+    const meter = document.getElementById('pw-strength');
+    const meterLabel = document.getElementById('pw-strength-label');
+    document.getElementById('reg-password').addEventListener('input', (e) => {
+        const s = passwordStrength(e.target.value);
+        meter.dataset.level = String(s.level);
+        meterLabel.textContent = s.level ? s.label : 'Belum diisi';
+        meterLabel.dataset.level = String(s.level);
+    });
+
+    // Chip skill
+    const renderChips = (popIndex = -1) => {
+        chips.innerHTML = skills.map((s, i) => `
+            <span class="skill-chip ${i === popIndex ? 'is-new' : ''}">${util.escapeHtml(s)}
+                <button type="button" data-remove-skill="${i}" aria-label="Hapus ${util.escapeHtml(s)}">&times;</button>
+            </span>`).join('');
+    };
+    const addSkill = () => {
+        const value = skillInput.value.trim().replace(/,$/, '');
+        if (!value) return;
+        if (!skills.some((s) => s.toLowerCase() === value.toLowerCase())) {
+            skills.push(value);
+            renderChips(skills.length - 1);
         }
         skillInput.value = '';
-        skillInput.focus();
-    }
-
-    btnAddSkill?.addEventListener('click', addSkillFromInput);
-    skillInput?.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
+    };
+    skillInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ',') {
             e.preventDefault();
-            addSkillFromInput();
+            addSkill();
+        } else if (e.key === 'Backspace' && !skillInput.value && skills.length) {
+            skills.pop();
+            renderChips();
         }
     });
+    // Memilih dari daftar saran langsung menambahkan chip
+    skillInput.addEventListener('change', addSkill);
+    chips.addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-remove-skill]');
+        if (!btn) return;
+        const chip = btn.parentElement;
+        const remove = () => {
+            skills.splice(Number(btn.dataset.removeSkill), 1);
+            renderChips();
+            skillInput.focus();
+        };
+        if (reduceMotion) return remove();
+        chip.classList.add('is-removing');
+        setTimeout(remove, 140);
+    });
+    document.getElementById('reg-skills-box').addEventListener('click', (e) => {
+        if (e.target.id === 'reg-skills-box') skillInput.focus();
+    });
 
-    // 7. Submit Form Register
-    const registerForm = document.getElementById('register-form');
-    registerForm?.addEventListener('submit', async (e) => {
+    // Saran kota dan skill diambil dari lowongan yang sedang dibuka
+    jobs.list({ per_page: 50, status: 'open' }).then((res) => {
+        const list = Array.isArray(res.data) ? res.data : [];
+        const cities = [...new Set(list.map((j) => j.location).filter(Boolean))];
+        const skillNames = [...new Set(list.flatMap((j) => (j.requirements || []).map((r) => util.skillName(r))).filter(Boolean))].sort();
+        document.getElementById('city-suggestions').innerHTML = cities.map((c) => `<option value="${util.escapeHtml(c)}"></option>`).join('');
+        document.getElementById('skill-suggestions').innerHTML = skillNames.map((s) => `<option value="${util.escapeHtml(s)}"></option>`).join('');
+    }).catch(() => { /* saran opsional, abaikan jika gagal */ });
+
+    form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        clearFieldErrors();
-
-        const btn = registerForm.querySelector('button[type="submit"]');
-        const name = document.getElementById('reg-name')?.value.trim();
-        const email = document.getElementById('reg-email')?.value.trim();
-        const password = document.getElementById('reg-password')?.value;
-        const role = document.querySelector('input[name="role"]:checked')?.value || 'applicant';
-        const phone = document.getElementById('reg-phone')?.value.trim();
-        const location = document.getElementById('reg-location')?.value.trim();
+        const btn = form.querySelector('.auth-submit');
+        addSkill();
+        let firstInvalid = validateForm(form);
+        const terms = document.getElementById('reg-terms');
+        const termsError = form.querySelector('[data-field-error="terms"]');
+        termsError.textContent = terms.checked ? '' : 'Centang persetujuan untuk melanjutkan.';
+        termsError.classList.toggle('is-shown', !terms.checked);
+        if (!terms.checked && !firstInvalid) firstInvalid = terms;
+        if (firstInvalid) {
+            shake(btn);
+            firstInvalid.focus();
+            return;
+        }
 
         const payload = {
-            name,
-            email,
-            password,
-            role,
-            phone: phone || null,
-            location: location || null,
-            skills: registerSkills,
+            name: document.getElementById('reg-name').value.trim(),
+            email: document.getElementById('reg-email').value.trim(),
+            password: document.getElementById('reg-password').value,
+            role: form.querySelector('input[name="role"]:checked')?.value || 'applicant',
+            phone: document.getElementById('reg-phone').value.trim() || null,
+            location: document.getElementById('reg-location').value.trim() || null,
+            skills,
         };
 
-        setLoading(btn, true, 'Mendaftarkan Akun...');
+        setSubmitState(btn, 'loading', 'Membuat akun...');
         try {
             const user = await auth.register(payload);
-            toast('Pendaftaran akun berhasil! Selamat datang di JobHarbour.', 'success');
-
-            setTimeout(() => {
-                if (nextUrl) {
-                    window.location.href = decodeURIComponent(nextUrl);
-                } else {
-                    window.location.href = JH.homeFor(user);
-                }
-            }, 650);
+            setSubmitState(btn, 'success', 'Akun dibuat! Mengalihkan...');
+            redirectAfterAuth(user);
         } catch (err) {
-            setLoading(btn, false);
-            if (err.errors) {
-                showFieldErrors(err.errors);
-            } else {
-                toast(err.message || 'Pendaftaran gagal.', 'error');
-            }
+            setSubmitState(btn, 'idle');
+            shake(btn);
+            if (err.errors) showServerErrors(form, err.errors);
+            else toast(err.message || 'Pendaftaran gagal. Coba lagi.', 'error');
         }
     });
+}
+
+// ------------------------------------------------------------------ tampilkan / sembunyikan sandi
+function initPasswordToggles() {
+    document.querySelectorAll('[data-toggle-password]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+            const input = document.getElementById(btn.dataset.togglePassword);
+            const show = input.type === 'password';
+            input.type = show ? 'text' : 'password';
+            btn.setAttribute('aria-pressed', String(show));
+            btn.setAttribute('aria-label', show ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi');
+        });
+    });
+}
+
+// ------------------------------------------------------------------ cahaya mercusuar di panel gambar
+function positionBeacon() {
+    const beacon = document.querySelector('.auth-beacon');
+    const panel = beacon?.parentElement;
+    if (!beacon || !panel || !panel.offsetWidth) return;
+    // Gambar selebar panel dan menempel di bawah, jadi posisi lampu dihitung dari tepi bawah
+    const w = panel.offsetWidth;
+    const imgH = w * (1050 / 960);
+    const top = panel.offsetHeight - imgH;
+    beacon.style.setProperty('--beacon-x', `${0.744 * w}px`);
+    beacon.style.setProperty('--beacon-y', `${top + 0.526 * imgH}px`);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    initModeSwitch();
+    initLiveValidation();
+    initPasswordToggles();
+    initLogin();
+    initRegister();
+    positionBeacon();
+    window.addEventListener('resize', positionBeacon, { passive: true });
 });
