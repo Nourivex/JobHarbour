@@ -687,4 +687,94 @@
 </div>
 </div>
 </footer>
+
+<!-- LIVE AUTH & PROFILE SKILLS INTEGRATION (Nabe'ela Ayu Ning Tyas Zahra) -->
+<div id="quickLoginModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200">
+        <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+            <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-sky-600 text-2xl">key</span>
+                <h3 class="font-bold text-slate-800 text-lg">Masuk Akun JobHarbour</h3>
+            </div>
+            <button onclick="document.getElementById('quickLoginModal').classList.add('hidden')" class="text-slate-400 hover:text-slate-600">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+        <div class="space-y-4 my-4">
+            <div>
+                <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Email Pengguna</label>
+                <input id="loginEmail" type="email" value="budi.santoso@example.com" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none"/>
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Kata Sandi</label>
+                <input id="loginPassword" type="password" value="password123" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-sky-500 focus:outline-none"/>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="text-xs text-slate-500">Quick Test:</span>
+                <button type="button" onclick="document.getElementById('loginEmail').value='budi.santoso@example.com'" class="px-2 py-0.5 rounded bg-slate-100 text-[11px] font-semibold text-slate-700 hover:bg-slate-200">Pelamar</button>
+                <button type="button" onclick="document.getElementById('loginEmail').value='recruiter@jobharbour.id'" class="px-2 py-0.5 rounded bg-slate-100 text-[11px] font-semibold text-slate-700 hover:bg-slate-200">Rekruter</button>
+            </div>
+        </div>
+        <button id="executeLoginBtn" type="button" class="w-full py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-sm shadow transition-all flex items-center justify-center gap-2">
+            <span>Dapatkan Bearer Token JWT</span>
+        </button>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const loginModal = document.getElementById('quickLoginModal');
+    const loginBtn = document.getElementById('executeLoginBtn');
+
+    // Create a floating Quick Login button if token not set
+    const floatingLogin = document.createElement('div');
+    floatingLogin.className = 'fixed bottom-6 right-6 z-40';
+    floatingLogin.innerHTML = `
+        <button onclick="document.getElementById('quickLoginModal').classList.remove('hidden')" class="px-4 py-3 rounded-full bg-slate-900 text-white shadow-xl hover:bg-sky-700 flex items-center gap-2 font-bold text-xs border border-white/20 transition-all active:scale-95">
+            <span class="material-symbols-outlined text-amber-400 text-sm">vpn_key</span>
+            <span id="loginStatusText">${localStorage.getItem('jh_token') ? 'Status: Terautentikasi (JWT)' : 'Login Akun (JWT)'}</span>
+        </button>
+    `;
+    document.body.appendChild(floatingLogin);
+
+    if (loginBtn) {
+        loginBtn.addEventListener('click', async function() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = '<span class="material-symbols-outlined animate-spin text-sm">sync</span> Mengautentikasi...';
+
+            try {
+                const res = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                const json = await res.json();
+
+                if (res.status === 200 && json.data && json.data.token) {
+                    localStorage.setItem('jh_token', json.data.token);
+                    localStorage.setItem('jh_user', JSON.stringify(json.data.user || {}));
+                    alert('✅ Login Berhasil! Bearer Token JWT tersimpan di browser.');
+                    loginModal.classList.add('hidden');
+                    document.getElementById('loginStatusText').textContent = 'Status: Terautentikasi (JWT)';
+                } else {
+                    alert('Gagal Login (401): ' + (json.message || 'Kredensial tidak valid'));
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Gagal menghubungi Auth Service backend.');
+            } finally {
+                loginBtn.disabled = false;
+                loginBtn.innerHTML = '<span>Dapatkan Bearer Token JWT</span>';
+            }
+        });
+    }
+});
+</script>
+
 </body></html>
