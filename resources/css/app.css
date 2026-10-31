@@ -1,9 +1,439 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
+@source "../views/**/*.blade.php";
+@source "../js/**/*.js";
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-heading: 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
+    --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+    --color-navy: #0C2238;
+    --color-navy-2: #133150;
+    --color-navy-border: #2B4A6B;
+
+    --color-canvas: #F4F6F8;
+    --color-surface: #FFFFFF;
+    --color-border-subtle: #E2E7ED;
+    --color-border-strong: #C5CFDA;
+
+    --color-text-primary: #0B1B2B;
+    --color-text-secondary: #3D4B5C;
+    --color-text-tertiary: #627080;
+
+    --color-orange-harbour: #C8460B;
+    --color-orange-bright: #F26A1B;
+    --color-orange-soft: #FFF3EA;
+    --color-orange-deep: #8A2E05;
+
+    --color-sea-blue: #1B65A6;
+    --color-sea-blue-light: #8CC8F2;
+
+    --color-status-success: #157F3B;
+    --color-status-success-bg: #E7F5EC;
+    --color-status-failed: #B42318;
+    --color-status-failed-bg: #FDEEEC;
 }
+
+@layer base {
+    html {
+        font-family: var(--font-sans);
+        color: var(--color-text-primary);
+        background-color: var(--color-canvas);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        font-family: var(--font-heading);
+        letter-spacing: -0.025em;
+    }
+
+    .num-tabular {
+        font-variant-numeric: tabular-nums;
+    }
+
+    /* Focus visible */
+    :focus-visible {
+        outline: 2px solid var(--color-orange-harbour);
+        outline-offset: 2px;
+    }
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInFast {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes pulseSubtle {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.55;
+    }
+}
+
+@keyframes floatGentle {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-6px);
+    }
+}
+
+.animate-float {
+    animation: floatGentle 4s ease-in-out infinite;
+}
+
+.animate-float-delayed {
+    animation: floatGentle 4.5s ease-in-out 2s infinite;
+}
+
+.animate-fade-in {
+    animation: fadeIn 220ms cubic-bezier(0.23, 1, 0.32, 1) forwards;
+}
+
+.animate-fade-fast {
+    animation: fadeInFast 150ms ease-out forwards;
+}
+
+.animate-slide-drawer {
+    animation: slideInRight 240ms cubic-bezier(0.23, 1, 0.32, 1) forwards;
+}
+
+.animate-skeleton {
+    animation: pulseSubtle 1.8s ease-in-out infinite;
+}
+
+/* Interactive card & button press */
+.btn-press {
+    transition: transform 120ms ease, background-color 150ms ease, opacity 150ms ease;
+}
+.btn-press:active {
+    transform: scale(0.97);
+}
+
+.card-hover {
+    transition: transform 180ms cubic-bezier(0.23, 1, 0.32, 1), border-color 180ms ease, box-shadow 180ms ease;
+}
+.card-hover:hover {
+    transform: translateY(-2px);
+    border-color: var(--color-border-strong);
+}
+
+/* ------------------------------------------------------------------ */
+/* Beranda: animasi ringan (hanya transform & opacity)                 */
+/* ------------------------------------------------------------------ */
+@keyframes heroIn {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes heroZoom {
+    from { transform: scale(1.06); }
+    to { transform: scale(1); }
+}
+
+@keyframes beacon {
+    0%, 100% { opacity: 0.55; transform: translate(-50%, -50%) scale(0.9); }
+    50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+}
+
+.hero-in {
+    opacity: 0;
+    animation: heroIn 600ms cubic-bezier(0.23, 1, 0.32, 1) var(--d, 0ms) forwards;
+}
+
+.hero-photo {
+    animation: heroZoom 1600ms cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+
+.hero-beacon {
+    left: var(--beacon-x, 85%);
+    top: var(--beacon-y, 25%);
+    width: 150px;
+    height: 150px;
+    background: radial-gradient(circle, rgba(255, 196, 120, 0.55) 0%, rgba(255, 160, 80, 0.18) 40%, transparent 70%);
+    animation: beacon 4s ease-in-out infinite;
+}
+
+/* Elemen yang muncul saat di-scroll (diaktifkan oleh app.js) */
+.reveal-ready [data-reveal] {
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 600ms cubic-bezier(0.23, 1, 0.32, 1), transform 600ms cubic-bezier(0.23, 1, 0.32, 1);
+    transition-delay: var(--reveal-delay, 0ms);
+}
+
+.reveal-ready [data-reveal].is-visible {
+    opacity: 1;
+    transform: none;
+}
+
+/* Kartu keahlian & lowongan: angkat sedikit saat disorot */
+.lift {
+    transition: transform 200ms cubic-bezier(0.23, 1, 0.32, 1), box-shadow 200ms ease, border-color 200ms ease;
+}
+
+.lift:hover {
+    transform: translateY(-3px);
+    border-color: var(--color-border-strong);
+    box-shadow: 0 16px 32px -20px rgba(12, 34, 56, 0.35);
+}
+
+/* Chip simulator: status aktif dan tidak aktif */
+.sandbox-chip {
+    background: #FFFFFF;
+    color: var(--color-text-secondary);
+    border-color: var(--color-border-strong);
+    transition: transform 120ms ease, background-color 150ms ease, color 150ms ease, border-color 150ms ease;
+}
+
+.sandbox-chip:hover {
+    border-color: var(--color-navy);
+}
+
+.sandbox-chip[aria-pressed="true"] {
+    background: var(--color-status-success);
+    border-color: var(--color-status-success);
+    color: #FFFFFF;
+}
+
+/* ------------------------------------------------------------------ */
+/* Navbar                                                              */
+/* ------------------------------------------------------------------ */
+.site-nav {
+    border-bottom: 1px solid transparent;
+    transition: background-color 250ms ease, border-color 250ms ease, box-shadow 250ms ease;
+}
+
+.site-nav.is-hero {
+    background: linear-gradient(180deg, rgba(8, 22, 40, 0.55) 0%, rgba(8, 22, 40, 0) 100%);
+    /* Tanpa ini gradien diulang di area border 1px dan muncul sebagai garis gelap */
+    background-origin: border-box;
+    border-bottom-color: transparent;
+}
+
+.site-nav.is-solid {
+    background: rgba(12, 34, 56, 0.94);
+    backdrop-filter: blur(12px);
+    border-color: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 10px 30px -18px rgba(0, 0, 0, 0.55);
+}
+
+.nav-link {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 0.9rem;
+    border-radius: 0.5rem;
+    font-size: 15px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.82);
+    transition: color 150ms ease, background-color 150ms ease;
+}
+
+.nav-link:hover {
+    color: #FFFFFF;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.nav-link[aria-current="page"] {
+    color: #FFFFFF;
+}
+
+.nav-link[aria-current="page"]::after {
+    content: "";
+    position: absolute;
+    left: 0.9rem;
+    right: 0.9rem;
+    bottom: 0.2rem;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--color-orange-bright);
+}
+
+.theme-toggle .icon-sun { display: none; }
+.dark .theme-toggle .icon-sun { display: block; }
+.dark .theme-toggle .icon-moon { display: none; }
+
+/* ------------------------------------------------------------------ */
+/* Kartu keahlian: menyala saat kursor mendekat, navy saat disorot     */
+/* ------------------------------------------------------------------ */
+.skill-tile {
+    position: relative;
+    isolation: isolate;
+    background: #FFFFFF;
+    border: 1px solid var(--color-border-subtle);
+    color: var(--color-text-primary);
+    transition: transform 220ms cubic-bezier(0.23, 1, 0.32, 1), background-color 220ms ease, color 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
+}
+
+/* Cahaya isi yang mengikuti posisi kursor */
+.skill-tile::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: radial-gradient(180px circle at var(--mx, 50%) var(--my, 50%), rgba(242, 106, 27, 0.14), transparent 65%);
+    opacity: var(--glow, 0);
+    transition: opacity 250ms ease;
+}
+
+/* Garis tepi yang menyala di sisi terdekat kursor */
+.skill-tile::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    padding: 1.5px;
+    background: radial-gradient(160px circle at var(--mx, 50%) var(--my, 50%), rgba(242, 106, 27, 0.95), transparent 70%);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: var(--glow, 0);
+    transition: opacity 250ms ease;
+    pointer-events: none;
+}
+
+.skill-tile .tile-icon {
+    background: var(--color-orange-soft);
+    color: var(--color-orange-harbour);
+    transition: background-color 220ms ease, color 220ms ease;
+}
+
+.skill-tile .tile-meta { color: var(--color-text-tertiary); transition: color 220ms ease; }
+.skill-tile .tile-arrow { background: var(--color-canvas); color: var(--color-text-primary); transition: transform 220ms ease, background-color 220ms ease, color 220ms ease; }
+
+/* Status menyala: hanya saat disorot, difokus keyboard, atau diklik */
+.skill-tile:hover,
+.skill-tile:focus-visible,
+.skill-tile.is-active {
+    background: var(--color-navy);
+    border-color: var(--color-navy);
+    color: #FFFFFF;
+    transform: translateY(-4px);
+    box-shadow: 0 20px 36px -20px rgba(12, 34, 56, 0.7), 0 0 0 4px rgba(242, 106, 27, 0.12);
+}
+
+.skill-tile:hover .tile-icon,
+.skill-tile:focus-visible .tile-icon,
+.skill-tile.is-active .tile-icon {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--color-orange-bright);
+}
+
+.skill-tile:hover .tile-meta,
+.skill-tile:focus-visible .tile-meta,
+.skill-tile.is-active .tile-meta { color: #C5D3E2; }
+
+.skill-tile:hover .tile-arrow,
+.skill-tile:focus-visible .tile-arrow,
+.skill-tile.is-active .tile-arrow {
+    background: #FFFFFF;
+    color: var(--color-navy);
+    transform: translateX(3px);
+}
+
+.skill-tile.is-active { transform: translateY(-2px) scale(0.98); }
+
+@media (prefers-reduced-motion: reduce) {
+    .hero-in,
+    .reveal-ready [data-reveal] {
+        opacity: 1 !important;
+        transform: none !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, ::before, ::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* ------------------------------------------------------------------ */
+/* Mode malam: memetakan palet terang ke palet gelap.                  */
+/* Ditulis di luar @layer agar menang atas utilitas Tailwind.          */
+/* ------------------------------------------------------------------ */
+html.dark { color-scheme: dark; background-color: #0B111C; }
+html.dark body { background-color: #0B111C; color: #E8EDF4; }
+.dark [class~="bg-white"] { background-color: #121A28; }
+.dark [class~="bg-[#F4F6F8]"] { background-color: #0B111C; }
+.dark [class~="bg-[#F8F9FC]"] { background-color: #0E1522; }
+.dark [class~="bg-[#E8EDF2]"] { background-color: #1E2A3D; }
+.dark [class~="bg-[#E2E7ED]"] { background-color: #243045; }
+.dark [class~="bg-[#FFF3EA]"] { background-color: #33200F; }
+.dark [class~="bg-[#ffe5d3]"] { background-color: #3D2512; }
+.dark [class~="bg-[#E7F5EC]"] { background-color: #11291C; }
+.dark [class~="bg-[#EBF3FB]"] { background-color: #13283A; }
+.dark [class~="bg-[#dbeaf8]"] { background-color: #183350; }
+.dark [class~="bg-[#FDEEEC]"] { background-color: #321715; }
+.dark [class~="bg-[#0C2238]"] { background-color: #16263D; }
+.dark [class~="bg-[#133150]"] { background-color: #1C3350; }
+.dark [class~="hover:bg-white"]:hover { background-color: #1E2A3D; }
+.dark [class~="hover:bg-[#F4F6F8]"]:hover { background-color: #1E2A3D; }
+.dark [class~="hover:bg-[#E2E7ED]"]:hover { background-color: #1E2A3D; }
+.dark [class~="hover:bg-[#FFF3EA]"]:hover { background-color: #3D2512; }
+.dark [class~="text-[#0B1B2B]"] { color: #E8EDF4; }
+.dark [class~="text-[#0F172A]"] { color: #E8EDF4; }
+.dark [class~="text-[#0C2238]"] { color: #E8EDF4; }
+.dark [class~="text-[#3D4B5C]"] { color: #B8C2CF; }
+.dark [class~="text-[#627080]"] { color: #8C98A8; }
+.dark [class~="text-[#C8460B]"] { color: #FF8A4C; }
+.dark [class~="text-[#8A2E05]"] { color: #FFB38A; }
+.dark [class~="text-[#157F3B]"] { color: #5BCB82; }
+.dark [class~="text-[#1B65A6]"] { color: #7CC4F5; }
+.dark [class~="text-[#B42318]"] { color: #F08A80; }
+.dark [class~="text-[#0284C7]"] { color: #5CC0F2; }
+.dark [class~="text-[#0369a1]"] { color: #7CC4F5; }
+.dark [class~="text-[#124B7D]"] { color: #A9D8F8; }
+.dark [class~="text-[#A93A08]"] { color: #FFA06A; }
+.dark [class~="hover:text-[#0B1B2B]"]:hover { color: #FFFFFF; }
+.dark .group:hover [class~="group-hover:text-[#C8460B]"] { color: #FF8A4C; }
+.dark [class~="border-[#E2E7ED]"], .dark [class~="divide-[#E2E7ED]"] > * + * { border-color: #243045; }
+.dark [class~="border-[#C5CFDA]"], .dark [class~="divide-[#C5CFDA]"] > * + * { border-color: #31405A; }
+.dark [class~="border-[#0C2238]"], .dark [class~="divide-[#0C2238]"] > * + * { border-color: #4A5E7A; }
+.dark [class~="hover:border-[#0C2238]"]:hover { border-color: #8C98A8; }
+.dark input, .dark select, .dark textarea { color: #E8EDF4; }
+.dark ::placeholder { color: #6E7B8B; }
+.dark .skill-tile { background: #121A28; border-color: #243045; color: #E8EDF4; }
+.dark .skill-tile .tile-arrow { background: #1E2A3D; color: #E8EDF4; }
+.dark .skill-tile .tile-icon { background: #33200F; color: #FF8A4C; }
+.dark .skill-tile:hover, .dark .skill-tile:focus-visible, .dark .skill-tile.is-active { background: #1C3350; border-color: #31405A; }
+.dark .sandbox-chip { background: #121A28; color: #B8C2CF; border-color: #31405A; }
+.dark .sandbox-chip[aria-pressed="true"] { background: #157F3B; border-color: #157F3B; color: #FFFFFF; }
+.dark .lift:hover { border-color: #31405A; box-shadow: 0 16px 32px -20px rgba(0, 0, 0, 0.8); }
+.dark .animate-skeleton { background-color: #182233; }
