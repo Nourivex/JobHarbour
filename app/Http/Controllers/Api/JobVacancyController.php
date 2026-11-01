@@ -229,7 +229,7 @@ class JobVacancyController extends Controller
             'expires_at' => $request->expires_at,
         ]);
 
-        // 6. Kembalikan response HTTP 201 Created
+        // 6. Kembalikan response HTTP 201 Created beserta header Location menuju resource baru
         return $this->createdResponse([
             'id' => $job->id,
             'title' => $job->title,
@@ -246,7 +246,7 @@ class JobVacancyController extends Controller
                 'email' => $currentUser->email,
             ],
             'created_at' => $job->created_at->toIso8601String(),
-        ], 'Lowongan pekerjaan baru berhasil diterbitkan.');
+        ], 'Lowongan pekerjaan baru berhasil diterbitkan.')->header('Location', url("/api/jobs/{$job->id}"));
     }
 
     /**
