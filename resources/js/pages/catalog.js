@@ -595,4 +595,40 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Mulai muat katalog
     fetchJobs();
+
+    // Smart Location Dropdown in Catalog
+    const catLocInput = document.getElementById('catalog-location');
+    const catLocDropdown = document.getElementById('catalog-location-dropdown');
+    const catGeoBtn = document.getElementById('catalog-geo-btn');
+    const catLocOptions = document.getElementById('catalog-location-options');
+
+    if (catLocInput && catLocDropdown) {
+        catLocInput.addEventListener('focus', () => {
+            catLocDropdown.classList.remove('hidden');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!catLocInput.closest('.relative')?.contains(e.target)) {
+                catLocDropdown.classList.add('hidden');
+            }
+        });
+
+        catLocOptions?.querySelectorAll('button[data-val]').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                catLocInput.value = btn.getAttribute('data-val');
+                catLocDropdown.classList.add('hidden');
+                // Trigger catalog filter update
+                catLocInput.dispatchEvent(new Event('input', { bubbles: true }));
+            });
+        });
+
+        catGeoBtn?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            catLocInput.value = 'Tegal';
+            catLocDropdown.classList.add('hidden');
+            catLocInput.dispatchEvent(new Event('input', { bubbles: true }));
+        });
+    }
+
 });

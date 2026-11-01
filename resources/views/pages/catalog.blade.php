@@ -59,15 +59,65 @@
 
                 <!-- Location Input -->
                 <div class="lg:col-span-3 relative">
-                    <div class="absolute left-3 top-1/2 -translate-y-1/2 text-[#627080]">
-                        <x-icon name="map-pin" class="w-4 h-4" />
+                    <div class="absolute left-3 top-1/2 -translate-y-1/2 text-[#627080] pointer-events-none">
+                        <svg class="w-4 h-4 text-[#C8460B]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>
+                        </svg>
                     </div>
                     <input
                         type="text"
                         id="catalog-location"
+                        autocomplete="off"
                         placeholder="Kota / Penempatan..."
-                        class="w-full min-h-[44px] pl-9 pr-3.5 py-2.5 bg-[#F4F6F8] text-[#0B1B2B] text-sm rounded-lg border border-[#C5CFDA] focus:border-[#C8460B] focus:ring-1 focus:ring-[#C8460B] transition-colors"
+                        class="w-full min-h-[44px] pl-9 pr-9 py-2.5 bg-[#F4F6F8] text-[#0B1B2B] text-sm rounded-xl border border-[#C5CFDA] focus:border-[#C8460B] focus:ring-1 focus:ring-[#C8460B] transition-colors cursor-pointer"
                     />
+                    <!-- SVG Geolocation Button -->
+                    <button type="button" id="catalog-geo-btn" title="Deteksi Lokasi Saya" class="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-[#C8460B] hover:bg-slate-200/60 rounded-lg transition-colors cursor-pointer">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/>
+                        </svg>
+                    </button>
+
+                    <!-- Smart Location Dropdown in Catalog (Solid White & Kontras) -->
+                    <div id="catalog-location-dropdown" class="absolute left-0 top-full mt-2 w-full sm:w-[320px] bg-white rounded-2xl border border-slate-200 shadow-2xl z-50 p-2.5 hidden text-[#0B1B2B]">
+                        <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider px-2 py-1 flex items-center justify-between border-b border-slate-100 pb-1.5 mb-1.5">
+                            <span class="flex items-center gap-1.5 text-slate-700">
+                                <svg class="w-3.5 h-3.5 text-[#C8460B]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+                                Pilih Kota Penempatan
+                            </span>
+                            <span class="text-[10px] text-sky-700 bg-sky-50 px-1.5 py-0.5 rounded font-bold border border-sky-100">Database Live</span>
+                        </div>
+                        <div class="space-y-1" id="catalog-location-options">
+                            <button type="button" data-val="" class="w-full px-2.5 py-2 rounded-xl text-left text-xs font-semibold text-slate-700 hover:bg-slate-100 flex items-center justify-between transition-colors cursor-pointer">
+                                <span class="flex items-center gap-2">
+                                    <svg class="w-4 h-4 text-slate-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                                    Semua Kota (Indonesia)
+                                </span>
+                                <span class="text-[11px] text-slate-400">Semua Loker</span>
+                            </button>
+                            <button type="button" data-val="Tegal" class="w-full px-2.5 py-2 rounded-xl text-left text-xs font-bold text-slate-900 bg-sky-50 hover:bg-sky-100 flex items-center justify-between transition-colors group cursor-pointer border border-sky-200">
+                                <span class="flex items-center gap-2 text-sky-950">
+                                    <svg class="w-4 h-4 text-sky-600 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="3"/><line x1="12" y1="22" x2="12" y2="8"/><path d="M5 12H2a10 10 0 0 0 20 0h-3"/></svg>
+                                    Tegal, Jawa Tengah
+                                </span>
+                                <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-sky-600 text-white font-bold">Dermaga Utama (2)</span>
+                            </button>
+                            <button type="button" data-val="Semarang" class="w-full px-2.5 py-2 rounded-xl text-left text-xs font-semibold text-slate-800 hover:bg-slate-100 flex items-center justify-between transition-colors cursor-pointer">
+                                <span class="flex items-center gap-2">
+                                    <svg class="w-4 h-4 text-slate-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                                    Semarang, Jawa Tengah
+                                </span>
+                                <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-600 font-medium">1 Lowongan</span>
+                            </button>
+                            <button type="button" data-val="Bandung" class="w-full px-2.5 py-2 rounded-xl text-left text-xs font-semibold text-slate-800 hover:bg-slate-100 flex items-center justify-between transition-colors cursor-pointer">
+                                <span class="flex items-center gap-2">
+                                    <svg class="w-4 h-4 text-slate-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                                    Bandung, Jawa Barat
+                                </span>
+                                <span class="text-[10px] px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-600 font-medium">1 Lowongan</span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Employment Type -->

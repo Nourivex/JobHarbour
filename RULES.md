@@ -77,3 +77,14 @@ Pastikan commit dan pull request didistribusikan merata ke 4 anggota sesuai pera
 - **M. Fahren Andrean Rangkuti:** Job Catalog Service (`/api/jobs/*`)
 - **Muhammad Yasir Ilham Nabil:** Application & Matchmaking Service (`/api/applications/*`)
 - **Muhammad Affif (Mas Affif):** Recruitment Pipeline Service (`/api/pipelines/*`) & CI/CD Security
+
+## 7. Arsitektur Stacking Context & Teleport Dropdown
+1. **Aturan Stacking Hero vs Card:**
+   - Hero Section wajib berada di layer dasar tanpa `z-index` yang menutupi komponen di bawahnya.
+   - Card Statistik (`-mt-20`) wajib memiliki `z-20` agar menumpuk di atas banner laut hero.
+2. **Aturan Popover / Dropdown Menu:**
+   - Dropdown yang keluar dari area form pencarian WAJIB menggunakan positioning `fixed` dengan floating positioner JavaScript (setara `<Teleport to="body">`) dengan `z-index: 99999`.
+   - Hal ini untuk mencegah clipping akibat `overflow-hidden` pada hero container.
+3. **Standarisasi Ikon UI:**
+   - Dilarang keras menggunakan tag font icon yang bisa membocorkan teks mentah ligatur (seperti `my_location` atau `public`).
+   - Selalu gunakan inline SVG vektor murni yang terdefinisi rapi.
