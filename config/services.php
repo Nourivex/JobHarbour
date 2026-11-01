@@ -35,4 +35,20 @@ return [
         ],
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | External Job Aggregator Configuration (Soal 2d UTS PWS)
+    |--------------------------------------------------------------------------
+    |
+    | Pengaturan timeout, retry, delay, dan TTL cache untuk integrasi API
+    | eksternal melalui adapter (Alkindo, Hasnur, Public JSON Feeds).
+    |
+    */
+    'aggregator' => [
+        'timeout' => (int) env('AGGREGATOR_TIMEOUT', 15),
+        'retry_attempts' => (int) env('AGGREGATOR_RETRY', 2),
+        'retry_delay_ms' => (int) env('AGGREGATOR_RETRY_DELAY', 500),
+        'cache_ttl_hours' => (int) env('AGGREGATOR_CACHE_TTL', 6),
+    ],
+
 ];

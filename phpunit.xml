@@ -32,5 +32,9 @@
         <env name="PULSE_ENABLED" value="false"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
         <env name="NIGHTWATCH_ENABLED" value="false"/>
+        <env name="AGGREGATOR_TIMEOUT" value="5"/>
+        <env name="AGGREGATOR_RETRY" value="2"/>
+        <env name="AGGREGATOR_RETRY_DELAY" value="0"/>
+        <env name="AGGREGATOR_CACHE_TTL" value="6"/>
     </php>
 </phpunit>

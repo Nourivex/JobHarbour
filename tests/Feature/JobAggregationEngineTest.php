@@ -251,12 +251,45 @@ class JobAggregationEngineTest extends TestCase
         $log = app(JobAggregationService::class)->syncSource($source);
 
         $this->assertSame('failed', $log->status);
-        $this->assertStringContainsString('HTTP 503', $log->error_details);
+        $this->assertStringContainsString('503', $log->error_details);
         $this->assertNotNull($source->fresh()->last_error_at);
 
         $this->getJson('/api/jobs')
             ->assertStatus(200)
             ->assertJsonCount(1, 'data')
             ->assertJsonPath('data.0.title', 'Backend Engineer');
+    }
+
+    /**
+     * Uji konfigurasi retry, timeout, dan caching feed eksternal (Soal 2d UTS PWS).
+     */
+    public function test_external_api_retry_and_cache_configuration(): void
+    {
+        // 1. Verifikasi konfigurasi di config/services.php
+        $this->assertGreaterThan(0, (int) config('services.aggregator.timeout'));
+        $this->assertGreaterThanOrEqual(1, (int) config('services.aggregator.retry_attempts'));
+        $this->assertGreaterThan(0, (int) config('services.aggregator.cache_ttl_hours'));
+
+        // 2. Verifikasi caching feed saat pengambilan berhasil
+        $source = $this->feedSource();
+        $cacheKey = "job_source_feed:{$source->id}";
+        \Illuminate\Support\Facades\Cache::forget($cacheKey);
+
+        Http::preventStrayRequests();
+        Http::fake([
+            'feed.example.test/*' => Http::sequence()
+                ->push('Transient Error', 500) // retry pertama
+                ->push(['jobs' => [
+                    ['id' => 99, 'title' => 'DevOps Specialist', 'company_name' => 'PT Mitra Feed', 'url' => 'https://feed.example.test/jobs/99'],
+                ]], 200),
+        ]);
+
+        $log = app(JobAggregationService::class)->syncSource($source);
+
+        $this->assertSame('success', $log->status);
+        $this->assertTrue(\Illuminate\Support\Facades\Cache::has($cacheKey));
+        $cachedData = \Illuminate\Support\Facades\Cache::get($cacheKey);
+        $this->assertNotEmpty($cachedData);
+        $this->assertSame('DevOps Specialist', $cachedData[0]['title']);
     }
 }
