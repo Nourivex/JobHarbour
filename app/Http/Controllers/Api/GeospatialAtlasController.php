@@ -240,4 +240,31 @@ class GeospatialAtlasController extends Controller
         return response()->json($geoData);
     }
 
+
+    /**
+     * Mengembalikan data GeoJSON Desa/Kelurahan (Level 4).
+     * Disajikan secara lazy-loaded per kode kecamatan (?district_code=3325070 / 3376030).
+     */
+    public function getVillagesGeoJson(Request $request): JsonResponse
+    {
+        $districtCode = $request->query('district_code', '3325070');
+        $cleanCode = preg_replace('/[^0-9.]/', '', $districtCode);
+        $path = public_path("geo/villages/{$cleanCode}.geojson");
+
+        if (!file_exists($path)) {
+            return response()->json([
+                'type' => 'FeatureCollection',
+                'meta' => [
+                    'district_code' => $cleanCode,
+                    'status' => 'not_available_yet',
+                    'message' => "Dataset batas desa/kelurahan untuk kecamatan {$cleanCode} sedang dalam proses verifikasi BIG (Level 3 Aktif)."
+                ],
+                'features' => []
+            ]);
+        }
+
+        $geoData = json_decode(file_get_contents($path), true);
+        return response()->json($geoData);
+    }
+
 }

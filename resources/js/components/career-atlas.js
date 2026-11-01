@@ -33,6 +33,7 @@ export class CareerAtlas {
         this.selectedProvince = null;
         this.selectedRegency = null;
         this.selectedDistrict = null;
+        this.selectedVillage = null;
         this.provincesData = null;
         this.regenciesData = null;
         this.industryData = null;
@@ -431,20 +432,67 @@ export class CareerAtlas {
         });
     }
 
-    handleDistrictClick(props, lngLat) {
+    async handleDistrictClick(props, lngLat) {
         this.currentLevel = 3;
         this.selectedDistrict = props.district_name;
         this.selectedRegency = props.regency_name;
         this.selectedProvince = props.province_name;
+        this.selectedVillage = null;
         this.updateHierarchyBreadcrumb();
+
+        const distCode = props.district_code;
+        let villageCount = 0;
+        let villageHtml = '';
+
+        // Lazy load Level 4 Desa / Kelurahan
+        try {
+            const vRes = await fetch(`/api/geo/villages?district_code=${encodeURIComponent(distCode)}`);
+            const vData = await vRes.json();
+            if (vData && Array.isArray(vData.features) && vData.features.length > 0) {
+                villageCount = vData.features.length;
+                villageHtml = `
+                    <div class="mt-2.5 pt-2 border-t border-slate-200 dark:border-slate-700">
+                        <span class="text-[10px] font-bold text-sky-700 dark:text-sky-400 uppercase tracking-wider block mb-1">
+                            Desa & Kelurahan Terdaftar (Level 4):
+                        </span>
+                        <div class="space-y-1">
+                            ${vData.features.map(f => {
+                                const vp = f.properties;
+                                return `
+                                    <div class="p-1.5 rounded-lg bg-sky-50 dark:bg-slate-800 text-xs flex items-center justify-between border border-sky-100 dark:border-slate-700">
+                                        <span class="font-bold text-slate-800 dark:text-white">${vp.village_name}</span>
+                                        <span class="text-[10px] text-slate-500 font-mono">${vp.village_code}</span>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+        } catch(e) {
+            console.error('Gagal memuat data desa:', e);
+        }
+
+        const statusNote = villageCount > 0 ?
+            `Menampilkan ${villageCount} Desa/Kelurahan resmi Level 4 di Kecamatan ${props.district_name}. ${villageHtml}` :
+            `Status Geometri: Poligon Terverifikasi (BIG & BPS Subdistricts). Kode Administrasi Kemendagri: ${props.district_code}. Data rincian Desa Level 4 sedang dalam proses integrasi bertahap.`;
 
         this.showRegionPanelInfo({
             level: 'Kecamatan (Level 3)',
             code: props.district_code,
             name: `Kecamatan ${props.district_name}`,
             parent: `${props.regency_name}, ${props.province_name}`,
-            note: `Status Geometri: Poligon Terverifikasi (BIG & BPS Subdistricts). Kode Administrasi Kemendagri: ${props.district_code}.`
+            note: statusNote
         });
+
+        if (lngLat) {
+            this.map.flyTo({
+                center: [lngLat.lng, lngLat.lat],
+                zoom: 11.5,
+                speed: 1.2,
+                essential: true
+            });
+        }
     }
 
     showIndustrialIntelligencePanel(props) {
@@ -563,6 +611,9 @@ export class CareerAtlas {
         }
         if (this.selectedDistrict) {
             html += ` <span class="text-slate-400">›</span> <span class="text-orange-400 font-bold">Kec. ${this.selectedDistrict}</span>`;
+        }
+        if (this.selectedVillage) {
+            html += ` <span class="text-slate-400">›</span> <span class="text-emerald-400 font-bold">${this.selectedVillage}</span>`;
         }
         bc.innerHTML = html;
     }

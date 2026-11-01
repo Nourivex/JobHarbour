@@ -42,7 +42,7 @@
                 <a href="/recruiter" data-jh-role-recruiter style="display:none;" class="nav-link" @if (request()->is('recruiter*')) aria-current="page" @endif>Rekrutmen</a>
                 <a href="/#cara-kerja" class="nav-link">Cara Kerja</a>
                 <a href="/login?tab=register" data-jh-guest-only class="nav-link">Untuk Recruiter</a>
-                <a href="/docs" target="_blank" rel="noopener" class="nav-link">API Docs</a>
+                <!-- API Docs dipindahkan ke footer bawah -->
             </nav>
 
             <!-- Aksi -->

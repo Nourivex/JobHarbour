@@ -1,0 +1,51 @@
+{
+  "type": "FeatureCollection",
+  "meta": {
+    "district_code": "3376030",
+    "district_name": "Tegal Barat",
+    "regency_code": "33.76",
+    "regency_name": "Kota Tegal",
+    "level": "village",
+    "provenance": "Delineasi Batas Kelurahan BIG & Pemkot Tegal 2024"
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          109.1352,
+          -6.8521
+        ]
+      },
+      "properties": {
+        "village_code": "33.76.03.1001",
+        "village_name": "Kelurahan Tegalsari",
+        "village_type": "kelurahan",
+        "industrial_zone_presence": "Dok & Galangan Kapal Perikanan Pelindo",
+        "district_name": "Tegal Barat",
+        "regency_name": "Kota Tegal",
+        "province_name": "Jawa Tengah"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          109.1214,
+          -6.8492
+        ]
+      },
+      "properties": {
+        "village_code": "33.76.03.1002",
+        "village_name": "Kelurahan Muarareja",
+        "village_type": "kelurahan",
+        "industrial_zone_presence": "Sentra Agro-Maritim & Pendaratan Ikan",
+        "district_name": "Tegal Barat",
+        "regency_name": "Kota Tegal",
+        "province_name": "Jawa Tengah"
+      }
+    }
+  ]
+}

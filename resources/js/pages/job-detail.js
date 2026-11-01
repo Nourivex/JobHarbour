@@ -41,10 +41,23 @@ function renderHeader(job) {
                 <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
                     <div class="min-w-0 flex-1">
                         <h1 class="text-2xl sm:text-[1.9rem] leading-tight font-extrabold text-[#0B1B2B]">${esc(job.title)}</h1>
-                        <p class="mt-1.5 inline-flex items-center gap-2 font-semibold text-[#3D4B5C]">
-                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22v-4h6v4M8 6h.01M16 6h.01M12 6h.01M8 10h.01M16 10h.01M12 10h.01"/></svg>
-                            ${esc(job.company)}
-                        </p>
+                        <div class="mt-1.5 flex flex-wrap items-center gap-2.5 font-semibold text-[#3D4B5C]">
+                            <span class="inline-flex items-center gap-1.5">
+                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22v-4h6v4M8 6h.01M16 6h.01M12 6h.01M8 10h.01M16 10h.01M12 10h.01"/></svg>
+                                ${esc(job.company)}
+                            </span>
+                            ${job.job_source_type === 'official_career_page' ? `
+                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-sky-50 text-sky-800 border border-sky-200">
+                                    <svg class="w-3 h-3 text-sky-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
+                                    Kurasi Web Karir Resmi (${esc(job.location_data_source || 'Portal Resmi')})
+                                </span>
+                            ` : `
+                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                                    <svg class="w-3 h-3 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                                    Mitra Terverifikasi JobHarbour
+                                </span>
+                            `}
+                        </div>
                     </div>
                     <div class="flex gap-2 shrink-0">
                         <button type="button" id="detail-share" class="btn-press w-11 h-11 rounded-xl border border-[#E2E7ED] flex items-center justify-center text-[#0B1B2B] hover:border-[#C5CFDA] cursor-pointer" aria-label="Bagikan lowongan">${icon('share', 'w-[18px] h-[18px]')}</button>

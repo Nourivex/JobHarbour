@@ -1,0 +1,70 @@
+{
+  "type": "FeatureCollection",
+  "meta": {
+    "district_code": "3325070",
+    "district_name": "Gringsing",
+    "regency_code": "33.25",
+    "regency_name": "Kabupaten Batang",
+    "level": "village",
+    "provenance": "Delineasi Batas Desa BIG & BPS 2024"
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          109.9572,
+          -6.9538
+        ]
+      },
+      "properties": {
+        "village_code": "33.25.07.2001",
+        "village_name": "Desa Ketanggan",
+        "village_type": "desa",
+        "industrial_zone_presence": "Kawasan Industri Terpadu Batang (KITB Phase 1)",
+        "district_name": "Gringsing",
+        "regency_name": "Kabupaten Batang",
+        "province_name": "Jawa Tengah"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          109.9721,
+          -6.9642
+        ]
+      },
+      "properties": {
+        "village_code": "33.25.07.2002",
+        "village_name": "Desa Sawangan",
+        "village_type": "desa",
+        "industrial_zone_presence": "Penyangga Koridor Logistik KITB",
+        "district_name": "Gringsing",
+        "regency_name": "Kabupaten Batang",
+        "province_name": "Jawa Tengah"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          109.985,
+          -6.9781
+        ]
+      },
+      "properties": {
+        "village_code": "33.25.07.2003",
+        "village_name": "Desa Plelen",
+        "village_type": "desa",
+        "industrial_zone_presence": "Akses Simpang Susun Tol Gringsing",
+        "district_name": "Gringsing",
+        "regency_name": "Kabupaten Batang",
+        "province_name": "Jawa Tengah"
+      }
+    }
+  ]
+}

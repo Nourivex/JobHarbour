@@ -161,3 +161,5 @@ Route::prefix('geo')->group(function () {
 });
 
 Route::get('/geo/districts', [\App\Http\Controllers\Api\GeospatialAtlasController::class, 'getDistrictsGeoJson']);
+
+Route::get('/geo/villages', [\App\Http\Controllers\Api\GeospatialAtlasController::class, 'getVillagesGeoJson']);
