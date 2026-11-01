@@ -1,0 +1,816 @@
+[
+  {
+    "id": 101,
+    "name": "Kawasan Industri Medan (KIM)",
+    "slug": "kim-medan",
+    "category": "manufacturing_ev",
+    "zone_type": "kawasan_industri",
+    "region_code": "12.71",
+    "latitude": 3.6821,
+    "longitude": 98.6854,
+    "area_hectares": 834.0,
+    "management_company": "PT Kawasan Industri Medan (BUMN Danareksa)",
+    "operational_status": "operating",
+    "anchor_tenants": [
+      "Aneka Gas Industri",
+      "PT Musim Mas",
+      "Industri Pangan & Logistik Sumatera"
+    ],
+    "infrastructure_support": [
+      "Pelabuhan Belawan (10 km)",
+      "Tol Medan-Belawan",
+      "Stasiun Labuhan"
+    ],
+    "website_url": "https://kim.co.id",
+    "verification_status": "official_kemenperin",
+    "data_source": "Kementerian Perindustrian RI (SIINas)",
+    "source_url": "https://kemenperin.go.id/kawasan-industri",
+    "dataset_edition": "Direktori Kawasan Industri Kemenperin 2024"
+  },
+  {
+    "id": 102,
+    "name": "Pelabuhan Belawan (Terminal Peti Kemas Belawan / BNCT)",
+    "slug": "pelabuhan-belawan-medan",
+    "category": "maritime_logistics",
+    "zone_type": "maritime_hub",
+    "region_code": "12.71",
+    "latitude": 3.7845,
+    "longitude": 98.6912,
+    "area_hectares": 114.0,
+    "management_company": "PT Pelabuhan Indonesia (Persero) Regional 1",
+    "operational_status": "operating",
+    "anchor_tenants": [
+      "Belawan New Container Terminal (BNCT)",
+      "Terminal Curah Cair Palm Oil"
+    ],
+    "infrastructure_support": [
+      "Alur Pelayaran Selat Malaka",
+      "Akses Tol Belmera"
+    ],
+    "website_url": "https://pelindo.co.id",
+    "verification_status": "official_kemenperin",
+    "data_source": "Direktorat Jenderal Perhubungan Laut Kemenhub RI",
+    "source_url": "https://hubla.dephub.go.id",
+    "dataset_edition": "Master Data Pelabuhan Nasional Kemenhub 2024"
+  },
+  {
+    "id": 103,
+    "name": "Kawasan Ekonomi Khusus Sei Mangkei",
+    "slug": "kek-sei-mangkei",
+    "category": "agro_industry",
+    "zone_type": "kawasan_ekonomi_khusus",
+    "region_code": "12.08",
+    "latitude": 3.123,
+    "longitude": 99.345,
+    "area_hectares": 1933.8,
+    "management_company": "PT Kawasan Industri Nusantara (PTPN III Group)",
+    "operational_status": "operating",
+    "anchor_tenants": [
+      "Unilever Oleochemical Indonesia",
+      "PT Industri Nabati Lestari",
+      "Bio-Chemical Plant"
+    ],
+    "infrastructure_support": [
+      "Dry Port Sei Mangkei Rel Kereta",
+      "Tol Tebing Tinggi-Indrapura",
+      "Pelabuhan Kuala Tanjung"
+    ],
+    "website_url": "https://seimangkeizone.com",
+    "verification_status": "official_kemenperin",
+    "data_source": "Dewan Nasional Kawasan Ekonomi Khusus (KEK)",
+    "source_url": "https://kek.go.id/kawasan/KEK-Sei-Mangkei",
+    "dataset_edition": "Laporan Kinerja KEK 2024"
+  },
+  {
+    "id": 104,
+    "name": "Pelabuhan Teluk Bayur (Gateway Pantai Barat Sumatera)",
+    "slug": "pelabuhan-teluk-bayur-padang",
+    "category": "maritime_logistics",
+    "zone_type": "maritime_hub",
+    "region_code": "13.71",
+    "latitude": -0.9982,
+    "longitude": 100.3704,
+    "area_hectares": 54.0,
+    "management_company": "PT Pelindo Regional 2 Teluk Bayur",
+    "operational_status": "operating",
+    "anchor_tenants": [
+      "Terminal Curah Semen Padang",
+      "Terminal CPO & Peti Kemas Samudra Hindia"
+    ],
+    "infrastructure_support": [
+      "Alur Pelayaran Samudra Hindia",
+      "Jalur Rel Semen Silo"
+    ],
+    "website_url": "https://pelindo.co.id",
+    "verification_status": "verified_estate",
+    "data_source": "Ditjen Hubla Kemenhub & Pelindo",
+    "source_url": "https://hubla.dephub.go.id",
+    "dataset_edition": "Master Data Pelabuhan Nasional Kemenhub 2024"
+  },
+  {
+    "id": 105,
+    "name": "KEK Nongsa Digital Park (NDP Batam)",
+    "slug": "kek-nongsa-digital-park",
+    "category": "technology_digital",
+    "zone_type": "kawasan_ekonomi_khusus",
+    "region_code": "21.71",
+    "latitude": 1.1712,
+    "longitude": 104.1034,
+    "area_hectares": 166.45,
+    "management_company": "PT Taman Resor Internet (Citramas Group)",
+    "operational_status": "operating",
+    "anchor_tenants": [
+      "Data Center Hyperscale Hub",
+      "Infinite Studios (Film/Animasi)",
+      "Apple Developer Academy Batam"
+    ],
+    "infrastructure_support": [
+      "Kabel Fiber Laut Singapura-Batam",
+      "Pelabuhan Ferry Nongsapura",
+      "Bandara Hang Nadim"
+    ],
+    "website_url": "https://nongsadigital.com",
+    "verification_status": "official_kemenperin",
+    "data_source": "Dewan Nasional KEK Indonesia & BP Batam",
+    "source_url": "https://kek.go.id/kawasan/KEK-Nongsa",
+    "dataset_edition": "Profil Resmi KEK Digital Nongsa 2024"
+  },
+  {
+    "id": 106,
+    "name": "Kawasan Industri Batamindo (Batamindo Industrial Park)",
+    "slug": "batamindo-industrial-park",
+    "category": "manufacturing_ev",
+    "zone_type": "kawasan_industri",
+    "region_code": "21.71",
+    "latitude": 1.0841,
+    "longitude": 104.0321,
+    "area_hectares": 320.0,
+    "management_company": "PT Batamindo Investment Cakrawala",
+    "operational_status": "operating",
+    "anchor_tenants": [
+      "Schneider Electric Manufacturing",
+      "Philips Electronics",
+      "Sumitomo Wiring Systems"
+    ],
+    "infrastructure_support": [
+      "Pembangkit Listrik Gas Mandiri 130 MW",
+      "Water Treatment Plant Mandiri",
+      "Pelabuhan Kargo Batu Ampar"
+    ],
+    "website_url": "https://batamindo.co.id",
+    "verification_status": "official_kemenperin",
+    "data_source": "Kementerian Perindustrian RI (SIINas) & BP Batam",
+    "source_url": "https://kemenperin.go.id/kawasan-industri",
+    "dataset_edition": "Direktori Kawasan Industri Kemenperin 2024"
+  },
+  {
+    "id": 107,
+    "name": "Pelabuhan Tanjung Priok (Hub Logistik Utama Nasional)",
+    "slug": "pelabuhan-tanjung-priok-jakarta",
+    "category": "maritime_logistics",
+    "zone_type": "maritime_hub",
+    "region_code": "31.72",
+    "latitude": -6.1021,
+    "longitude": 106.8833,
+    "area_hectares": 604.0,
+    "management_company": "PT Pelindo Regional 2 Tanjung Priok",
+    "operational_status": "operating",
+    "anchor_tenants": [
+      "Jakarta International Container Terminal (JICT)",
+      "KOJA Container Terminal",
+      "New Priok Kalibaru"
+    ],
+    "infrastructure_support": [
+      "Jalan Tol Akses Tanjung Priok (ATP)",
+      "Kanal Cikarang Dry Port",
+      "Pelayaran Internasional"
+    ],
+    "website_url": "https://pelindo.co.id",
+    "verification_status": "official_kemenperin",
+    "data_source": "Ditjen Hubla Kemenhub & Pelindo",
+    "source_url": "https://hubla.dephub.go.id",
+    "dataset_edition": "Master Data Pelabuhan Nasional Kemenhub 2024"
+  },
+  {
+    "id": 108,
+    "name": "Kawasan Industri Jababeka (Cikarang)",
+    "slug": "kawasan-industri-jababeka",
+    "category": "manufacturing_ev",
+    "zone_type": "kawasan_industri",
+    "region_code": "32.16",
+    "latitude": -6.3151,
+    "longitude": 107.1425,
+    "area_hectares": 5600.0,
+    "management_company": "PT Kawasan Industri Jababeka Tbk",
+    "operational_status": "operating",
+    "anchor_tenants": [
+      "Unilever Indonesia",
+      "Samsung Electronics",
+      "Mattel Indonesia",
+      "L'Oreal Indonesia"
+    ],
+    "infrastructure_support": [
+      "Cikarang Dry Port (CDP)",
+      "Akses Tol Jakarta-Cikampek KM 31",
+      "Pembangkit Listrik Cikarang Listrindo"
+    ],
+    "website_url": "https://jababeka.com",
+    "verification_status": "official_kemenperin",
+    "data_source": "Kementerian Perindustrian RI (SIINas)",
+    "source_url": "https://kemenperin.go.id/kawasan-industri",
+    "dataset_edition": "Direktori Kawasan Industri Kemenperin 2024"
+  },
+  {
+    "id": 109,
+    "name": "Kawasan Industri KIIC (Karawang International Industrial City)",
+    "slug": "kiic-karawang",
+    "category": "manufacturing_ev",
+    "zone_type": "kawasan_industri",
+    "region_code": "32.15",
+    "latitude": -6.3542,
+    "longitude": 107.2764,
+    "area_hectares": 1500.0,
+    "management_company": "PT Maligi Permata Industrial Estate (Sinar Mas Land & ITOCHU Corp)",
+    "operational_status": "operating",
+    "anchor_tenants": [
+      "Toyota Motor Manufacturing Indonesia",
+      "Daihatsu Motor",
+      "Yamaha Motor",
+      "PT HLI Green Power (EV Battery)"
+    ],
+    "infrastructure_support": [
+      "Interchange Tol Karawang Barat KM 46",
+      "Dekat Pelabuhan Patimban"
+    ],
+    "website_url": "https://kiic.co.id",
+    "verification_status": "official_kemenperin",
+    "data_source": "Kementerian Perindustrian RI (SIINas)",
+    "source_url": "https://kemenperin.go.id/kawasan-industri",
+    "dataset_edition": "Direktori Kawasan Industri Kemenperin 2024"
+  },
+  {
+    "id": 110,
+    "name": "Pelabuhan Patimban (Sentra Ekspor Otomotif Nasional)",
+    "slug": "pelabuhan-patimban-subang",
+    "category": "maritime_logistics",
+    "zone_type": "maritime_hub",
+    "region_code": "32.13",
+    "latitude": -6.2481,
+    "longitude": 107.9022,
+    "area_hectares": 654.0,
+    "management_company": "PT Pelabuhan Patimban Internasional (Konsorsium BUMN & Swasta)",
+    "operational_status": "operating",
+    "anchor_tenants": [
+      "Terminal Kendaraan Ekspor Otomotif CBU (Car Terminal)",
+      "Terminal Kontainer Multipurpose"
+    ],
+    "infrastructure_support": [
+      "Jalan Akses Patimban Tol Cipali",
+      "Alur Kedalaman Laut -14m LWS"
+    ],
+    "website_url": "https://dephub.go.id",
+    "verification_status": "official_kemenperin",
+    "data_source": "Kementerian Perhubungan RI (Proyek Strategis Nasional)",
+    "source_url": "https://hubla.dephub.go.id",
+    "dataset_edition": "Direktori Pelabuhan Hubla 2024"
+  },
+  {
+    "id": 111,
+    "name": "Bandung Digital Valley & High-Tech R&D Park",
+    "slug": "bandung-digital-valley",
+    "category": "technology_digital",
+    "zone_type": "tech_park",
+    "region_code": "32.73",
+    "latitude": -6.8647,
+    "longitude": 107.5912,
+    "area_hectares": 12.0,
+    "management_company": "Telkom Indonesia Innovation Hub & Diskominfo Jabar",
+    "operational_status": "operating",
+    "anchor_tenants": [
+      "Telkom Digital Labs",
+      "Game Developer Ecosystem",
+      "Cloud AI Center"
+    ],
+    "infrastructure_support": [
+      "Jaringan Fiber Optic Terabit",
+      "Stasiun Kereta Cepat Whoosh Padalarang"
+    ],
+    "website_url": "https://telkom.co.id",
+    "verification_status": "verified_estate",
+    "data_source": "Diskominfo Pemprov Jawa Barat",
+    "source_url": "https://jabarprov.go.id",
+    "dataset_edition": "Peta Ekosistem Digital Jawa Barat 2024"
+  },
+  {
+    "id": 112,
+    "name": "Kawasan Pelabuhan & Dok Galangan Kapal Tegal",
+    "slug": "dok-maritim-tegal",
+    "category": "maritime_logistics",
+    "zone_type": "maritime_hub",
+    "region_code": "33.76",
+    "latitude": -6.8521,
+    "longitude": 109.1352,
+    "area_hectares": 64.5,
+    "management_company": "PT Pelindo Regional 3 & Pemkot Tegal",
+    "operational_status": "operating",
+    "anchor_tenants": [
+      "Industri Dok Perkapalan Pantura",
+      "Pengolahan Hasil Laut",
+      "Sentra Logam Mesin Kapal"
+    ],
+    "infrastructure_support": [
+      "Dermaga Kedalaman 5m LWS",
+      "Jalur Arteri Pantura",
+      "Stasiun Tegal Barang"
+    ],
+    "website_url": "https://pelindo.co.id",
+    "verification_status": "verified_estate",
+    "data_source": "Kemenhub RI & Disperinaker Kota Tegal",
+    "source_url": "https://tegalkota.go.id",
+    "dataset_edition": "Direktori Sentra Industri Maritim 2024"
+  },
+  {
+    "id": 113,
+    "name": "Kawasan Industri Terpadu Batang (KITB / Grand Batang City)",
+    "slug": "kitb-batang",
+    "category": "manufacturing_ev",
+    "zone_type": "kawasan_industri",
+    "region_code": "33.25",
+    "latitude": -6.9538,
+    "longitude": 109.9572,
+    "area_hectares": 4300.0,
+    "management_company": "PT Kawasan Industri Terpadu Batang (Holding Danareksa)",
+    "operational_status": "operating",
+    "anchor_tenants": [
+      "LG Energy Solution (Baterai EV)",
+      "KCC Glass Indonesia (Pabrik Kaca Terbesar SE Asia)",
+      "Yih Quan Footwear"
+    ],
+    "infrastructure_support": [
+      "Interchange Tol Trans-Jawa KM 371",
+      "Pelabuhan Multipurpose Batang",
+      "Dry Port Terintegrasi Rel KA"
+    ],
+    "website_url": "https://kitb.id",
+    "verification_status": "official_kemenperin",
+    "data_source": "Kementerian Perindustrian RI (SIINas)",
+    "source_url": "https://kemenperin.go.id/kawasan-industri",
+    "dataset_edition": "Peta Kawasan Industri Prioritas Nasional 2024"
+  },
+  {
+    "id": 114,
+    "name": "Kawasan Ekonomi Khusus Kendal (KEK Kendal - Park by the Bay)",
+    "slug": "kek-kendal",
+    "category": "manufacturing_ev",
+    "zone_type": "kawasan_ekonomi_khusus",
+    "region_code": "33.24",
+    "latitude": -6.9189,
+    "longitude": 110.2312,
+    "area_hectares": 1000.0,
+    "management_company": "PT Kawasan Industri Kendal (Jababeka & Sembcorp Singapore)",
+    "operational_status": "operating",
+    "anchor_tenants": [
+      "BTR New Energy Materials (Anoda Baterai EV)",
+      "PT Polycell Tech",
+      "PT Eclat Textile"
+    ],
+    "infrastructure_support": [
+      "Pelabuhan Tanjung Kendal",
+      "Arteri Pantura & Tol Batang-Semarang"
+    ],
+    "website_url": "https://kendalindustrialpark.co.id",
+    "verification_status": "official_kemenperin",
+    "data_source": "Dewan Nasional KEK Indonesia",
+    "source_url": "https://kek.go.id/kawasan/KEK-Kendal",
+    "dataset_edition": "Laporan Kinerja KEK 2024"
+  },
+  {
+    "id": 115,
+    "name": "Pelabuhan Tanjung Emas (Sentra Ekspor Jawa Tengah)",
+    "slug": "pelabuhan-tanjung-emas-semarang",
+    "category": "maritime_logistics",
+    "zone_type": "maritime_hub",
+    "region_code": "33.74",
+    "latitude": -6.9532,
+    "longitude": 110.4215,
+    "area_hectares": 88.0,
+    "management_company": "PT Pelindo Regional 3 Tanjung Emas",
+    "operational_status": "operating",
+    "anchor_tenants": [
+      "Terminal Peti Kemas Semarang (TPKS)",
+      "Terminal Penumpang Nusantara"
+    ],
+    "infrastructure_support": [
+      "Tol Semarang-Demak & Tol Dalam Kota",
+      "Alur Pelayaran Laut Jawa"
+    ],
+    "website_url": "https://pelindo.co.id",
+    "verification_status": "official_kemenperin",
+    "data_source": "Ditjen Hubla Kemenhub & Pelindo",
+    "source_url": "https://hubla.dephub.go.id",
+    "dataset_edition": "Master Data Pelabuhan Hubla 2024"
+  },
+  {
+    "id": 116,
+    "name": "Java Integrated Industrial and Port Estate (JIIPE Manyar Gresik)",
+    "slug": "jiipe-gresik",
+    "category": "energy_mining",
+    "zone_type": "kawasan_ekonomi_khusus",
+    "region_code": "35.25",
+    "latitude": -7.0982,
+    "longitude": 112.5843,
+    "area_hectares": 3000.0,
+    "management_company": "PT Berkah Kawasan Manyar Sejahtera (AKR & Pelindo)",
+    "operational_status": "operating",
+    "anchor_tenants": [
+      "PT Freeport Indonesia (Smelter Tembaga Single-Line)",
+      "PT Clariant Indonesia",
+      "PT Nippon Indosari Corpindo"
+    ],
+    "infrastructure_support": [
+      "Pelabuhan Laut Dalam Manyar (-16m LWS)",
+      "Akses Tol KLBM Manyar"
+    ],
+    "website_url": "https://jiipe.com",
+    "verification_status": "official_kemenperin",
+    "data_source": "Dewan Nasional KEK & Kemenperin SIINas",
+    "source_url": "https://kek.go.id/kawasan/KEK-Gresik",
+    "dataset_edition": "Laporan KEK Gresik 2024"
+  },
+  {
+    "id": 117,
+    "name": "Pelabuhan Tanjung Perak (Hub Maritim Gerbang Indonesia Timur)",
+    "slug": "pelabuhan-tanjung-perak-surabaya",
+    "category": "maritime_logistics",
+    "zone_type": "maritime_hub",
+    "region_code": "35.78",
+    "latitude": -7.1983,
+    "longitude": 112.7321,
+    "area_hectares": 590.0,
+    "management_company": "PT Pelindo Regional 3 Tanjung Perak",
+    "operational_status": "operating",
+    "anchor_tenants": [
+      "Terminal Teluk Lamong (Green Port Otomatis)",
+      "Terminal Peti Kemas Surabaya (TPS)",
+      "Terminal Jamrud"
+    ],
+    "infrastructure_support": [
+      "Jembatan Suramadu",
+      "Tol Surabaya-Gresik & Tol Tanjung Perak",
+      "Alur Pelayaran Barat Surabaya"
+    ],
+    "website_url": "https://pelindo.co.id",
+    "verification_status": "official_kemenperin",
+    "data_source": "Ditjen Hubla Kemenhub & Pelindo",
+    "source_url": "https://hubla.dephub.go.id",
+    "dataset_edition": "Master Data Pelabuhan Hubla 2024"
+  },
+  {
+    "id": 118,
+    "name": "Kawasan Inti Smart Tech & Green Infrastructure IKN",
+    "slug": "smart-tech-ikn",
+    "category": "technology_digital",
+    "zone_type": "tech_park",
+    "region_code": "64.09",
+    "latitude": -0.9741,
+    "longitude": 116.7025,
+    "area_hectares": 6600.0,
+    "management_company": "Otorita Ibu Kota Nusantara (OIKN)",
+    "operational_status": "under_development",
+    "anchor_tenants": [
+      "Integrated Command Center (Smart City Hub)",
+      "PLTS Surya Hijau 50 MW",
+      "Sentra Inovasi Nusantara"
+    ],
+    "infrastructure_support": [
+      "Multi-Utility Tunnel (MUT)",
+      "Tol IKN-Balikpapan (30 menit)",
+      "Bandara VVIP Nusantara"
+    ],
+    "website_url": "https://ikn.go.id",
+    "verification_status": "official_kemenperin",
+    "data_source": "Otorita Ibu Kota Nusantara (OIKN)",
+    "source_url": "https://ikn.go.id/tata-ruang",
+    "dataset_edition": "Rencana Induk Spasial IKN 2024-2026"
+  },
+  {
+    "id": 119,
+    "name": "Pelabuhan Semayang & Kariangau (Hub Logistik Teluk Balikpapan)",
+    "slug": "pelabuhan-kariangau-balikpapan",
+    "category": "maritime_logistics",
+    "zone_type": "maritime_hub",
+    "region_code": "64.71",
+    "latitude": -1.2184,
+    "longitude": 116.8219,
+    "area_hectares": 140.0,
+    "management_company": "PT Pelindo Regional 4 & PT Kaltim Kariangau Terminal",
+    "operational_status": "operating",
+    "anchor_tenants": [
+      "Kariangau Container Terminal (KCT)",
+      "Dermaga Penyeberangan Logistik IKN Nusantara"
+    ],
+    "infrastructure_support": [
+      "Tol Balikpapan-Samarinda",
+      "Alur Laut Selat Makassar (ALKI II)"
+    ],
+    "website_url": "https://pelindo.co.id",
+    "verification_status": "official_kemenperin",
+    "data_source": "Ditjen Hubla Kemenhub & Pelindo",
+    "source_url": "https://hubla.dephub.go.id",
+    "dataset_edition": "Master Data Pelabuhan Hubla 2024"
+  },
+  {
+    "id": 120,
+    "name": "Kawasan Industri Kariangau (KIK Balikpapan)",
+    "slug": "kik-kariangau-balikpapan",
+    "category": "manufacturing_ev",
+    "zone_type": "kawasan_industri",
+    "region_code": "64.71",
+    "latitude": -1.1732,
+    "longitude": 116.8524,
+    "area_hectares": 3500.0,
+    "management_company": "Pemerintah Kota Balikpapan & BUMD Kariangau",
+    "operational_status": "operating",
+    "anchor_tenants": [
+      "Sentra Fabrikasi Alat Berat & Migas",
+      "Pabrik Minyak Goreng Sawit",
+      "Pergudangan Penunjang IKN"
+    ],
+    "infrastructure_support": [
+      "Akses Jalan Tol Balikpapan-IKN",
+      "Pelabuhan Peti Kemas Kariangau"
+    ],
+    "website_url": "https://balikpapan.go.id",
+    "verification_status": "official_kemenperin",
+    "data_source": "Kementerian Perindustrian RI (SIINas)",
+    "source_url": "https://kemenperin.go.id/kawasan-industri",
+    "dataset_edition": "Direktori Kawasan Industri Kemenperin 2024"
+  },
+  {
+    "id": 121,
+    "name": "Kawasan Industri Bontang (Kaltim Industrial Estate - KIE)",
+    "slug": "kie-bontang",
+    "category": "energy_mining",
+    "zone_type": "kawasan_industri",
+    "region_code": "64.74",
+    "latitude": 0.1741,
+    "longitude": 117.4912,
+    "area_hectares": 1100.0,
+    "management_company": "PT Kaltim Industrial Estate (Pupuk Kaltim Group)",
+    "operational_status": "operating",
+    "anchor_tenants": [
+      "PT Pupuk Kalimantan Timur (Pupuk Urea & Amoniak)",
+      "Kilang Petrokimia Gas Alam",
+      "PT Kaltim Parna Industri"
+    ],
+    "infrastructure_support": [
+      "Pelabuhan Laut Khusus Ekspor Pupuk Bontang",
+      "Bandara Khusus Pupuk Kaltim"
+    ],
+    "website_url": "https://kie.co.id",
+    "verification_status": "official_kemenperin",
+    "data_source": "Kementerian Perindustrian RI (SIINas)",
+    "source_url": "https://kemenperin.go.id/kawasan-industri",
+    "dataset_edition": "Direktori Kawasan Industri Kemenperin 2024"
+  },
+  {
+    "id": 122,
+    "name": "Indonesia Morowali Industrial Park (IMIP Bahodopi)",
+    "slug": "imip-morowali",
+    "category": "energy_mining",
+    "zone_type": "kawasan_industri",
+    "region_code": "72.06",
+    "latitude": -2.8275,
+    "longitude": 122.158,
+    "area_hectares": 3000.0,
+    "management_company": "PT Indonesia Morowali Industrial Park",
+    "operational_status": "operating",
+    "anchor_tenants": [
+      "PT Sulawesi Mining Investment (Stainless Steel)",
+      "PT Huayue Nickel Cobalt (Bahan Baku Baterai EV)",
+      "PT QMB New Energy"
+    ],
+    "infrastructure_support": [
+      "Pelabuhan Laut Khusus Curah Bahodopi",
+      "Bandara Khusus IMIP",
+      "Pembangkit Listrik Mandiri"
+    ],
+    "website_url": "https://imip.co.id",
+    "verification_status": "official_kemenperin",
+    "data_source": "Kementerian Perindustrian RI (SIINas)",
+    "source_url": "https://kemenperin.go.id/kawasan-industri",
+    "dataset_edition": "Peta Kawasan Hilirisasi Logam & Baterai 2024"
+  },
+  {
+    "id": 123,
+    "name": "Pelabuhan Soekarno-Hatta Makassar (Makassar New Port / MNP)",
+    "slug": "makassar-new-port",
+    "category": "maritime_logistics",
+    "zone_type": "maritime_hub",
+    "region_code": "73.71",
+    "latitude": -5.1124,
+    "longitude": 119.4142,
+    "area_hectares": 142.0,
+    "management_company": "PT Pelindo Regional 4 Makassar",
+    "operational_status": "operating",
+    "anchor_tenants": [
+      "Terminal Peti Kemas Terbesar Indonesia Timur",
+      "Hub Logistik Distribusi Antar-Pulau"
+    ],
+    "infrastructure_support": [
+      "Jalan Tol Layang AP Pettarani",
+      "Jalur Kereta Api Trans-Sulawesi (Makassar-Parepare)"
+    ],
+    "website_url": "https://pelindo.co.id",
+    "verification_status": "official_kemenperin",
+    "data_source": "Ditjen Hubla Kemenhub & Pelindo",
+    "source_url": "https://hubla.dephub.go.id",
+    "dataset_edition": "Master Data Pelabuhan Hubla 2024"
+  },
+  {
+    "id": 124,
+    "name": "Kawasan Industri Konawe (Virtue Dragon Nickel Industry)",
+    "slug": "kawasan-industri-konawe",
+    "category": "energy_mining",
+    "zone_type": "kawasan_industri",
+    "region_code": "74.03",
+    "latitude": -3.8821,
+    "longitude": 122.4251,
+    "area_hectares": 2253.0,
+    "management_company": "PT Obsidian Stainless Steel & VDNI",
+    "operational_status": "operating",
+    "anchor_tenants": [
+      "Smelter Ferronickel Terpadu",
+      "Pabrik Stainless Steel Slab",
+      "Pembangkit Listrik Mandiri"
+    ],
+    "infrastructure_support": [
+      "Jety Khusus Smelter Morosi",
+      "Akses Jalan Arteri Kendari-Konawe"
+    ],
+    "website_url": "https://kemenperin.go.id",
+    "verification_status": "official_kemenperin",
+    "data_source": "Kementerian Perindustrian RI (SIINas)",
+    "source_url": "https://kemenperin.go.id/kawasan-industri",
+    "dataset_edition": "Direktori Kawasan Industri Kemenperin 2024"
+  },
+  {
+    "id": 125,
+    "name": "KEK Palu (Kawasan Ekonomi Khusus Palu)",
+    "slug": "kek-palu-pantoloan",
+    "category": "manufacturing_ev",
+    "zone_type": "kawasan_ekonomi_khusus",
+    "region_code": "72.71",
+    "latitude": -0.7182,
+    "longitude": 119.8841,
+    "area_hectares": 1500.0,
+    "management_company": "PT Bangun Palu Sulawesi Tengah (BUMD Sulteng)",
+    "operational_status": "operating",
+    "anchor_tenants": [
+      "Industri Pengolahan Getah Pinus & Rotan",
+      "Smelter Tembaga & Pengolahan Logam"
+    ],
+    "infrastructure_support": [
+      "Pelabuhan Pantoloan Palu",
+      "Bandara Mutiara SIS Al-Jufri"
+    ],
+    "website_url": "https://kek.go.id",
+    "verification_status": "official_kemenperin",
+    "data_source": "Dewan Nasional KEK Indonesia",
+    "source_url": "https://kek.go.id/kawasan/KEK-Palu",
+    "dataset_edition": "Laporan Kinerja KEK 2024"
+  },
+  {
+    "id": 126,
+    "name": "KEK Kura Kura Bali & Tech Island",
+    "slug": "kek-kura-kura-bali",
+    "category": "technology_digital",
+    "zone_type": "kawasan_ekonomi_khusus",
+    "region_code": "51.71",
+    "latitude": -8.7351,
+    "longitude": 115.2284,
+    "area_hectares": 498.0,
+    "management_company": "PT Bali Turtle Island Development",
+    "operational_status": "under_development",
+    "anchor_tenants": [
+      "Tsinghua University Southeast Asia Center",
+      "Global Tech & Sustainability Research Hub",
+      "Digital Nomad Village"
+    ],
+    "infrastructure_support": [
+      "Dekat Bandara Internasional I Gusti Ngurah Rai (15 menit)",
+      "Pelabuhan Marina Benoa"
+    ],
+    "website_url": "https://kurakurabali.com",
+    "verification_status": "official_kemenperin",
+    "data_source": "Dewan Nasional KEK Indonesia",
+    "source_url": "https://kek.go.id/kawasan/KEK-Kura-Kura-Bali",
+    "dataset_edition": "Laporan Kinerja KEK 2024"
+  },
+  {
+    "id": 127,
+    "name": "Pelabuhan Benoa (Bali Maritime Tourism & Logistics Hub)",
+    "slug": "pelabuhan-benoa-bali",
+    "category": "maritime_logistics",
+    "zone_type": "maritime_hub",
+    "region_code": "51.71",
+    "latitude": -8.7491,
+    "longitude": 115.2152,
+    "area_hectares": 143.0,
+    "management_company": "PT Pelindo Regional 3 Benoa",
+    "operational_status": "operating",
+    "anchor_tenants": [
+      "Dermaga Kapal Pesiar Internasional (Cruise Terminal)",
+      "Terminal Curah Minyak & Perikanan Samudra"
+    ],
+    "infrastructure_support": [
+      "Jalan Tol Bali Mandara",
+      "Alur Kolam Pelabuhan -12m LWS"
+    ],
+    "website_url": "https://pelindo.co.id",
+    "verification_status": "official_kemenperin",
+    "data_source": "Ditjen Hubla Kemenhub & Pelindo",
+    "source_url": "https://hubla.dephub.go.id",
+    "dataset_edition": "Master Data Pelabuhan Hubla 2024"
+  },
+  {
+    "id": 128,
+    "name": "Kawasan Industri Weda Bay (IWIP Halmahera Tengah)",
+    "slug": "iwip-weda-bay-halmahera",
+    "category": "energy_mining",
+    "zone_type": "kawasan_industri",
+    "region_code": "82.02",
+    "latitude": 0.4952,
+    "longitude": 127.9621,
+    "area_hectares": 5000.0,
+    "management_company": "PT Indonesia Weda Bay Industrial Park",
+    "operational_status": "operating",
+    "anchor_tenants": [
+      "Smelter Nikel Terpadu IWIP",
+      "Pabrik Bahan Baku Baterai EV Hidrometalurgi (HPAL)",
+      "Pembangkit Listrik Mandiri"
+    ],
+    "infrastructure_support": [
+      "Pelabuhan Khusus Laut Dalam Weda Bay",
+      "Bandara Khusus IWIP Halmahera Tengah"
+    ],
+    "website_url": "https://iwip.co.id",
+    "verification_status": "official_kemenperin",
+    "data_source": "Kementerian Perindustrian RI (SIINas)",
+    "source_url": "https://kemenperin.go.id/kawasan-industri",
+    "dataset_edition": "Peta Kawasan Hilirisasi Nikel Timur Indonesia 2024"
+  },
+  {
+    "id": 129,
+    "name": "Pelabuhan Jayapura & Depapre (Gerbang Maritim Pasifik Papua)",
+    "slug": "pelabuhan-jayapura-depapre",
+    "category": "maritime_logistics",
+    "zone_type": "maritime_hub",
+    "region_code": "91.71",
+    "latitude": -2.5341,
+    "longitude": 140.7121,
+    "area_hectares": 38.0,
+    "management_company": "PT Pelindo Regional 4 Jayapura & Kemenhub RI",
+    "operational_status": "operating",
+    "anchor_tenants": [
+      "Terminal Peti Kemas Jayapura",
+      "Terminal Kargo Pelabuhan Laut Depapre (Samudra Pasifik)"
+    ],
+    "infrastructure_support": [
+      "Jalan Trans-Papua",
+      "Alur Pelayaran Samudra Pasifik Utara"
+    ],
+    "website_url": "https://pelindo.co.id",
+    "verification_status": "official_kemenperin",
+    "data_source": "Ditjen Hubla Kemenhub & Pelindo",
+    "source_url": "https://hubla.dephub.go.id",
+    "dataset_edition": "Master Data Pelabuhan Hubla 2024"
+  },
+  {
+    "id": 130,
+    "name": "KEK Sorong (Sentra Industri & Logistik Maritim Papua Barat Daya)",
+    "slug": "kek-sorong-papua",
+    "category": "maritime_logistics",
+    "zone_type": "kawasan_ekonomi_khusus",
+    "region_code": "96.01",
+    "latitude": -1.0212,
+    "longitude": 131.3412,
+    "area_hectares": 523.7,
+    "management_company": "PT Malamoi Olom Wobok (BUMD Kab. Sorong)",
+    "operational_status": "operating",
+    "anchor_tenants": [
+      "Industri Galangan Kapal & Perikanan Tangkap",
+      "Logistik Peti Kemas Tol Laut Papua",
+      "Pabrik Kayu Olahan"
+    ],
+    "infrastructure_support": [
+      "Pelabuhan Samudra Arar",
+      "Jalan Nasional Sorong-Klamono"
+    ],
+    "website_url": "https://kek.go.id/kawasan/KEK-Sorong",
+    "verification_status": "official_kemenperin",
+    "data_source": "Dewan Nasional KEK Indonesia",
+    "source_url": "https://kek.go.id/kawasan/KEK-Sorong",
+    "dataset_edition": "Laporan Kinerja KEK 2024"
+  }
+]

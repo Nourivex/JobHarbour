@@ -17,7 +17,7 @@
     <link rel="apple-touch-icon" href="/images/logo-icon-256.png">
 
     <!-- Terapkan mode malam sebelum halaman dirender supaya tidak berkedip -->
-    <script>try { var t = localStorage.getItem('jh_theme'); if (t === 'dark' || (!t && matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.classList.add('dark'); } catch (e) {}</script>
+    <script>try { var t = localStorage.getItem('jh_theme'); if (t === 'dark') document.documentElement.classList.add('dark'); } catch (e) {}</script>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('styles')

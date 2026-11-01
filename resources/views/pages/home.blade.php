@@ -8,7 +8,7 @@
     <!-- HERO: foto mercusuar senja + pencarian                         -->
     <!-- ============================================================== -->
     <section class="relative isolate overflow-hidden bg-[#0C2238] text-white">
-        <picture class="absolute inset-0 -z-20">
+        <picture class="absolute inset-0 overflow-hidden pointer-events-none -z-20">
             <source srcset="/images/hero-lighthouse.webp" type="image/webp">
             <img
                 src="/images/hero-lighthouse.jpg"
@@ -44,17 +44,30 @@
                     Setiap lowongan menampilkan skor kecocokan dengan profilmu, skill yang masih kurang, dan setiap tahap seleksi sampai penawaran.
                 </p>
 
-                <form id="hero-search-form" role="search" class="hero-in mt-8 bg-white rounded-2xl p-2 flex flex-col sm:flex-row gap-2 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.6)]" style="--d: 240ms">
+                <form id="hero-search-form" role="search" class="hero-in relative z-30 mt-8 bg-white rounded-2xl p-2 flex flex-col sm:flex-row gap-2 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.6)]" style="--d: 240ms">
                     <label class="flex-[1.6] flex items-center gap-2.5 px-3.5 min-h-12 rounded-xl text-[#627080] focus-within:bg-[#F4F6F8] transition-colors">
                         <x-icon name="search" class="w-5 h-5 shrink-0" />
                         <span class="sr-only">Posisi atau keahlian</span>
                         <input id="hero-search-keyword" type="text" placeholder="Posisi atau skill, mis. Laravel" class="w-full bg-transparent border-0 outline-none text-[15px] text-[#0B1B2B] placeholder:text-[#8C98A8]">
                     </label>
-                    <label class="flex-1 flex items-center gap-2.5 px-3.5 min-h-12 rounded-xl text-[#627080] focus-within:bg-[#F4F6F8] transition-colors sm:border-l sm:border-[#E2E7ED] sm:rounded-l-none">
-                        <x-icon name="map-pin" class="w-5 h-5 shrink-0" />
-                        <span class="sr-only">Kota</span>
-                        <input id="hero-search-location" type="text" placeholder="Semua kota" class="w-full bg-transparent border-0 outline-none text-[15px] text-[#0B1B2B] placeholder:text-[#8C98A8]">
-                    </label>
+                    <div class="relative flex-1" id="smart-location-wrapper">
+                        <div class="w-full flex items-center gap-2.5 px-3.5 min-h-12 rounded-xl bg-white text-[#627080] focus-within:bg-[#F4F6F8] transition-colors sm:border-l sm:border-[#E2E7ED] sm:rounded-l-none">
+                            <!-- SVG Map Pin Icon -->
+                            <svg class="w-5 h-5 shrink-0 text-[#C8460B]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>
+                            </svg>
+                            <span class="sr-only">Kota</span>
+                            <input id="hero-search-location" type="text" autocomplete="off" placeholder="Pilih kota / pelabuhan..." class="w-full bg-transparent border-0 outline-none text-[15px] text-[#0B1B2B] placeholder:text-[#8C98A8] cursor-pointer">
+                            <!-- SVG Geolocation Button -->
+                            <button type="button" id="geo-detect-btn" title="Deteksi Lokasi Saya" class="p-1.5 rounded-lg text-slate-400 hover:text-[#C8460B] hover:bg-slate-100 transition-colors shrink-0 cursor-pointer">
+                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/>
+                                </svg>
+                            </button>
+                        </div>
+
+                        
+                    </div>
                     <button type="submit" class="btn-press group inline-flex items-center justify-center gap-2 min-h-12 px-6 rounded-xl bg-[#C8460B] hover:bg-[#A93A08] text-white font-bold text-[15px] cursor-pointer">
                         Cari lowongan
                         <x-icon name="arrow-right" class="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
@@ -62,12 +75,14 @@
                 </form>
 
                 <div class="hero-in mt-5 flex flex-wrap items-center gap-2 text-sm" style="--d: 320ms">
-                    <span class="text-[#B8C6D6] mr-1">Populer:</span>
-                    @foreach (['Laravel', 'React', 'Docker', 'Python', 'Kubernetes'] as $skill)
-                        <button type="button" data-skill-filter="{{ $skill }}" class="px-3 py-1.5 rounded-full text-[13px] font-medium text-white bg-white/8 ring-1 ring-white/25 hover:bg-white/18 hover:ring-white/45 transition-colors cursor-pointer">
-                            {{ $skill }}
-                        </button>
-                    @endforeach
+                    <span class="text-[#B8C6D6] mr-1 flex items-center gap-1.5 text-xs font-semibold">
+                        <span class="w-1.5 h-1.5 rounded-full bg-[#F26A1B] animate-pulse"></span>
+                        Tren Keahlian Nyata:
+                    </span>
+                    <div id="hero-popular-skills-container" class="flex flex-wrap items-center gap-2">
+                        <!-- Di-generate dinamis dari requirements lowongan database -->
+                        <span class="text-xs text-slate-400 italic">Menganalisis tren keahlian database...</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -76,7 +91,7 @@
     <!-- ============================================================== -->
     <!-- STATISTIK NYATA (dihitung dari GET /api/jobs)                  -->
     <!-- ============================================================== -->
-    <section class="relative z-10 max-w-[1240px] mx-auto px-5 sm:px-8 -mt-20 sm:-mt-24">
+    <section class="relative z-20 max-w-[1240px] mx-auto px-5 sm:px-8 -mt-20 sm:-mt-24">
         <div data-reveal class="bg-[#0F2A45]/95 backdrop-blur-md text-white rounded-2xl ring-1 ring-white/10 shadow-[0_24px_60px_-24px_rgba(8,22,40,0.55)] grid grid-cols-2 lg:grid-cols-4">
             @php
                 $stats = [
@@ -98,7 +113,12 @@
                 </div>
             @endforeach
         </div>
-        <p class="mt-3 text-xs text-[#627080] text-right">Angka diambil langsung dari data lowongan yang sedang dibuka.</p>
+        <div class="mt-3 flex items-center justify-end gap-2 text-[12px]">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full font-semibold shadow-xs border bg-white text-[#0B1B2B] border-[#C5CFDA] transition-colors">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span>Sinkronisasi Otomatis Database JobHarbour</span>
+            </span>
+        </div>
     </section>
 
     <!-- ============================================================== -->
@@ -241,6 +261,175 @@
     </section>
 
     <!-- ============================================================== -->
+        <!-- ============================================================== -->
+    <!-- ============================================================== -->
+    <!-- ============================================================== -->
+    <!-- RADAR PERKEMBANGAN INDUSTRI INDONESIA (GEOSPATIAL 2D)            -->
+    <!-- ============================================================== -->
+    <section class="max-w-[1240px] mx-auto px-5 sm:px-8 pt-20 sm:pt-28">
+        <div data-reveal class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
+            <div>
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold bg-[#EBF3FB] text-[#1B65A6] border border-[#1B65A6]/20 shadow-2xs">
+                    <svg class="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+                    Sistem GIS Resmi: BIG (WGS84), Kemendagri & Kemenperin RI
+                </span>
+                <h2 class="mt-3 text-3xl sm:text-4xl font-extrabold text-[#0B1B2B] font-heading tracking-tight">
+                    Radar Perkembangan Industri Indonesia
+                </h2>
+                <p class="mt-2 text-sm text-[#3D4B5C] max-w-2xl leading-relaxed">
+                    Jelajahi persebaran kawasan industri, pusat manufaktur, koridor logistik, dan ekosistem teknologi di seluruh Indonesia berdasarkan sumber data yang dapat diverifikasi.
+                </p>
+            </div>
+
+            <!-- Filter Kategori & Tombol Navigasi Reset -->
+            <div class="flex flex-wrap items-center gap-2">
+                <button type="button" id="atlas-reset-btn" class="px-3.5 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 text-xs font-bold hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors flex items-center gap-1.5 shadow-2xs cursor-pointer">
+                    <svg class="w-3.5 h-3.5 text-[#C8460B]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                    <span>Seluruh Nusantara</span>
+                </button>
+                <div class="flex items-center gap-1 bg-white dark:bg-slate-800 p-1 rounded-xl border border-slate-300 dark:border-slate-700 text-xs shadow-2xs">
+                    <button type="button" data-atlas-filter="all" class="px-2.5 py-1 rounded-lg font-bold bg-[#C8460B] text-white transition-colors cursor-pointer">Semua</button>
+                    <button type="button" data-atlas-filter="maritime_logistics" class="px-2.5 py-1 rounded-lg font-semibold text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white transition-colors cursor-pointer flex items-center gap-1">
+                        <span class="w-2 h-2 rounded-full bg-[#0284C7]"></span> Maritim
+                    </button>
+                    <button type="button" data-atlas-filter="manufacturing_ev" class="px-2.5 py-1 rounded-lg font-semibold text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white transition-colors cursor-pointer flex items-center gap-1">
+                        <span class="w-2 h-2 rounded-full bg-[#F59E0B]"></span> EV & Manufaktur
+                    </button>
+                    <button type="button" data-atlas-filter="technology_digital" class="px-2.5 py-1 rounded-lg font-semibold text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white transition-colors cursor-pointer flex items-center gap-1">
+                        <span class="w-2 h-2 rounded-full bg-[#10B981]"></span> Tech Hub
+                    </button>
+                    <button type="button" data-atlas-filter="energy_mining" class="px-2.5 py-1 rounded-lg font-semibold text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white transition-colors cursor-pointer flex items-center gap-1">
+                        <span class="w-2 h-2 rounded-full bg-[#EF4444]"></span> Hilirisasi
+                    </button>
+                    <button type="button" data-atlas-filter="agro_industry" class="px-2.5 py-1 rounded-lg font-semibold text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white transition-colors cursor-pointer flex items-center gap-1">
+                        <span class="w-2 h-2 rounded-full bg-[#14B8A6]"></span> Agro
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Frame Canvas GIS Utama -->
+        <div class="relative w-full rounded-3xl overflow-hidden border border-[#2B4A6B] shadow-2xl bg-[#081628]">
+            
+            <!-- Breadcrumb Tingkat Administrasi Spasial (Kiri Atas Peta) -->
+            <div class="absolute left-4 top-4 z-20 bg-slate-900/95 backdrop-blur-md px-3.5 py-1.5 rounded-xl border border-white/15 text-xs flex items-center gap-2 shadow-lg">
+                <span class="text-slate-400 font-bold text-[10px] uppercase">Hierarki Spasial:</span>
+                <div id="atlas-hierarchy-breadcrumb" class="font-semibold text-white flex items-center gap-1.5">
+                    <span class="text-slate-300">Indonesia (Level 1)</span>
+                </div>
+            </div>
+
+            <!-- Legenda Kategori Industri Berbasis Ikon Semantik Lucide -->
+            <div class="hidden lg:flex absolute right-16 top-4 z-20 bg-slate-900/95 backdrop-blur-md px-3.5 py-1.5 rounded-xl border border-white/15 text-[11px] items-center gap-3.5 shadow-xl text-slate-200">
+                <div class="flex items-center gap-1.5">
+                    <div class="w-4 h-4 rounded bg-[#0284C7] flex items-center justify-center p-0.5">
+                        <svg class="w-3 h-3 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="5" r="3"/><line x1="12" y1="22" x2="12" y2="8"/><path d="M5 12H2a10 10 0 0 0 20 0h-3"/></svg>
+                    </div>
+                    <span>Maritim</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                    <div class="w-4 h-4 rounded bg-[#F59E0B] flex items-center justify-center p-0.5">
+                        <svg class="w-3 h-3 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M2 20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-7 5V8l-7 5V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/></svg>
+                    </div>
+                    <span>Manufaktur</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                    <div class="w-4 h-4 rounded bg-[#10B981] flex items-center justify-center p-0.5">
+                        <svg class="w-3 h-3 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/></svg>
+                    </div>
+                    <span>Tech Hub</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                    <div class="w-4 h-4 rounded bg-[#EF4444] flex items-center justify-center p-0.5">
+                        <svg class="w-3 h-3 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m14 10 6.5-6.5a1.5 1.5 0 0 1 2 2L16 12"/><path d="M14 10 8 16a2.83 2.83 0 0 1-4 0 2.83 2.83 0 0 1 0-4l6-6"/></svg>
+                    </div>
+                    <span>Hilirisasi</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                    <div class="w-4 h-4 rounded bg-[#14B8A6] flex items-center justify-center p-0.5">
+                        <svg class="w-3 h-3 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/></svg>
+                    </div>
+                    <span>Agro</span>
+                </div>
+            </div>
+
+            <!-- Container Canvas MapLibre GL -->
+            <div id="career-atlas-map" class="w-full h-[500px] sm:h-[580px]"></div>
+
+            <!-- Floating Hover Tooltip -->
+            <div id="atlas-hover-tooltip" class="absolute pointer-events-none hidden z-30 px-3 py-2 rounded-xl bg-slate-900/95 text-white shadow-2xl border border-white/20 backdrop-blur-sm -translate-x-1/2 -translate-y-full min-w-[140px]"></div>
+
+            <!-- Industrial Intelligence Panel Profesional (Kiri Bawah) -->
+            <div id="atlas-selected-panel" class="absolute left-4 bottom-4 z-20 max-w-md w-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-md rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-700 shadow-2xl hidden transition-all">
+                <div class="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
+                    <div class="flex items-center gap-1.5">
+                        <span id="atlas-panel-level-badge" class="text-[10px] font-extrabold text-sky-800 dark:text-sky-300 bg-sky-100 dark:bg-sky-950/80 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                            Level Wilayah
+                        </span>
+                        <span id="atlas-verification-badge" class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                            ✓ Terverifikasi Resmi
+                        </span>
+                    </div>
+                    <button type="button" onclick="document.getElementById('atlas-selected-panel').classList.add('hidden')" class="p-1 rounded-lg text-slate-400 hover:text-slate-600 cursor-pointer">✕</button>
+                </div>
+
+                <div class="mt-2.5">
+                    <h4 id="atlas-selected-title" class="font-extrabold text-slate-900 dark:text-white text-base leading-snug">-</h4>
+                    <div class="flex items-center gap-2 mt-1 text-[11px] text-slate-500 dark:text-slate-400 font-mono">
+                        <span id="atlas-panel-code" class="bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">Kode: -</span>
+                        <span id="atlas-panel-parent" class="truncate">Induk: -</span>
+                    </div>
+                </div>
+
+                <div id="atlas-selected-desc" class="mt-2.5 text-xs text-slate-600 dark:text-slate-300 leading-relaxed bg-slate-50 dark:bg-slate-800/60 p-3 rounded-xl border border-slate-200/80 dark:border-slate-700/80">
+                    Memuat data spasial...
+                </div>
+
+                <!-- Industrial Intelligence Specs Container -->
+                <div id="atlas-zone-specs-container" class="mt-3 space-y-2 hidden">
+                    <div class="grid grid-cols-2 gap-2 text-xs py-2 px-2.5 bg-slate-50 dark:bg-slate-800/80 rounded-xl border border-slate-200 dark:border-slate-700">
+                        <div>
+                            <span class="text-[10px] text-slate-400 block uppercase">Luas Wilayah Resmi:</span>
+                            <span id="atlas-spec-area" class="font-extrabold text-slate-800 dark:text-white">-</span>
+                        </div>
+                        <div>
+                            <span class="text-[10px] text-slate-400 block uppercase">Status Operasional:</span>
+                            <span id="atlas-spec-status" class="font-extrabold text-emerald-600 capitalize">-</span>
+                        </div>
+                    </div>
+                    <div id="atlas-spec-management-wrap" class="text-[11px] text-slate-600 dark:text-slate-300">
+                        <span class="font-bold text-slate-800 dark:text-white block text-[10px] uppercase text-slate-400">Pengelola Kawasan:</span>
+                        <span id="atlas-spec-management">-</span>
+                    </div>
+                    <div id="atlas-spec-tenants-wrap" class="text-[11px] text-slate-600 dark:text-slate-300">
+                        <span class="font-bold text-slate-800 dark:text-white block text-[10px] uppercase text-slate-400 mb-1">Tenant Terverifikasi:</span>
+                        <div id="atlas-spec-tenants" class="space-y-0.5 font-medium"></div>
+                    </div>
+                </div>
+
+                <!-- Data Provenance Card -->
+                <div class="mt-3 pt-2.5 border-t border-slate-100 dark:border-slate-800 text-[10px] text-slate-400 flex items-center justify-between">
+                    <span id="atlas-provenance-text">Dataset: BIG BATAS 2026 & SIINas Kemenperin</span>
+                    <button type="button" onclick="window.careerAtlasInstance?.resetView()" class="text-[#C8460B] font-bold hover:underline cursor-pointer">Reset Kamera ↺</button>
+                </div>
+            </div>
+
+            <!-- Atribusi Geospasial Resmi (Kanan Bawah) -->
+            <div class="absolute right-4 bottom-3 z-10 text-[11px] text-slate-400 bg-slate-900/85 px-3 py-1.5 rounded-xl border border-white/10 backdrop-blur-xs flex items-center gap-2 shadow-md">
+                <span>Geometri: BIG WGS84 & Ditjen Bina Adwil</span>
+                <span>•</span>
+                <span>SIINas Kemenperin</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================== -->
+    <!-- 4 LANGKAH                                                      -->
+    <!-- ============================================================== -->
+    <!-- ============================================================== -->
+    <!-- 4 LANGKAH                                                      -->
+    <!-- ============================================================== -->
+    <!-- ============================================================== -->
     <!-- 4 LANGKAH                                                      -->
     <!-- ============================================================== -->
     <section class="max-w-[1240px] mx-auto px-5 sm:px-8 pt-20 sm:pt-28 pb-6">
@@ -287,4 +476,46 @@
     @push('scripts')
         @vite('resources/js/pages/home.js')
     @endpush
+
+    <!-- FLOATING SMART LOCATION DROPDOWN (Teleported to root body level) -->
+    <div id="smart-location-dropdown" style="z-index: 99999;" class="fixed bg-white rounded-2xl border border-slate-200 shadow-2xl p-3 hidden text-[#0B1B2B] w-[340px] sm:w-[360px]">
+        <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-100">
+            <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                <svg class="w-4 h-4 text-[#C8460B]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+                Pilih Kota / Pelabuhan
+            </span>
+            <span class="text-[10px] text-sky-700 font-bold bg-sky-50 px-2 py-0.5 rounded-full border border-sky-100">Database Live</span>
+        </div>
+        <div class="space-y-1.5" id="smart-location-options">
+            <button type="button" data-val="" class="w-full px-3 py-2 rounded-xl text-left text-xs font-semibold text-slate-700 hover:bg-slate-100 flex items-center justify-between transition-colors cursor-pointer">
+                <span class="flex items-center gap-2">
+                    <svg class="w-4 h-4 text-slate-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                    Semua Kota (Seluruh Indonesia)
+                </span>
+                <span class="text-[11px] text-slate-400 shrink-0">Semua Loker</span>
+            </button>
+            <button type="button" data-val="Tegal" class="w-full px-3 py-2.5 rounded-xl text-left text-xs font-bold text-slate-900 bg-sky-50 hover:bg-sky-100 flex items-center justify-between transition-colors group cursor-pointer border border-sky-200">
+                <span class="flex items-center gap-2 text-sky-950">
+                    <svg class="w-4 h-4 text-sky-600 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="3"/><line x1="12" y1="22" x2="12" y2="8"/><path d="M5 12H2a10 10 0 0 0 20 0h-3"/></svg>
+                    Tegal, Jawa Tengah
+                </span>
+                <span class="text-[10px] px-2 py-0.5 rounded-full bg-sky-600 text-white font-bold shrink-0">Dermaga Utama (2)</span>
+            </button>
+            <button type="button" data-val="Semarang" class="w-full px-3 py-2 rounded-xl text-left text-xs font-semibold text-slate-800 hover:bg-slate-100 flex items-center justify-between transition-colors cursor-pointer">
+                <span class="flex items-center gap-2">
+                    <svg class="w-4 h-4 text-slate-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                    Semarang, Jawa Tengah
+                </span>
+                <span class="text-[11px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 font-medium shrink-0">1 Lowongan</span>
+            </button>
+            <button type="button" data-val="Bandung" class="w-full px-3 py-2 rounded-xl text-left text-xs font-semibold text-slate-800 hover:bg-slate-100 flex items-center justify-between transition-colors cursor-pointer">
+                <span class="flex items-center gap-2">
+                    <svg class="w-4 h-4 text-slate-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                    Bandung, Jawa Barat
+                </span>
+                <span class="text-[11px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 font-medium shrink-0">1 Lowongan</span>
+            </button>
+        </div>
+    </div>
+
 </x-layouts.app>

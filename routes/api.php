@@ -147,3 +147,17 @@ Route::middleware('jwt.auth')->group(function () {
     Route::patch('/pipelines/{applicationId}/status', [PipelineController::class, 'updateStatus'])->middleware('jwt.auth:recruiter');
     Route::patch('/applications/{id}/stage', [PipelineController::class, 'updateStatus'])->middleware('jwt.auth:recruiter');
 });
+
+// =========================================================================
+
+// =========================================================================
+// 6. Radar Perkembangan Industri Indonesia (Geospatial API)
+// =========================================================================
+Route::prefix('geo')->group(function () {
+    Route::get('/provinces', [\App\Http\Controllers\Api\GeospatialAtlasController::class, 'getProvincesGeoJson']);
+    Route::get('/regencies', [\App\Http\Controllers\Api\GeospatialAtlasController::class, 'getRegenciesGeoJson']);
+    Route::get('/industry-zones', [\App\Http\Controllers\Api\GeospatialAtlasController::class, 'getIndustryRadarData']);
+    Route::get('/atlas', [\App\Http\Controllers\Api\GeospatialAtlasController::class, 'getIndustryRadarData']); // Alias kompatibilitas
+});
+
+Route::get('/geo/districts', [\App\Http\Controllers\Api\GeospatialAtlasController::class, 'getDistrictsGeoJson']);

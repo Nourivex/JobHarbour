@@ -14,7 +14,7 @@
     <!-- Favicon: logo perahu layar JobHarbour -->
     <link rel="icon" href="/images/favicon-jobharbour.ico" sizes="any">
     <link rel="apple-touch-icon" href="/images/logo-icon-256.png">
-    <script>try { var t = localStorage.getItem('jh_theme'); if (t === 'dark' || (!t && matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.classList.add('dark'); } catch (e) {}</script>
+    <script>try { var t = localStorage.getItem('jh_theme'); if (t === 'dark') document.documentElement.classList.add('dark'); } catch (e) {}</script>
     <link rel="preload" as="image" href="/images/auth-lighthouse.webp" type="image/webp">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])

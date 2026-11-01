@@ -6,6 +6,12 @@
 
 ---
 
+## User Identity & Communication Protocol
+- User Name: **Affif** (panggil dengan hormat dan akrab: **Mas Affif** atau **Ka Affif**).
+- Gaya Komunikasi: Santai, solutif, to-the-point, ramah sesama mahasiswa teknik informatika, dan tidak bertele-tele.
+
+---
+
 ## Project Overview
 
 JobHarbour is a recruitment platform built with **4 independent Laravel microservices** communicating via **REST API JSON**. Each service has its own database (database-per-service pattern).
@@ -31,12 +37,9 @@ composer -V
 ```
 
 If either command is unavailable, install using the appropriate command for the user's OS:
-
 - **macOS:** `/bin/bash -c "$(curl -fsSL https://php.new/install/mac/8.5)"`
 - **Linux:** `/bin/bash -c "$(curl -fsSL https://php.new/install/linux/8.5)"`
 - **Windows:** `Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://php.new/install/windows/8.5'))`
-
-After installation, ask the user to restart their terminal.
 
 ---
 
@@ -46,128 +49,61 @@ After installation, ask the user to restart their terminal.
 - **Framework:** Laravel 13.x per service
 - **Database:** MariaDB (one instance per service)
 - **Local Environment:** DDEV (preferred) or local PHP fallback
-- **CLI Helper:** `./dev --setup`, `./dev migrate`, `./dev <artisan-command>`
+- **CLI Helper:** `./dev --setup`, `./dev migrate`, `./dev test`, `./dev <artisan-command>`
 
 ---
 
-## Architecture & Coding Conventions
+## Strict Development Rules & Best Practices
 
-### REST API Standards
+1. **Anti-Slop AI Policy:**
+   - Dilarang keras menggunakan gaya bahasa robotik, frasa AI klise (contoh: "tapestry", "delve", "pivotal", "in conclusion", "seperti pelabuhan untuk kota Tegal").
+   - Bahasa harus terdengar wajar buatan tangan manusia (*human-crafted*), lugas, to-the-point, dan berbobot.
+2. **Punctuation Rule (Strict):**
+   - Dilarang keras menggunakan strip panjang (*em-dash* U+2014 atau *en-dash* U+2013) di seluruh dokumentasi, kode program, git commit, dan berkas HTML/Blade.
+   - Selalu gunakan strip pendek biasa (-).
+3. **UI/UX Consistency Guard:**
+   - Pertahankan tema dominan terang (*Crisp Salt White & Slate*) dengan aksen *Deep Harbour Navy*. Jangan membuat halaman gelap pekat yang melelahkan mata pelamar.
+   - Gunakan token warna Tailwind CSS yang terstandarisasi, jangan mencampur warna *hardcoded hex* acak.
+   - Konsistensi border-radius (default kartu: `rounded-xl` / 12px).
+4. **Git Contribution Balance:**
+   - Setiap fitur yang dikerjakan harus disesuaikan dengan tanggung jawab pemilik modul (Nabe'ela, Fahren, Yasir, Affif).
+5. **Memory & History Tracking:**
+   - Selalu rujuk dan perbarui `MEMORY.md` untuk melacak status pengerjaan agar konteks tidak hilang saat sesi terestart.
 
-All endpoints MUST follow these conventions:
+---
 
-1. **JSON envelope** - Every response uses this structure:
+## REST API Standards
+
+1. **JSON Envelope** - Setiap respons menggunakan struktur:
    ```json
    {
      "status": "success | error",
-     "message": "Human-readable message",
+     "message": "Pesan deskriptif bahasa manusia",
      "data": {},
      "meta": { "timestamp": "ISO8601", "version": "1.0.0" }
    }
    ```
-
-2. **Headers** - All requests must include:
-   - `Content-Type: application/json` (POST/PUT/PATCH)
-   - `Accept: application/json` (all requests)
-   - `Authorization: Bearer <token>` (protected endpoints)
-
-3. **HTTP Methods** - Use correct semantics:
-   - `GET` → read (idempotent)
-   - `POST` → create
-   - `PUT` → full replace
-   - `PATCH` → partial update
-   - `DELETE` → remove
-
-4. **Status Codes** - Use appropriate codes:
+2. **Status Codes:**
    - `200` OK, `201` Created
-   - `400` Bad Request, `401` Unauthorized, `403` Forbidden
-   - `404` Not Found, `409` Conflict, `422` Validation Error
+   - `400` Bad Request, `401` Unauthorized, `403` Forbidden (Anti-IDOR)
+   - `404` Not Found, `409` Conflict (Duplicate/Illegal cancel), `422` Validation Error
    - `500` Internal Server Error
-
-5. **Validation errors** (422) must return field-level errors in an `errors` object.
-
-### Authentication
-
-- JWT-based authentication via Auth & Profile Service.
-- Three roles: `applicant`, `recruiter`, `admin`.
-- Inter-service calls use service-to-service tokens configured via `.env`.
-
-### Matchmaking Engine
-
-The Application & Matchmaking Service calculates match scores using **Weighted Jaccard Similarity**:
-
-```
-Match Score = (Σ weight of matched skills) / (Σ weight of all required skills) × 100%
-```
-
-Skill weights: `required = 3`, `important = 2`, `nice_to_have = 1`.
-
-### Pipeline Stages
-
-Recruitment pipeline follows this fixed sequence:
-
-```
-Screening → Assessment → Interview → Offering / Rejected
-```
-
-### Database Rules
-
-- **No cross-database queries.** Services access other services' data only through REST API calls.
-- Each service manages its own migrations independently.
-- Use Laravel Form Requests for all input validation.
-
-### Code Style
-
-- Follow standard Laravel conventions (PSR-12, Eloquent models, Resource controllers).
-- API routes go in `routes/api.php`.
-- Use Laravel API Resources for response transformation.
-- Use Form Request classes for validation.
-- Write feature tests for every endpoint.
-- **Gaya Bahasa Mahasiswa (Tone of Voice):** Saat menulis dokumentasi, laporan praktikum, atau panduan tugas, GUNAKAN gaya bahasa mahasiswa yang santai, lugas, wajar, dan mudah dipahami sesama mahasiswa. JANGAN terlihat terlalu kaku, formal birokratis, korporat berlebihan, atau sok ahli/dosen. Buat penjelasannya membumi, to-the-point, dan enak dibaca teman sekelompok.
-- **Punctuation rule:** DILARANG menggunakan strip panjang (em-dash U+2014 atau en-dash U+2013) di seluruh dokumentasi, kode, dan HTML. Selalu gunakan strip pendek biasa (-).
-- **Aturan Berkas Tugas Individu:**
-  - JANGAN PERNAH mencantumkan label pembagian kelompok internal seperti "Paket A", "Paket B", "Paket C", "Paket D" atau semacamnya di dalam berkas PDF/HTML laporan tugas yang dikumpulkan ke dosen. Dokumen harus murni tampil sebagai tugas mandiri mahasiswa untuk proyek semester.
-  - Penulisan tugas harus proporsional dan fokus menjawab apa yang diminta modul/dosen (misal: jika tugas hanya meminta Bagian A, B, C, cukup buat Bagian A, B, C saja, jangan berlebihan menambahkan analisis ekstra atau padding halaman yang tidak diminta).
-- **Lokasi Kampus / Kota Dokumen:** Kampus **Universitas Harkat Negeri** berlokasi di **Tegal** (Jawa Tengah). DILARANG menggunakan "Jakarta" sebagai lokasi tanda tangan/titimangsa dokumen atau identitas kampus. Selalu gunakan **Tegal** (misal: "Tegal, 16 Oktober 2026") pada seluruh dokumen tugas, lembar kerja, laporan praktikum, lembar pengesahan, PDF, dan dokumentasi akademik.
+3. **Matchmaking Engine Formula:**
+   ```
+   Match Score = (Σ weight of matched skills) / (Σ weight of all required skills) × 100%
+   ```
+   Bobot: `required = 3`, `important = 2`, `nice_to_have = 1`.
+4. **Pipeline Stages Sequence:**
+   `Screening → Assessment → Interview → Offering / Rejected`
 
 ---
 
 ## Key Documentation
 
-| Document | Purpose |
-|----------|---------|
-| `README.md` | Project overview, setup instructions, team info |
-| `docs/ARCHITECTURE.md` | System topology, inter-service communication, matchmaking formula, data structures |
-| `docs/API_CONTRACT_STANDARDS.md` | JSON envelope, headers, error formats, mock endpoints per service |
-| `docs/SPRINT_PLAN.md` | Sprint breakdown, product backlog, milestone mapping |
-
-**Always consult these documents before making architectural decisions or designing new endpoints.**
-
----
-
-## Common Tasks
-
-### Setting up the project
-```sh
-./dev --setup
-```
-
-### Running migrations
-```sh
-./dev migrate
-```
-
-### Creating a new controller
-```sh
-./dev make:controller Api/JobController --api
-```
-
-### Running tests
-```sh
-./dev test
-```
-
-### Environment diagnostics
-```sh
-./dev --doctor
-```
+| Berkas | Tujuan |
+|---|---|
+| `RULES.md` | Aturan baku anti-slop, penulisan, styling CSS, dan keamanan kode |
+| `MEMORY.md` | Catatan riwayat progres pengerjaan, status sprint, dan checkpoint proyek |
+| `README.md` | Ringkasan proyek, setup lokal, dan tim pengembang |
+| `docs/ARCHITECTURE.md` | Arsitektur microservice, formula matching, dan struktur data |
+| `docs/API_CONTRACT_STANDARDS.md` | Standar kontrak REST API, envelope, dan mock data |

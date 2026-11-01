@@ -1,3 +1,4 @@
+import { CareerAtlas } from '../components/career-atlas.js';
 import { jobs, matchmaking, session, util } from '../api.js';
 
 const esc = util.escapeHtml;
@@ -72,6 +73,53 @@ function positionBeacon() {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
+    // Inisialisasi Real Geospatial Career Atlas (MapLibre GL)
+    let atlasInstance = null;
+    const atlasMapEl = document.getElementById('career-atlas-map');
+    if (atlasMapEl) {
+        atlasInstance = new CareerAtlas('career-atlas-map');
+        window.careerAtlasInstance = atlasInstance;
+        atlasInstance.init();
+    }
+
+    // Window helper untuk klik beacon distrik
+    window.filterByDistrict = function(districtName) {
+        window.location.href = '/catalog?location=' + encodeURIComponent(districtName);
+    };
+
+    // Render Dinamis Chip Keahlian Terpopuler dari Database
+    function renderDynamicPopularSkills(jobsList) {
+        const container = document.getElementById('hero-popular-skills-container');
+        if (!container || !Array.isArray(jobsList)) return;
+
+        const skillsTally = {};
+        jobsList.forEach(job => {
+            (job.requirements || []).forEach(req => {
+                const s = req.skill;
+                if (s) {
+                    skillsTally[s] = (skillsTally[s] || 0) + 1;
+                }
+            });
+        });
+
+        // Urutkan berdasarkan frekuensi terbanyak
+        const topSkills = Object.entries(skillsTally)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 6)
+            .map(entry => entry[0]);
+
+        if (topSkills.length === 0) {
+            container.innerHTML = '<span class="text-xs text-slate-400">Belum ada data keahlian</span>';
+            return;
+        }
+
+        container.innerHTML = topSkills.map(skill => `
+            <a href="/catalog?search=${encodeURIComponent(skill)}" class="px-3 py-1.5 rounded-full text-[13px] font-medium text-white bg-white/10 ring-1 ring-white/25 hover:bg-white/20 hover:ring-white/45 transition-colors cursor-pointer flex items-center gap-1">
+                <span>${skill}</span>
+            </a>
+        `).join('');
+    }
+
     const user = session.user();
     const isApplicant = session.isLoggedIn() && user && (user.role === 'applicant' || user.role === 'admin');
     const applicantSkills = isApplicant ? (user.skills || []) : [];
@@ -90,10 +138,51 @@ document.addEventListener('DOMContentLoaded', async () => {
         window.location.href = '/catalog' + (params.toString() ? '?' + params.toString() : '');
     });
 
-    document.addEventListener('click', (e) => {
-        const chip = e.target.closest('[data-skill-filter]');
-        if (chip) window.location.href = '/catalog?skill=' + encodeURIComponent(chip.dataset.skillFilter);
-    });
+    // Smart Location Dropdown (Floating Positioner) & Geolocation
+    const locInput = document.getElementById('hero-search-location');
+    const locDropdown = document.getElementById('smart-location-dropdown');
+    const geoBtn = document.getElementById('geo-detect-btn');
+    const locOptions = document.getElementById('smart-location-options');
+
+    function positionFloatingDropdown() {
+        if (!locInput || !locDropdown || locDropdown.classList.contains('hidden')) return;
+        const rect = locInput.getBoundingClientRect();
+        locDropdown.style.top = (rect.bottom + 8) + 'px';
+        locDropdown.style.left = rect.left + 'px';
+    }
+
+    if (locInput && locDropdown) {
+        locInput.addEventListener('focus', () => {
+            locDropdown.classList.remove('hidden');
+            positionFloatingDropdown();
+        });
+
+        window.addEventListener('scroll', positionFloatingDropdown, { passive: true });
+        window.addEventListener('resize', positionFloatingDropdown, { passive: true });
+
+        document.addEventListener('click', (e) => {
+            const isClickInside = locInput.contains(e.target) || 
+                                  locDropdown.contains(e.target) || 
+                                  geoBtn?.contains(e.target);
+            if (!isClickInside) {
+                locDropdown.classList.add('hidden');
+            }
+        });
+
+        locOptions?.querySelectorAll('button[data-val]').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                locInput.value = btn.getAttribute('data-val');
+                locDropdown.classList.add('hidden');
+            });
+        });
+
+        geoBtn?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            locInput.value = 'Tegal';
+            locDropdown.classList.add('hidden');
+        });
+    }
 
     // 2. Sapaan untuk pelamar yang sudah login
     if (isApplicant) {
@@ -122,6 +211,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         renderStats(list, res.meta?.pagination?.total ?? list.length);
         renderSkills(list);
+        renderDynamicPopularSkills(list);
 
         if (!list.length) {
             empty?.classList.remove('hidden');
