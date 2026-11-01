@@ -163,3 +163,11 @@ Route::prefix('geo')->group(function () {
 Route::get('/geo/districts', [\App\Http\Controllers\Api\GeospatialAtlasController::class, 'getDistrictsGeoJson']);
 
 Route::get('/geo/villages', [\App\Http\Controllers\Api\GeospatialAtlasController::class, 'getVillagesGeoJson']);
+
+// =========================================================================
+// 7. Mesin Agregasi & Pemantauan Kesehatan Sumber (Admin Monitoring)
+// =========================================================================
+Route::prefix('aggregator')->group(function () {
+    Route::get('/summary', [\App\Http\Controllers\Api\JobSourceMonitoringController::class, 'getMonitoringSummary']);
+    Route::post('/sync', [\App\Http\Controllers\Api\JobSourceMonitoringController::class, 'triggerSync']);
+});

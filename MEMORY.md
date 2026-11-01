@@ -51,6 +51,14 @@ Dokumen ini berfungsi sebagai memori jangka panjang (*long-term memory*) untuk m
 - Penghapusan data mockup statis: halaman depan `/`, `/catalog`, `/login`, `/my-dock`, `/profile`, dan `/recruiter` kini **100% terhubung secara live ke database backend**.
 - Audit Chrome DevTools: 0 console errors, build asset Vite (`@tailwindcss/vite`) sukses.
 
+### Integrasi Data Karier Nyata & Mesin Agregator Otomatis:
+- Pemisahan ketat antara data demo simulasi (`is_demo = true`) dan lowongan nyata terverifikasi (`is_demo = false`).
+- Pembangunan registri sumber agregasi (`job_sources`) dan log sinkronisasi (`job_sync_logs`).
+- Adapter ekstraksi web karier resmi live: Alkindo Naratama Tbk (`career.alkindo.co.id`) dan Hasnur Internasional Shipping Tbk (`pthis.id/career`).
+- Mesin deduplikasi otomatis berbasis Canonical Hash dan external reference ID.
+- Perbaikan tata letak kartu lowongan katalog agar adaptif, responsif, dan bebas terhimpit.
+- Lencana transparansi asal lowongan: **Sumber Karier Resmi**, **Mitra Terverifikasi**, dan **Data Demo**.
+
 ---
 
 ## 3. Catatan Teknis Penting (Gotchas & Caveats)

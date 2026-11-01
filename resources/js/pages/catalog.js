@@ -1,5 +1,5 @@
 import { jobs, matchmaking, session, util } from '../api.js';
-import { EMPLOYMENT_SHORT, companyTile, jobCode, salaryRange, scoreCategory, savedJobs, icon } from '../job-ui.js';
+import { companyTile, icon, rupiah, salaryRange, savedJobs, jobSourceBadge, EMPLOYMENT_SHORT, jobCode } from '../job-ui.js';
 
 const esc = util.escapeHtml;
 
@@ -145,41 +145,51 @@ function card(job) {
     const saved = savedJobs.has(job.id);
     let badge = '';
     if (job._match && job._match.score === 0) {
-        badge = '<span class="inline-flex items-center px-2.5 py-1 rounded-lg text-[13px] font-semibold bg-[#F4F6F8] text-[#627080]">Belum cocok</span>';
+        badge = '<span class="inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-semibold bg-[#F4F6F8] text-[#627080]">Belum cocok</span>';
     } else if (job._match) {
         const cat = scoreCategory(job._match.score);
-        badge = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[13px] font-bold" style="background:${cat.soft};color:${cat.color}">
-            <span class="w-4 h-4 rounded-full flex items-center justify-center text-white" style="background:${cat.color}">${icon('check', 'w-2.5 h-2.5')}</span>
+        badge = `<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-xs font-bold" style="background:${cat.soft};color:${cat.color}">
+            <span class="w-3.5 h-3.5 rounded-full flex items-center justify-center text-white" style="background:${cat.color}">${icon('check', 'w-2 h-2')}</span>
             ${job._match.score}% Match</span>`;
     }
     return `
-        <article class="job-row group relative bg-white rounded-2xl border border-[#E2E7ED] p-4 sm:p-5 flex gap-4 sm:gap-5">
-            ${companyTile(job.company)}
-            <div class="flex-1 min-w-0 grid md:grid-cols-[minmax(0,1fr)_auto] gap-x-6 gap-y-3">
-                <div class="min-w-0">
-                    ${badge}
-                    <h3 class="${badge ? 'mt-2' : ''} text-lg font-extrabold font-heading leading-snug text-[#0B1B2B]">
-                        <a href="/jobs/${job.id}" class="job-row-link after:absolute after:inset-0 after:rounded-2xl focus-visible:outline-none">${esc(job.title)}</a>
-                    </h3>
-                    <p class="mt-0.5 text-[15px] text-[#3D4B5C]">${esc(job.company)}</p>
-                    <p class="mt-2 flex flex-wrap gap-x-5 gap-y-1 text-sm text-[#3D4B5C]">
-                        <span class="inline-flex items-center gap-1.5">${icon('pin')} ${esc(job.location || '-')}</span>
-                        <span class="inline-flex items-center gap-1.5">${icon('briefcase')} ${esc(EMPLOYMENT_SHORT[job.employment_type] || job.employment_type || '-')}</span>
-                        <span class="inline-flex items-center gap-1.5">${icon('clock')} ${esc(util.timeAgo(job.created_at))}</span>
-                    </p>
-                </div>
-                <div class="md:text-right flex md:flex-col md:items-end gap-x-4 gap-y-2.5 flex-wrap items-center">
-                    <span class="hidden md:inline-block text-xs font-medium px-2.5 py-1 rounded-full bg-[#F4F6F8] text-[#627080] num-tabular">${jobCode(job)}</span>
-                    <p class="text-[15px]">${salary ? `<b class="text-[#C8460B] num-tabular">${salary}</b> <span class="text-[#627080]">/ bulan</span>` : '<span class="text-[#627080]">Gaji tidak dicantumkan</span>'}</p>
-                    <div class="flex flex-wrap gap-1.5 md:justify-end">
-                        ${reqs.slice(0, 3).map((r) => `<span class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-[#F4F6F8] text-[#3D4B5C]">${esc(util.skillName(r))}</span>`).join('')}
-                        ${reqs.length > 3 ? `<span class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-[#F4F6F8] text-[#3D4B5C]">+${reqs.length - 3}</span>` : ''}
+        <article class="job-row group relative bg-white rounded-2xl border border-[#E2E7ED] p-4 sm:p-5 flex flex-col md:flex-row items-stretch md:items-start gap-4 sm:gap-5 transition-all">
+            <div class="flex items-start gap-4 flex-1 min-w-0">
+                ${companyTile(job.company)}
+                <div class="flex-1 min-w-0">
+                    <div class="flex flex-wrap items-center gap-2 mb-2">
+                        ${jobSourceBadge(job)}
+                        ${badge || ''}
                     </div>
+                    <h3 class="text-base sm:text-lg font-extrabold font-heading leading-snug text-[#0B1B2B]">
+                        <a href="/jobs/${job.id}" class="job-row-link after:absolute after:inset-0 after:rounded-2xl focus-visible:outline-none hover:text-[#C8460B] transition-colors">${esc(job.title)}</a>
+                    </h3>
+                    <p class="mt-1 text-sm sm:text-[15px] font-medium text-[#3D4B5C]">${esc(job.company)}</p>
+                    <p class="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs sm:text-sm text-[#627080]">
+                        <span class="inline-flex items-center gap-1.5">${icon('pin', 'w-4 h-4 text-[#8C98A8]')} ${esc(job.location || '-')}</span>
+                        <span class="inline-flex items-center gap-1.5">${icon('briefcase', 'w-4 h-4 text-[#8C98A8]')} ${esc(EMPLOYMENT_SHORT[job.employment_type] || job.employment_type || '-')}</span>
+                        <span class="inline-flex items-center gap-1.5">${icon('clock', 'w-4 h-4 text-[#8C98A8]')} ${esc(util.timeAgo(job.created_at))}</span>
+                    </p>
+                    ${reqs.length > 0 ? `
+                        <div class="mt-3 flex flex-wrap items-center gap-1.5">
+                            ${reqs.slice(0, 3).map((r) => `<span class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-[#F4F6F8] text-[#3D4B5C] border border-[#E2E7ED]">${esc(util.skillName(r))}</span>`).join('')}
+                            ${reqs.length > 3 ? `<span class="px-2 py-1 rounded-lg text-xs font-semibold bg-[#F4F6F8] text-[#627080] border border-[#E2E7ED]">+${reqs.length - 3}</span>` : ''}
+                        </div>
+                    ` : ''}
                 </div>
             </div>
-            <div class="relative z-10 flex flex-col items-center justify-between gap-3">
-                <button type="button" data-save-job="${job.id}" aria-pressed="${saved}" aria-label="${saved ? 'Hapus dari tersimpan' : 'Simpan lowongan'}" class="save-btn w-9 h-9 rounded-lg flex items-center justify-center text-[#3D4B5C] hover:bg-[#F4F6F8] cursor-pointer">${icon('bookmark', 'w-5 h-5')}</button>
-                <span class="row-arrow w-11 h-11 rounded-xl flex items-center justify-center border border-[#E2E7ED] text-[#0B1B2B]" aria-hidden="true">${icon('arrow', 'w-5 h-5')}</span>
+
+            <div class="md:w-52 shrink-0 flex md:flex-col justify-between md:items-end items-center border-t md:border-t-0 pt-3 md:pt-0 border-[#F0F3F6] gap-3">
+                <div class="flex md:flex-col md:items-end items-center gap-2">
+                    <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-[#F4F6F8] text-[#627080] num-tabular">${jobCode(job)}</span>
+                    <p class="text-sm sm:text-[15px] font-semibold text-right">
+                        ${salary ? `<b class="text-[#C8460B] num-tabular font-bold">${salary}</b> <span class="text-xs text-[#627080] font-normal">/ bulan</span>` : '<span class="text-xs text-[#8C98A8]">Gaji tidak dicantumkan</span>'}
+                    </p>
+                </div>
+                <div class="relative z-10 flex items-center gap-2">
+                    <button type="button" data-save-job="${job.id}" aria-pressed="${saved}" aria-label="${saved ? 'Hapus dari tersimpan' : 'Simpan lowongan'}" class="save-btn w-9 h-9 rounded-lg flex items-center justify-center text-[#627080] hover:text-[#C8460B] hover:bg-[#F4F6F8] transition-colors cursor-pointer">${icon('bookmark', 'w-4 h-4')}</button>
+                    <span class="row-arrow w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center border border-[#E2E7ED] text-[#0B1B2B] group-hover:border-[#C8460B] group-hover:bg-[#C8460B] group-hover:text-white transition-all" aria-hidden="true">${icon('arrow', 'w-4 h-4')}</span>
+                </div>
             </div>
         </article>`;
 }

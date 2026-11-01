@@ -216,6 +216,21 @@ function applyButton(job, applied) {
     if (isRecruiter) {
         return '<p class="rounded-2xl bg-[#F4F6F8] px-4 py-3 text-sm text-[#3D4B5C]">Kamu masuk sebagai recruiter. Hanya akun pelamar yang dapat melamar.</p>';
     }
+    // Jika lowongan bersumber dari kurasi karir luar (External Ingestion)
+    if (job.source_type === 'external' && job.application_url) {
+        return `
+            <div class="space-y-3">
+                <a href="${job.application_url}" target="_blank" rel="noopener noreferrer" class="btn-press group w-full inline-flex items-center justify-center gap-2.5 h-14 rounded-2xl bg-[#1B65A6] hover:bg-[#134E82] text-white text-base sm:text-lg font-extrabold shadow-[0_14px_28px_-14px_rgba(27,101,166,0.9)]">
+                    <svg class="w-5 h-5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                    Lamar di Situs Resmi Perusahaan
+                </a>
+                <p class="text-[11px] text-[#627080] text-center leading-relaxed">
+                    ℹ️ Anda akan diarahkan langsung ke portal rekrutmen resmi <strong class="text-[#0B1B2B]">${esc(job.company)}</strong>. JobHarbour tidak memungut biaya apa pun.
+                </p>
+            </div>
+        `;
+    }
+
     const href = loggedIn ? `/apply?job=${job.id}` : `/login?next=${encodeURIComponent('/jobs/' + job.id)}`;
     return `<a href="${href}" class="btn-press group w-full inline-flex items-center justify-center gap-2.5 h-14 rounded-2xl bg-[#F26A1B] hover:bg-[#FF7D33] text-white text-lg font-extrabold shadow-[0_14px_28px_-14px_rgba(242,106,27,0.9)]">
         <svg class="w-5 h-5 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4z"/></svg>

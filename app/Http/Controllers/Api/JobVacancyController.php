@@ -73,6 +73,26 @@ class JobVacancyController extends Controller
             $query->where('employment_type', $request->employment_type);
         }
 
+        // 5. Filter Asal Lowongan (Source Type: direct, partner, external)
+        if ($request->filled('source_type')) {
+            $query->where('source_type', $request->source_type);
+        }
+
+        // 6. Filter Mode Demo (is_demo: 0 = produksi nyata saja, 1 = demo saja)
+        if ($request->has('is_demo')) {
+            $query->where('is_demo', filter_var($request->is_demo, FILTER_VALIDATE_BOOLEAN));
+        }
+
+        // 7. Filter Status Verifikasi Lowongan
+        if ($request->filled('verification_status')) {
+            $query->where('verification_status', $request->verification_status);
+        }
+
+        // 8. Filter Kode Wilayah Administrasi (Provinsi / Kab / Kota)
+        if ($request->filled('administrative_code')) {
+            $query->where('administrative_code', 'like', "{$request->administrative_code}%");
+        }
+
         // 5. Filter Keahlian (Skill): Mencari syarat kompetensi di dalam kolom JSON 'requirements'
         if ($request->filled('skill')) {
             $skillSearch = strtolower($request->skill);

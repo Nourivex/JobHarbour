@@ -34,6 +34,26 @@ class JobVacancy extends Model
         'status',       // open, closed
         'posted_by',    // ID Recruiter pembuat lowongan
         'expires_at',   // Batas akhir pendaftaran
+        'job_source_id',
+        'administrative_code',
+        'industrial_zone_id',
+        'source_type',
+        'source_company',
+        'source_url',
+        'application_url',
+        'external_reference',
+        'canonical_hash',
+        'published_at',
+        'first_seen_at',
+        'last_seen_at',
+        'last_checked_at',
+        'verification_status',
+        'verification_notes',
+        'is_demo',
+        'job_source_type',
+        'location_verification_status',
+        'location_data_source',
+        'lifecycle_status',
     ];
 
     /**
@@ -48,6 +68,11 @@ class JobVacancy extends Model
             'salary_max' => 'integer',
             'quota' => 'integer',
             'filled' => 'integer',
+            'is_demo' => 'boolean',
+            'published_at' => 'datetime',
+            'first_seen_at' => 'datetime',
+            'last_seen_at' => 'datetime',
+            'last_checked_at' => 'datetime',
         ];
     }
 
