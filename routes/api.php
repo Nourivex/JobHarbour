@@ -1,7 +1,9 @@
 <?php
 
+use App\Http\Controllers\Api\AdminVerificationController;
 use App\Http\Controllers\Api\ApplicationController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\CompanyController;
 use App\Http\Controllers\Api\JobVacancyController;
 use App\Http\Controllers\Api\PipelineController;
 use App\Http\Controllers\Api\ProfileSkillController;
@@ -89,6 +91,31 @@ Route::prefix('auth')->group(function () {
 
     // Rute Terproteksi (Wajib Header: Authorization: Bearer <token>)
     Route::get('/me', [AuthController::class, 'me'])->middleware('jwt.auth');
+    Route::put('/password', [AuthController::class, 'changePassword'])->middleware('jwt.auth');
+});
+
+// Profil perusahaan dan pengajuan verifikasi (khusus recruiter)
+Route::middleware('jwt.auth:recruiter')->group(function () {
+    Route::get('/company', [CompanyController::class, 'show']);
+    Route::put('/company', [CompanyController::class, 'update']);
+    Route::post('/company/logo', [CompanyController::class, 'uploadLogo']);
+    Route::get('/company/verification', [CompanyController::class, 'verification']);
+    Route::post('/company/verification', [CompanyController::class, 'submitVerification']);
+});
+
+// Logo perusahaan bersifat publik karena tampil di kartu lowongan
+Route::get('/companies/{id}/logo', [CompanyController::class, 'logo'])->whereNumber('id');
+
+// Dokumen verifikasi: hanya pemilik perusahaan atau admin (diperiksa di controller)
+Route::get('/verifications/{id}/documents/{index}', [CompanyController::class, 'document'])
+    ->whereNumber(['id', 'index'])
+    ->middleware('jwt.auth');
+
+// Pemeriksaan verifikasi perusahaan oleh admin
+Route::middleware('jwt.auth:admin')->prefix('admin')->group(function () {
+    Route::get('/verifications', [AdminVerificationController::class, 'index']);
+    Route::patch('/verifications/{id}', [AdminVerificationController::class, 'review'])->whereNumber('id');
+    Route::patch('/companies/{id}/status', [AdminVerificationController::class, 'setCompanyStatus'])->whereNumber('id');
 });
 
 Route::middleware('jwt.auth')->group(function () {

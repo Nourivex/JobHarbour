@@ -26,6 +26,12 @@ class JobVacancyController extends Controller
 {
     use ApiResponse;
 
+    /** Siklus lowongan: draft -> open (dipublikasikan) -> closed -> archived. */
+    public const STATUSES = ['draft', 'open', 'closed', 'archived'];
+
+    /** Status yang boleh dilihat publik lewat katalog. */
+    private const PUBLIC_STATUSES = ['open', 'closed'];
+
     /**
      * Job Catalog Service: Menampilkan dan memfilter daftar lowongan pekerjaan yang tersedia.
      *
@@ -46,8 +52,9 @@ class JobVacancyController extends Controller
     {
         $query = JobVacancy::query();
 
-        // 1. Filter Status Lowongan: secara default hanya menampilkan lowongan yang masih dibuka ('open')
-        if ($request->filled('status')) {
+        // 1. Filter Status Lowongan: secara default hanya menampilkan lowongan yang masih dibuka ('open').
+        //    Draft dan arsip tidak pernah tampil di katalog publik.
+        if ($request->filled('status') && in_array($request->status, self::PUBLIC_STATUSES, true)) {
             $query->where('status', $request->status);
         } else {
             $query->where('status', 'open');
@@ -141,7 +148,8 @@ class JobVacancyController extends Controller
     {
         $job = JobVacancy::with('recruiter:id,name,email')->find($id);
 
-        if (! $job) {
+        // Draft dan arsip diperlakukan tidak ada bagi publik; pemiliknya melihatnya lewat /api/jobs/my
+        if (! $job || ! in_array($job->status, self::PUBLIC_STATUSES, true)) {
             return $this->notFoundResponse('Lowongan pekerjaan yang dicari tidak ditemukan.');
         }
 
@@ -168,8 +176,14 @@ class JobVacancyController extends Controller
             return $this->forbiddenResponse('Akses dilarang. Hanya akun dengan peran Recruiter yang dapat memposting lowongan baru.');
         }
 
+        // Nama perusahaan diambil dari profil perusahaan bila tidak dikirim
+        if (! $request->filled('company') && $currentUser->company) {
+            $request->merge(['company' => $currentUser->company->name]);
+        }
+
         // 3. Validasi ketat terhadap form data lowongan baru
         $validator = Validator::make($request->all(), [
+            'status' => 'nullable|string|in:draft,open',
             'title' => 'required|string|max:255',
             'company' => 'required|string|max:255',
             'description' => 'required|string',
@@ -192,6 +206,11 @@ class JobVacancyController extends Controller
 
         if ($validator->fails()) {
             return $this->validationErrorResponse($validator->errors(), 'Gagal memposting lowongan karena data tidak valid.');
+        }
+
+        $status = $request->input('status', 'open');
+        if ($status === 'open' && ($blocked = $this->publishBlocked($currentUser))) {
+            return $blocked;
         }
 
         // 4. Standarisasi bobot kualifikasi tiap keahlian:
@@ -224,7 +243,7 @@ class JobVacancyController extends Controller
             'quota' => $request->quota ?? 1,
             'filled' => 0,
             'requirements' => $requirements,
-            'status' => 'open',
+            'status' => $status,
             'posted_by' => $currentUser->id,
             'expires_at' => $request->expires_at,
         ]);
@@ -246,7 +265,32 @@ class JobVacancyController extends Controller
                 'email' => $currentUser->email,
             ],
             'created_at' => $job->created_at->toIso8601String(),
-        ], 'Lowongan pekerjaan baru berhasil diterbitkan.');
+        ], $status === 'draft' ? 'Draft lowongan berhasil disimpan.' : 'Lowongan pekerjaan baru berhasil diterbitkan.');
+    }
+
+    /**
+     * Aturan publikasi: recruiter hanya boleh membuka lowongan bila perusahaannya terverifikasi.
+     * Admin tidak dibatasi. Mengembalikan response 403 bila diblokir, atau null bila boleh.
+     */
+    private function publishBlocked($user): ?JsonResponse
+    {
+        if ($user->role === 'admin') {
+            return null;
+        }
+
+        $company = $user->company;
+        if ($company && $company->canPublishJobs()) {
+            return null;
+        }
+
+        $message = match ($company?->verification_status) {
+            null => 'Lengkapi profil perusahaan dan ajukan verifikasi sebelum mempublikasikan lowongan. Lowongan tetap bisa disimpan sebagai draft.',
+            'pending' => 'Verifikasi perusahaan masih diperiksa admin. Simpan lowongan sebagai draft dan publikasikan setelah disetujui.',
+            'suspended' => 'Perusahaan sedang ditangguhkan admin sehingga lowongan tidak dapat dipublikasikan.',
+            default => 'Perusahaan belum terverifikasi. Ajukan verifikasi sebelum mempublikasikan lowongan. Lowongan tetap bisa disimpan sebagai draft.',
+        };
+
+        return $this->forbiddenResponse($message, 'COMPANY_NOT_VERIFIED');
     }
 
     /**
@@ -316,12 +360,17 @@ class JobVacancyController extends Controller
             'requirements.*.skill' => 'required_with:requirements|string|max:100',
             'requirements.*.weight' => 'nullable|integer|in:1,2,3',
             'requirements.*.level' => 'nullable|string|in:required,important,nice_to_have',
-            'status' => 'nullable|string|in:open,closed',
+            'status' => 'nullable|string|in:'.implode(',', self::STATUSES),
             'expires_at' => 'nullable|date',
         ]);
 
         if ($validator->fails()) {
             return $this->validationErrorResponse($validator->errors(), 'Gagal memperbarui lowongan karena data tidak valid.');
+        }
+
+        // Membuka (mempublikasikan) lowongan yang belum terbuka tunduk pada aturan verifikasi perusahaan
+        if ($request->input('status') === 'open' && $job->status !== 'open' && ($blocked = $this->publishBlocked($currentUser))) {
+            return $blocked;
         }
 
         if ($request->has('requirements')) {

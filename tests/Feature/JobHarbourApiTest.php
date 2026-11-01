@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Application;
+use App\Models\Company;
 use App\Models\JobVacancy;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -37,6 +38,16 @@ class JobHarbourApiTest extends TestCase
             'password' => Hash::make('secret123'),
             'role' => 'recruiter',
         ]);
+
+        // Recruiter di skenario ini mewakili perusahaan terverifikasi yang boleh mempublikasikan lowongan
+        foreach ([$this->recruiter, $this->recruiterOther] as $owner) {
+            Company::create([
+                'owner_id' => $owner->id,
+                'name' => "PT {$owner->name}",
+                'verification_status' => 'verified',
+                'verified_at' => now(),
+            ]);
+        }
 
         $this->applicant = User::create([
             'name' => 'Applicant Test',

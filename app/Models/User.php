@@ -5,6 +5,7 @@ namespace App\Models;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -74,5 +75,13 @@ class User extends Authenticatable
     public function applications(): HasMany
     {
         return $this->hasMany(Application::class, 'user_id');
+    }
+
+    /**
+     * Relasi: Satu Recruiter memiliki satu profil perusahaan (One-to-One).
+     */
+    public function company(): HasOne
+    {
+        return $this->hasOne(Company::class, 'owner_id');
     }
 }
