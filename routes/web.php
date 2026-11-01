@@ -37,10 +37,21 @@ Route::get('/profile', function () {
     return view('pages.profile');
 })->name('page.profile');
 
-// Papan Kendali Rekruter & Manajemen Pipeline
-Route::get('/recruiter', function () {
-    return view('pages.recruiter');
-})->name('page.recruiter');
+// Portal Recruiter (workspace dengan sidebar). Hak akses diperiksa di sisi klien lewat token JWT,
+// dan setiap data tetap dilindungi middleware jwt.auth di API.
+Route::prefix('recruiter')->name('recruiter.')->group(function () {
+    Route::view('/', 'recruiter.dashboard')->name('dashboard');
+    Route::view('/jobs', 'recruiter.jobs')->name('jobs');
+    Route::get('/jobs/{id}', fn (int $id) => view('recruiter.job-detail', ['jobId' => $id]))->whereNumber('id')->name('job');
+    Route::view('/pipeline', 'recruiter.pipeline')->name('pipeline');
+    Route::get('/candidates/{id}', fn (int $id) => view('recruiter.candidate', ['applicationId' => $id]))->whereNumber('id')->name('candidate');
+    Route::view('/company', 'recruiter.company')->name('company');
+    Route::view('/verification', 'recruiter.verification')->name('verification');
+    Route::view('/settings', 'recruiter.settings')->name('settings');
+});
+
+// Pemeriksaan verifikasi perusahaan oleh admin
+Route::view('/admin/verifications', 'recruiter.admin-verifications')->name('admin.verifications');
 
 // Dokumentasi Swagger / OpenAPI
 Route::get('/docs', function () {

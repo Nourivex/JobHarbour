@@ -324,6 +324,24 @@ Dikembalikan ketika token valid tetapi user tidak memiliki akses (role tidak ses
 }
 ```
 
+#### Profil Perusahaan, Verifikasi, dan Akun (Portal Recruiter)
+
+| Method | Endpoint | Deskripsi | Auth |
+|--------|----------|-----------|------|
+| `PUT` | `/auth/password` | Ganti kata sandi (`current_password`, `password`, `password_confirmation`, minimal 8 karakter) | ✅ |
+| `GET` | `/company` | Profil perusahaan milik recruiter (`data: null` bila belum dibuat) | ✅ recruiter |
+| `PUT` | `/company` | Buat (201) atau perbarui (200) profil perusahaan. Nama terkunci setelah terverifikasi (409 `COMPANY_NAME_LOCKED`) | ✅ recruiter |
+| `POST` | `/company/logo` | Unggah logo (multipart `logo`, JPG/PNG/WEBP, maks 1 MB) | ✅ recruiter |
+| `GET` | `/companies/{id}/logo` | Berkas logo perusahaan | ❌ |
+| `GET` | `/company/verification` | Status verifikasi, catatan admin, kolom profil yang kurang, dan riwayat pengajuan | ✅ recruiter |
+| `POST` | `/company/verification` | Kirim atau kirim ulang pengajuan (multipart: `legal_name`, `registration_number`, `tax_number?`, `applicant_position`, `notes?`, `documents[]` PDF/JPG/PNG maks 2 MB, 1 sampai 5 file, `document_types[]`). 409 bila masih diperiksa atau sudah terverifikasi, 403 `COMPANY_SUSPENDED` bila ditangguhkan | ✅ recruiter |
+| `GET` | `/verifications/{id}/documents/{index}` | Unduh dokumen pengajuan, hanya pemilik perusahaan atau admin | ✅ |
+| `GET` | `/admin/verifications?status=` | Daftar pengajuan (`pending`, `approved`, `rejected`) beserta `meta.counts` | ✅ admin |
+| `PATCH` | `/admin/verifications/{id}` | `{ "decision": "approve" \| "reject", "admin_notes" }`, catatan wajib saat menolak | ✅ admin |
+| `PATCH` | `/admin/companies/{id}/status` | `{ "status": "suspended" \| "verified", "note" }` untuk menangguhkan atau memulihkan | ✅ admin |
+
+Status verifikasi perusahaan: `unverified`, `pending`, `verified`, `rejected`, `suspended`. Pendaftaran publik (`POST /auth/register`) hanya menerima peran `applicant` dan `recruiter`.
+
 ---
 
 ### 4.2 Service 2: Job Catalog Service
@@ -341,6 +359,10 @@ Dikembalikan ketika token valid tetapi user tidak memiliki akses (role tidak ses
 | `GET` | `/jobs/{id}/requirements` | Daftar skill requirements | ✅ | All |
 | `POST` | `/jobs/{id}/requirements` | Tambah skill requirement | ✅ | Recruiter |
 | `PATCH` | `/jobs/{id}/requirements/{reqId}` | Update weight/level requirement | ✅ | Recruiter |
+
+**Siklus status lowongan:** `draft` → `open` (dipublikasikan) → `closed` → `archived`. `POST /jobs` menerima `status` `draft` atau `open` (bawaan `open`); `PUT/PATCH /jobs/{id}` menerima keempat status. Membuka lowongan (`open`) hanya diizinkan bila perusahaan recruiter berstatus `verified`, selain itu `403` dengan `error_code: COMPANY_NOT_VERIFIED`. Draft dan arsip tidak tampil di `GET /jobs` maupun `GET /jobs/{id}` publik; pemiliknya melihat semua status lewat `GET /jobs/my` (admin melihat semua lowongan). Bila `company` tidak dikirim, nama perusahaan diambil dari profil perusahaan.
+
+**Tahap Hired:** dicatat sebagai `PATCH /pipelines/{id}/status` dengan `{ "stage": "offering", "status": "passed" }` saat kandidat sudah di tahap Offering. Portal recruiter menampilkannya sebagai kolom Hired.
 
 #### Mock: `POST /jobs`
 

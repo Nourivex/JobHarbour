@@ -215,6 +215,43 @@ export const pipelines = {
 export const profile = {
     updateSkills: (skills) => api.put('/profile/skills', { skills }),
     update: (payload) => api.put('/profile', payload),
+    changePassword: (payload) => api.put('/auth/password', payload),
+};
+
+/** Unduh berkas yang dilindungi token lalu buka di tab baru (atau simpan bila pop-up diblokir). */
+export async function downloadProtected(url, filename = 'dokumen') {
+    const res = await fetch(url, { headers: { Authorization: 'Bearer ' + session.token() } });
+    if (!res.ok) {
+        let msg = 'Berkas tidak tersedia atau Anda tidak memiliki izin.';
+        try { msg = (await res.json()).message || msg; } catch (e) { /* abaikan */ }
+        throw new ApiError(msg, res.status);
+    }
+    const blobUrl = URL.createObjectURL(await res.blob());
+    const a = document.createElement('a');
+    a.href = blobUrl;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(blobUrl), 60000);
+}
+
+export const company = {
+    show: () => api.get('/company'),
+    update: (payload) => api.put('/company', payload),
+    uploadLogo(file) {
+        const fd = new FormData();
+        fd.append('logo', file);
+        return api.upload('/company/logo', fd);
+    },
+    verification: () => api.get('/company/verification'),
+    submitVerification: (formData) => api.upload('/company/verification', formData),
+};
+
+export const admin = {
+    verifications: (status) => api.get('/admin/verifications', status ? { status } : undefined),
+    review: (id, payload) => api.patch('/admin/verifications/' + id, payload),
+    setCompanyStatus: (id, payload) => api.patch('/admin/companies/' + id + '/status', payload),
 };
 
 export const matchmaking = {
