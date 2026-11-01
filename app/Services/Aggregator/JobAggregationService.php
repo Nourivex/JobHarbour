@@ -5,6 +5,7 @@ namespace App\Services\Aggregator;
 use App\Models\JobSource;
 use App\Models\JobSyncLog;
 use App\Models\JobVacancy;
+use App\Models\User;
 use App\Services\Aggregator\Contracts\JobSourceAdapterInterface;
 use Illuminate\Support\Facades\Log;
 
@@ -114,7 +115,7 @@ class JobAggregationService
                         'job_source_type' => $v['job_source_type'] ?? 'official_career_page',
                         'location_verification_status' => $v['location_verification_status'] ?? 'approximate_city',
                         'location_data_source' => $v['location_data_source'] ?? $source->name,
-                        'posted_by' => 1,
+                        'posted_by' => $v['posted_by'] ?? User::where('role', 'admin')->value('id') ?? User::where('email', 'admin@jobharbour.id')->value('id'),
                     ]);
                     $createdCount++;
                 }

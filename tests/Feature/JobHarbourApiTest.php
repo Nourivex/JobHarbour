@@ -455,4 +455,78 @@ class JobHarbourApiTest extends TestCase
             ->assertStatus(200)
             ->assertJsonPath('data.title', 'QA Engineer');
     }
+
+    /**
+     * Test aturan transisi pipeline: tahapan hanya boleh maju atau ke rejected, tolak rollback (Issue #11).
+     */
+    public function test_pipeline_rejects_backward_stage_transitions(): void
+    {
+        $job = JobVacancy::create([
+            'title' => 'DevOps Engineer',
+            'company' => 'PT Awan Nusantara',
+            'description' => 'CI/CD & Cloud',
+            'posted_by' => $this->recruiter->id,
+            'status' => 'open',
+        ]);
+
+        $applicantToken = $this->postJson('/api/auth/login', [
+            'email' => 'applicant@test.com',
+            'password' => 'secret123',
+        ])->json('data.token');
+
+        $recruiterToken = $this->postJson('/api/auth/login', [
+            'email' => 'recruiter@test.com',
+            'password' => 'secret123',
+        ])->json('data.token');
+
+        $appRes = $this->withHeaders(['Authorization' => "Bearer {$applicantToken}"])
+            ->postJson('/api/applications', ['job_id' => $job->id]);
+        $appId = $appRes->json('data.application_id');
+
+        // 1. Maju ke tahap interview (sah)
+        $this->withHeaders(['Authorization' => "Bearer {$recruiterToken}"])
+            ->patchJson("/api/pipelines/{$appId}/status", [
+                'stage' => 'interview',
+                'status' => 'in_progress',
+            ])
+            ->assertStatus(200)
+            ->assertJsonPath('data.current_stage', 'interview');
+
+        // 2. Coba rollback mundur ke screening -> Ditolak 422
+        $rollbackToScreening = $this->withHeaders(['Authorization' => "Bearer {$recruiterToken}"])
+            ->patchJson("/api/pipelines/{$appId}/status", [
+                'stage' => 'screening',
+                'status' => 'in_progress',
+            ]);
+        $rollbackToScreening->assertStatus(422)
+            ->assertJsonPath('error_code', 'INVALID_STAGE_TRANSITION');
+
+        // 3. Coba rollback mundur ke assessment -> Ditolak 422
+        $rollbackToAssessment = $this->withHeaders(['Authorization' => "Bearer {$recruiterToken}"])
+            ->patchJson("/api/pipelines/{$appId}/status", [
+                'stage' => 'assessment',
+                'status' => 'in_progress',
+            ]);
+        $rollbackToAssessment->assertStatus(422)
+            ->assertJsonPath('error_code', 'INVALID_STAGE_TRANSITION');
+
+        // 4. Beralih ke rejected (sah dari tahap mana pun)
+        $this->withHeaders(['Authorization' => "Bearer {$recruiterToken}"])
+            ->patchJson("/api/pipelines/{$appId}/status", [
+                'stage' => 'rejected',
+                'status' => 'rejected',
+                'notes' => 'Kandidat belum memenuhi kualifikasi interview.',
+            ])
+            ->assertStatus(200)
+            ->assertJsonPath('data.current_stage', 'rejected');
+
+        // 5. Coba ubah dari rejected kembali ke interview -> Ditolak 422 (status final terkunci)
+        $reactivateRejected = $this->withHeaders(['Authorization' => "Bearer {$recruiterToken}"])
+            ->patchJson("/api/pipelines/{$appId}/status", [
+                'stage' => 'interview',
+                'status' => 'in_progress',
+            ]);
+        $reactivateRejected->assertStatus(422)
+            ->assertJsonPath('error_code', 'INVALID_STAGE_TRANSITION');
+    }
 }

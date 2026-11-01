@@ -41,7 +41,7 @@ class JobAggregationEngineTest extends TestCase
     }
 
     /**
-     * Test endpoint ringkasan monitoring kesehatan sumber agregator.
+     * Test endpoint ringkasan monitoring kesehatan sumber agregator memerlukan otorisasi admin.
      */
     public function test_aggregator_monitoring_summary_endpoint(): void
     {
@@ -54,7 +54,42 @@ class JobAggregationEngineTest extends TestCase
             'is_enabled' => true,
         ]);
 
-        $response = $this->getJson('/api/aggregator/summary');
+        // 1. Tanpa token otentikasi -> Ditolak 401
+        $this->getJson('/api/aggregator/summary')
+            ->assertStatus(401)
+            ->assertJsonPath('error_code', 'MISSING_BEARER_TOKEN');
+
+        // 2. Akun non-admin (recruiter) -> Ditolak 403
+        $recruiter = User::create([
+            'name' => 'Recruiter Test',
+            'email' => 'recruiter_test@test.com',
+            'password' => Hash::make('secret123'),
+            'role' => 'recruiter',
+        ]);
+        $recruiterToken = $this->postJson('/api/auth/login', [
+            'email' => 'recruiter_test@test.com',
+            'password' => 'secret123',
+        ])->json('data.token');
+
+        $this->withHeaders(['Authorization' => "Bearer {$recruiterToken}"])
+            ->getJson('/api/aggregator/summary')
+            ->assertStatus(403)
+            ->assertJsonPath('error_code', 'INSUFFICIENT_ROLE');
+
+        // 3. Akun Admin -> Diterima 200 OK
+        $admin = User::create([
+            'name' => 'Admin Test',
+            'email' => 'admin_test@test.com',
+            'password' => Hash::make('secret123'),
+            'role' => 'admin',
+        ]);
+        $adminToken = $this->postJson('/api/auth/login', [
+            'email' => 'admin_test@test.com',
+            'password' => 'secret123',
+        ])->json('data.token');
+
+        $response = $this->withHeaders(['Authorization' => "Bearer {$adminToken}"])
+            ->getJson('/api/aggregator/summary');
 
         $response->assertStatus(200)
             ->assertJsonStructure([
@@ -73,6 +108,34 @@ class JobAggregationEngineTest extends TestCase
                     'sources',
                 ],
             ]);
+    }
+
+    /**
+     * Test endpoint sinkronisasi manual memvalidasi otentikasi admin.
+     */
+    public function test_aggregator_sync_requires_admin_auth(): void
+    {
+        // 1. Tanpa otentikasi -> 401
+        $this->postJson('/api/aggregator/sync', [])
+            ->assertStatus(401)
+            ->assertJsonPath('error_code', 'MISSING_BEARER_TOKEN');
+
+        // 2. Akun pelamar -> 403
+        $applicant = User::create([
+            'name' => 'Applicant Test',
+            'email' => 'app_test@test.com',
+            'password' => Hash::make('secret123'),
+            'role' => 'applicant',
+        ]);
+        $applicantToken = $this->postJson('/api/auth/login', [
+            'email' => 'app_test@test.com',
+            'password' => 'secret123',
+        ])->json('data.token');
+
+        $this->withHeaders(['Authorization' => "Bearer {$applicantToken}"])
+            ->postJson('/api/aggregator/sync', [])
+            ->assertStatus(403)
+            ->assertJsonPath('error_code', 'INSUFFICIENT_ROLE');
     }
 
     /**
@@ -140,13 +203,12 @@ class JobAggregationEngineTest extends TestCase
 
     /**
      * API eksternal normal: lowongan dari feed tersimpan sebagai lowongan eksternal.
+     * Tidak membutuhkan user ID 1 dan posted_by otomatis diisi admin jika ada, atau null jika tidak ada.
      */
     public function test_external_feed_success_creates_external_vacancies(): void
     {
-        // JobAggregationService menyimpan lowongan eksternal dengan posted_by = 1 (ditulis tetap di kode),
-        // jadi sinkronisasi membutuhkan user id 1, seperti pada database hasil seeder.
-        User::create(['name' => 'Akun Sistem', 'email' => 'sistem@test.com', 'password' => Hash::make('secret123'), 'role' => 'recruiter']);
-
+        // Pengujian ini membuktikan tidak ada hardcoded posted_by = 1 (Issue #10 selesai).
+        // Database kosong tanpa user ID 1 sama sekali.
         Http::preventStrayRequests();
         Http::fake([
             'feed.example.test/*' => Http::response(['jobs' => [
@@ -158,6 +220,11 @@ class JobAggregationEngineTest extends TestCase
 
         $this->assertSame('success', $log->status, (string) $log->error_details);
         $this->assertSame(1, (int) $log->vacancies_created);
+
+        $savedVacancy = JobVacancy::where('title', 'Data Engineer')->first();
+        $this->assertNotNull($savedVacancy);
+        $this->assertNull($savedVacancy->posted_by); // Bebas dari error foreign key user ID 1
+
         $this->getJson('/api/jobs?source_type=external')
             ->assertStatus(200)
             ->assertJsonCount(1, 'data')
