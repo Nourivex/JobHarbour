@@ -389,4 +389,70 @@ class JobHarbourApiTest extends TestCase
             ->assertJsonPath('status', 'error')
             ->assertJsonStructure(['status', 'message', 'error_code']);
     }
+
+    public function test_validation_error_returns_422_with_field_errors(): void
+    {
+        // Login tanpa email dan dengan format email salah
+        $this->postJson('/api/auth/login', ['password' => 'secret123'])
+            ->assertStatus(422)
+            ->assertJsonPath('status', 'error')
+            ->assertJsonPath('error_code', 'VALIDATION_ERROR')
+            ->assertJsonStructure(['status', 'message', 'data', 'meta', 'errors' => ['email']]);
+
+        // Recruiter membuat lowongan tanpa kolom wajib
+        $token = $this->postJson('/api/auth/login', [
+            'email' => 'recruiter@test.com',
+            'password' => 'secret123',
+        ])->json('data.token');
+
+        $this->withHeaders(['Authorization' => "Bearer {$token}"])
+            ->postJson('/api/jobs', ['title' => 'Tanpa syarat skill'])
+            ->assertStatus(422)
+            ->assertJsonPath('error_code', 'VALIDATION_ERROR')
+            ->assertJsonStructure(['errors' => ['company', 'description', 'location', 'requirements']]);
+    }
+
+    public function test_missing_resource_returns_404(): void
+    {
+        $this->getJson('/api/jobs/999999')
+            ->assertStatus(404)
+            ->assertJsonPath('status', 'error')
+            ->assertJsonPath('error_code', 'RESOURCE_NOT_FOUND');
+
+        $token = $this->postJson('/api/auth/login', [
+            'email' => 'applicant@test.com',
+            'password' => 'secret123',
+        ])->json('data.token');
+
+        $this->withHeaders(['Authorization' => "Bearer {$token}"])
+            ->getJson('/api/applications/999999')
+            ->assertStatus(404)
+            ->assertJsonPath('error_code', 'RESOURCE_NOT_FOUND');
+    }
+
+    public function test_create_job_returns_201_with_location_header(): void
+    {
+        $token = $this->postJson('/api/auth/login', [
+            'email' => 'recruiter@test.com',
+            'password' => 'secret123',
+        ])->json('data.token');
+
+        $response = $this->withHeaders(['Authorization' => "Bearer {$token}"])
+            ->postJson('/api/jobs', [
+                'title' => 'QA Engineer',
+                'company' => 'PT Uji Mutu',
+                'description' => 'Menguji API',
+                'location' => 'Tegal',
+                'requirements' => [['skill' => 'PHPUnit', 'level' => 'required']],
+            ]);
+
+        $id = $response->json('data.id');
+        $response->assertStatus(201)
+            ->assertHeader('Location', url("/api/jobs/{$id}"));
+
+        // URL di header Location benar-benar menunjuk resource yang baru dibuat
+        $this->getJson("/api/jobs/{$id}")
+            ->assertStatus(200)
+            ->assertJsonPath('data.title', 'QA Engineer');
+    }
 }

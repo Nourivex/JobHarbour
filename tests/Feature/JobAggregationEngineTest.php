@@ -6,6 +6,9 @@ use App\Models\JobSource;
 use App\Models\JobVacancy;
 use App\Services\Aggregator\JobAggregationService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 class JobAggregationEngineTest extends TestCase
@@ -120,5 +123,73 @@ class JobAggregationEngineTest extends TestCase
         $this->assertCount(1, $respDemo->json('data'));
         $this->assertTrue((bool) $respDemo->json('data.0.is_demo'));
         $this->assertEquals('demo_sample', $respDemo->json('data.0.verification_status'));
+    }
+
+    private function feedSource(): JobSource
+    {
+        return JobSource::create([
+            'name' => 'Feed Uji',
+            'slug' => 'feed-uji',
+            'source_type' => 'api',
+            'adapter_class' => \App\Services\Aggregator\Adapters\PublicJsonFeedAdapter::class,
+            'base_url' => 'https://feed.example.test/jobs',
+            'company_name' => 'PT Mitra Feed',
+            'is_enabled' => true,
+        ]);
+    }
+
+    /**
+     * API eksternal normal: lowongan dari feed tersimpan sebagai lowongan eksternal.
+     */
+    public function test_external_feed_success_creates_external_vacancies(): void
+    {
+        // JobAggregationService menyimpan lowongan eksternal dengan posted_by = 1 (ditulis tetap di kode),
+        // jadi sinkronisasi membutuhkan user id 1, seperti pada database hasil seeder.
+        User::create(['name' => 'Akun Sistem', 'email' => 'sistem@test.com', 'password' => Hash::make('secret123'), 'role' => 'recruiter']);
+
+        Http::preventStrayRequests();
+        Http::fake([
+            'feed.example.test/*' => Http::response(['jobs' => [
+                ['id' => 77, 'title' => 'Data Engineer', 'company_name' => 'PT Mitra Feed', 'url' => 'https://feed.example.test/jobs/77'],
+            ]], 200),
+        ]);
+
+        $log = app(JobAggregationService::class)->syncSource($this->feedSource());
+
+        $this->assertSame('success', $log->status, (string) $log->error_details);
+        $this->assertSame(1, (int) $log->vacancies_created);
+        $this->getJson('/api/jobs?source_type=external')
+            ->assertStatus(200)
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.title', 'Data Engineer');
+    }
+
+    /**
+     * API eksternal mati (fail-open): kegagalan dicatat, katalog tetap melayani lowongan yang sudah ada.
+     */
+    public function test_external_feed_down_is_logged_and_catalog_keeps_serving(): void
+    {
+        JobVacancy::create([
+            'title' => 'Backend Engineer',
+            'company' => 'PT Lama',
+            'description' => 'Lowongan yang sudah ada sebelum sinkronisasi',
+            'location' => 'Tegal',
+            'status' => 'open',
+        ]);
+
+        Http::preventStrayRequests();
+        Http::fake(['feed.example.test/*' => Http::response('Service Unavailable', 503)]);
+
+        $source = $this->feedSource();
+        $log = app(JobAggregationService::class)->syncSource($source);
+
+        $this->assertSame('failed', $log->status);
+        $this->assertStringContainsString('HTTP 503', $log->error_details);
+        $this->assertNotNull($source->fresh()->last_error_at);
+
+        $this->getJson('/api/jobs')
+            ->assertStatus(200)
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.title', 'Backend Engineer');
     }
 }
