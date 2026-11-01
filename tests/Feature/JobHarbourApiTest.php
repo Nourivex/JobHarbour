@@ -192,6 +192,59 @@ class JobHarbourApiTest extends TestCase
             ->assertJsonPath('data.status', 'closed');
     }
 
+    public function test_job_catalog_my_jobs_returns_all_jobs_for_admin(): void
+    {
+        User::create([
+            'name' => 'Admin Test',
+            'email' => 'admin@test.com',
+            'password' => Hash::make('secret123'),
+            'role' => 'admin',
+        ]);
+
+        JobVacancy::create([
+            'title' => 'Mobile Developer',
+            'company' => 'PT Karya Bahari',
+            'description' => 'Flutter & Kotlin',
+            'location' => 'Tegal',
+            'posted_by' => $this->recruiter->id,
+            'status' => 'open',
+        ]);
+
+        JobVacancy::create([
+            'title' => 'Data Analyst',
+            'company' => 'PT Data Samudra',
+            'description' => 'SQL & Python',
+            'location' => 'Semarang',
+            'posted_by' => $this->recruiterOther->id,
+            'status' => 'closed',
+        ]);
+
+        $tokenFor = fn (string $email) => $this->postJson('/api/auth/login', [
+            'email' => $email,
+            'password' => 'secret123',
+        ])->json('data.token');
+
+        // Recruiter hanya melihat lowongan miliknya sendiri
+        $this->withHeaders(['Authorization' => 'Bearer '.$tokenFor('recruiter@test.com')])
+            ->getJson('/api/jobs/my')
+            ->assertStatus(200)
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('meta.total_managed_jobs', 1);
+
+        // Admin melihat lowongan dari semua recruiter, termasuk yang sudah ditutup
+        $this->withHeaders(['Authorization' => 'Bearer '.$tokenFor('admin@test.com')])
+            ->getJson('/api/jobs/my')
+            ->assertStatus(200)
+            ->assertJsonPath('status', 'success')
+            ->assertJsonCount(2, 'data')
+            ->assertJsonPath('meta.total_managed_jobs', 2);
+
+        // Pelamar tetap ditolak
+        $this->withHeaders(['Authorization' => 'Bearer '.$tokenFor('applicant@test.com')])
+            ->getJson('/api/jobs/my')
+            ->assertStatus(403);
+    }
+
     public function test_application_matchmaking_apply_and_scoring(): void
     {
         $job = JobVacancy::create([

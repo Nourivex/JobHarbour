@@ -304,7 +304,8 @@ export function requireAuth(roles) {
 
 export function homeFor(user) {
     if (!user) return '/catalog';
-    return user.role === 'recruiter' ? '/recruiter' : '/my-dock';
+    // Admin belum punya dasbor sendiri, jadi memakai Papan Rekrutmen dengan cakupan semua lowongan
+    return user.role === 'recruiter' || user.role === 'admin' ? '/recruiter' : '/my-dock';
 }
 
 export const util = {

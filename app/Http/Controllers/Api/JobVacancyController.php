@@ -251,10 +251,12 @@ class JobVacancyController extends Controller
 
     /**
      * Job Catalog Service: Recruiter melihat daftar lowongan yang ia terbitkan sendiri.
+     * Admin melihat seluruh lowongan dari semua recruiter (semua status), selaras dengan
+     * GET /api/applications yang juga mengembalikan seluruh lamaran untuk admin.
      *
      * Method  : GET
      * Endpoint: /api/jobs/my
-     * Headers : Authorization: Bearer <token_recruiter>
+     * Headers : Authorization: Bearer <token_recruiter|token_admin>
      */
     public function myJobs(Request $request): JsonResponse
     {
@@ -264,7 +266,8 @@ class JobVacancyController extends Controller
             return $this->forbiddenResponse('Hanya recruiter yang dapat mengakses daftar lowongan miliknya.');
         }
 
-        $jobs = JobVacancy::where('posted_by', $currentUser->id)
+        $jobs = JobVacancy::query()
+            ->when($currentUser->role !== 'admin', fn ($query) => $query->where('posted_by', $currentUser->id))
             ->withCount('applications')
             ->latest()
             ->get();

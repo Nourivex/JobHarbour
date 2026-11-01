@@ -56,9 +56,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     tabPipelineBtn?.addEventListener('click', () => switchView('pipeline'));
     tabJobsBtn?.addEventListener('click', () => switchView('jobs'));
 
-    // 3. Muat Data Dashboard
-    await loadDashboardData();
-
+    // 3. Muat Data Dashboard (dipanggil di akhir, setelah semua elemen tab dan form dideklarasikan)
     async function loadDashboardData() {
         const loadingEl = document.getElementById('recruiter-loading');
         if (loadingEl) loadingEl.classList.remove('hidden');
@@ -891,4 +889,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             showError(err, 'Gagal menyimpan data lowongan.');
         }
     });
+
+    await loadDashboardData();
 });

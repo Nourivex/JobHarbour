@@ -41,7 +41,7 @@ function bindSessionUI(root = document) {
     });
 
     root.querySelectorAll('[data-jh-role-applicant]').forEach((el) => {
-        el.style.display = loggedIn && (user.role === 'applicant' || user.role === 'admin') ? '' : 'none';
+        el.style.display = loggedIn && user.role === 'applicant' ? '' : 'none';
     });
 
     root.querySelectorAll('[data-jh-role-recruiter]').forEach((el) => {
