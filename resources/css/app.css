@@ -1249,7 +1249,8 @@
 .rk-d-h { font-size: 13px; font-weight: 700; letter-spacing: 0.02em; color: var(--color-text-primary); }
 
 .rk-req-row { display: grid; grid-template-columns: 6.5rem 1fr; gap: 0.75rem; align-items: start; }
-.rk-req-level { display: inline-flex; align-items: center; gap: 0.25rem; padding-left: 0.6rem; border-left: 3px solid var(--lvl); font-size: 13px; font-weight: 700; color: var(--color-text-primary); }
+.rk-req-level { display: inline-flex; align-items: center; gap: 0.25rem; min-height: 1.6rem; font-size: 13px; font-weight: 700; color: var(--color-text-primary); }
+.rk-req-level::before { content: ""; width: 0.5rem; height: 0.5rem; margin-right: 0.3rem; border-radius: 9999px; background: var(--lvl); }
 
 .rk-timeline { display: grid; gap: 0; }
 .rk-tl-item { position: relative; padding: 0 0 1.25rem 1.6rem; }
