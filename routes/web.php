@@ -2,11 +2,42 @@
 
 use Illuminate\Support\Facades\Route;
 
+// Halaman Beranda (Home / Landing Page)
 Route::get('/', function () {
-    // Landing page = katalog lowongan (sudah tersambung ke API /api/jobs)
-    return view('pages.catalog');
-});
+    return view('pages.home');
+})->name('home');
 
+// Katalog Lowongan Kerja
+Route::get('/catalog', function () {
+    return view('pages.catalog');
+})->name('page.catalog');
+
+// Halaman Masuk & Pendaftaran Akun
+Route::get('/login', function () {
+    return view('pages.login');
+})->name('login');
+
+// Pengajuan Berkas Lamaran & Quick Apply
+Route::get('/apply', function () {
+    return view('pages.apply');
+})->name('page.apply');
+
+// Dasbor Pelamar & Pelacakan Lamaran Saya
+Route::get('/my-dock', function () {
+    return view('pages.my-dock');
+})->name('page.my-dock');
+
+// Profil Pengguna & Kalibrasi Keahlian
+Route::get('/profile', function () {
+    return view('pages.profile');
+})->name('page.profile');
+
+// Papan Kendali Rekruter & Manajemen Pipeline
+Route::get('/recruiter', function () {
+    return view('pages.recruiter');
+})->name('page.recruiter');
+
+// Dokumentasi Swagger / OpenAPI
 Route::get('/docs', function () {
     return view('swagger');
 })->name('swagger.docs');
@@ -25,33 +56,7 @@ Route::get('/api/docs/openapi.yaml', function () {
     ]);
 })->name('swagger.spec');
 
-// Halaman-halaman Frontend Modern Harbour Tech
-// Catatan: semua halaman ini ngobrol ke backend lewat REST API (/api/*) pakai public/js/jh-api.js
-Route::get('/login', function () {
-    return view('pages.login');
-})->name('login');
-
-Route::get('/catalog', function () {
-    return view('pages.catalog');
-})->name('page.catalog');
-
-Route::get('/apply', function () {
-    return view('pages.apply-modal');
-})->name('page.apply');
-
-Route::get('/my-dock', function () {
-    return view('pages.my-dock');
-})->name('page.my-dock');
-
-Route::get('/profile', function () {
-    return view('pages.profile');
-})->name('page.profile');
-
-Route::get('/recruiter', function () {
-    return view('pages.recruiter');
-})->name('page.recruiter');
-
-// Stitch Screens Showcase & Previews
+// Stitch Screens Showcase & Previews (dipertahankan)
 Route::get('/stitch', function () {
     $manifestPath = public_path('stitch/stitch_manifest.json');
     $screens = file_exists($manifestPath) ? json_decode(file_get_contents($manifestPath), true) : [];
@@ -64,17 +69,3 @@ Route::get('/stitch/{slug}', function ($slug) {
     }
     abort(404, "Screen {$slug} tidak ditemukan.");
 })->name('stitch.screen');
-
-// Fallback melayani file statis JS di public/js jika server meneruskan request ke router Laravel
-Route::get('/js/{path}', function (string $path) {
-    $fullPath = public_path('js/'.$path);
-    abort_unless(is_file($fullPath), 404);
-
-    return response(file_get_contents($fullPath), 200, [
-        'Content-Type' => 'application/javascript; charset=utf-8',
-        'Cache-Control' => 'no-store, no-cache, must-revalidate',
-    ]);
-})->where('path', '.*');
-
-
-
