@@ -287,7 +287,7 @@
                     <svg class="w-3.5 h-3.5 text-[#C8460B]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
                     <span>Seluruh Nusantara</span>
                 </button>
-                <div class="flex items-center gap-1 bg-white dark:bg-slate-800 p-1 rounded-xl border border-slate-300 dark:border-slate-700 text-xs shadow-2xs">
+                <div class="flex items-center gap-1 max-w-full overflow-x-auto bg-white dark:bg-slate-800 p-1 rounded-xl border border-slate-300 dark:border-slate-700 text-xs shadow-2xs [&>button]:shrink-0 [&>button]:whitespace-nowrap">
                     <button type="button" data-atlas-filter="all" class="px-2.5 py-1 rounded-lg font-bold bg-[#C8460B] text-white transition-colors cursor-pointer">Semua</button>
                     <button type="button" data-atlas-filter="maritime_logistics" class="px-2.5 py-1 rounded-lg font-semibold text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white transition-colors cursor-pointer flex items-center gap-1">
                         <span class="w-2 h-2 rounded-full bg-[#0284C7]"></span> Maritim

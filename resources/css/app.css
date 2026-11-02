@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+/* Varian dark: mengikuti kelas .dark di <html> (tombol tema situs), bukan pengaturan gelap sistem operasi.
+   Tanpa ini, perangkat yang memakai mode gelap sistem menampilkan sebagian elemen gelap di halaman terang. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @source "../views/**/*.blade.php";
 @source "../js/**/*.js";
 
@@ -728,18 +732,19 @@
     align-items: center;
     justify-content: center;
     border-radius: 0.8rem;
-    background: var(--color-orange-bright);
+    /* Oranye gelap: kontras teks putih 4,8:1 (oranye terang hanya 3,3:1, di bawah WCAG AA) */
+    background: var(--color-orange-harbour);
     color: #FFFFFF;
     font-size: 16px;
     font-weight: 700;
     cursor: pointer;
-    box-shadow: 0 14px 26px -16px rgba(242, 106, 27, 0.95);
+    box-shadow: 0 14px 26px -16px rgba(200, 70, 11, 0.85);
     transition: background-color 200ms ease, transform 120ms ease, box-shadow 200ms ease;
 }
 
-.auth-submit:hover { background: #FF7D33; }
+.auth-submit:hover { background: #A93A08; }
 .auth-submit:disabled { cursor: default; }
-.auth-submit.is-loading { background: #E0743A; }
+.auth-submit.is-loading { background: #A93A08; }
 .auth-submit.is-success { background: var(--color-status-success); box-shadow: 0 14px 26px -16px rgba(21, 127, 59, 0.9); }
 .auth-submit-label { animation: fadeInFast 180ms ease-out; }
 

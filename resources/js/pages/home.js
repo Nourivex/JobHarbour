@@ -14,7 +14,8 @@ function countUp(el, target, duration = 900) {
     }
     const start = performance.now();
     const tick = (now) => {
-        const t = Math.min((now - start) / duration, 1);
+        // Stempel waktu frame bisa sedikit lebih awal dari `start`; tanpa batas bawah angka sempat tampil "-0"
+        const t = Math.max(0, Math.min((now - start) / duration, 1));
         el.textContent = Math.round(target * (1 - Math.pow(1 - t, 3))).toLocaleString('id-ID');
         if (t < 1) requestAnimationFrame(tick);
     };

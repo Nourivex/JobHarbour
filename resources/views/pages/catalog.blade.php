@@ -31,8 +31,10 @@
     <!-- ============================================================== -->
     <div class="max-w-[1240px] mx-auto px-5 sm:px-8 py-8 grid lg:grid-cols-[272px_minmax(0,1fr)] gap-6 items-start">
 
-        <!-- Sidebar filter -->
-        <aside class="lg:sticky lg:top-[88px]" aria-label="Filter lowongan">
+        <!-- Sidebar filter. Di ponsel dan tablet tampil sebagai panel bawah yang dibuka lewat tombol Filter,
+             supaya daftar lowongan langsung terlihat tanpa menggulir melewati semua pilihan filter. -->
+        <div id="filter-backdrop" class="hidden lg:hidden fixed inset-0 z-40 bg-[#0C2238]/45" data-filter-close></div>
+        <aside id="filter-panel" class="hidden lg:block lg:sticky lg:top-[88px]" aria-label="Filter lowongan">
             <div class="bg-white rounded-2xl border border-[#E2E7ED] p-5">
                 <div class="flex items-center justify-between gap-2 pb-4 border-b border-[#E2E7ED]">
                     <h2 class="flex items-center gap-2.5 text-lg font-extrabold text-[#0B1B2B]">
@@ -40,6 +42,9 @@
                         Filter Lowongan
                     </h2>
                     <span id="filter-active-count" class="hidden text-xs font-bold px-2 py-0.5 rounded-full bg-[#FFF3EA] text-[#8A2E05]"></span>
+                    <button type="button" class="lg:hidden ml-auto w-9 h-9 rounded-full inline-flex items-center justify-center text-[#3D4B5C] hover:bg-[#F4F6F8]" data-filter-close aria-label="Tutup filter">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                    </button>
                 </div>
 
                 <div id="catalog-filters" class="divide-y divide-[#E2E7ED]">
@@ -77,6 +82,9 @@
                     <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
                     Reset Filter
                 </button>
+                <button type="button" class="lg:hidden btn-press mt-3 w-full inline-flex items-center justify-center h-11 rounded-xl bg-[#0C2238] text-white font-semibold" data-filter-close>
+                    Tampilkan <span id="filter-result-count" class="mx-1">hasil</span>
+                </button>
             </div>
         </aside>
 
@@ -88,7 +96,12 @@
                     <span class="sr-only">Cari lowongan</span>
                     <input id="catalog-search" type="search" placeholder="Cari posisi, perusahaan, atau keahlian..." class="w-full bg-transparent border-0 outline-none text-[15px] text-[#0B1B2B] placeholder:text-[#8C98A8]">
                 </label>
-                <label class="flex items-center gap-2 h-12 pl-4 pr-2 rounded-xl bg-white border border-[#C5CFDA] text-sm text-[#3D4B5C]">
+                <div class="flex gap-3">
+                <button type="button" id="filter-toggle" class="lg:hidden btn-press flex-1 sm:flex-none inline-flex items-center justify-center gap-2 h-12 px-4 rounded-xl bg-white border border-[#C5CFDA] text-sm font-bold text-[#0B1B2B]" aria-controls="filter-panel" aria-expanded="false">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg>
+                    Filter <span id="filter-toggle-count" class="hidden min-w-5 h-5 px-1.5 rounded-full bg-[#0C2238] text-white text-[11px] leading-5"></span>
+                </button>
+                <label class="flex-1 sm:flex-none flex items-center gap-2 h-12 pl-4 pr-2 rounded-xl bg-white border border-[#C5CFDA] text-sm text-[#3D4B5C]">
                     <span class="shrink-0">Urutkan:</span>
                     <select id="catalog-sort" class="bg-transparent border-0 outline-none font-bold text-[#0B1B2B] pr-1 cursor-pointer">
                         <option value="match" data-applicant-only>Kecocokan tertinggi</option>
@@ -97,6 +110,7 @@
                         <option value="salary_low">Gaji terendah</option>
                     </select>
                 </label>
+                </div>
             </div>
 
             <div class="mt-5 flex flex-wrap items-center gap-2 min-h-7">

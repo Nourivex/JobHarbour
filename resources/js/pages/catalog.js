@@ -129,6 +129,10 @@ function renderList() {
     const counter = el('filter-active-count');
     counter.textContent = `${activeCount} aktif`;
     counter.classList.toggle('hidden', !activeCount);
+    const toggleCount = el('filter-toggle-count');
+    toggleCount.textContent = activeCount;
+    toggleCount.classList.toggle('hidden', !activeCount);
+    el('filter-result-count').textContent = `${list.length} lowongan`;
     // Animasi masuk hanya saat daftar pertama kali tampil, bukan setiap filter berubah
     if (!state.animated) {
         state.animated = true;
@@ -233,7 +237,34 @@ function resetFilters() {
     renderList();
 }
 
+/** Panel filter di ponsel dan tablet: dibuka sebagai panel bawah, ditutup lewat tombol, latar, atau Escape. */
+function initMobileFilters() {
+    const panel = el('filter-panel');
+    const backdrop = el('filter-backdrop');
+    const toggle = el('filter-toggle');
+    const sheet = ['fixed', 'inset-x-0', 'bottom-0', 'z-50', 'max-h-[85vh]', 'overflow-y-auto', 'rounded-t-2xl'];
+    const setOpen = (open) => {
+        panel.classList.toggle('hidden', !open);
+        sheet.forEach((c) => panel.classList.toggle(c, open));
+        backdrop.classList.toggle('hidden', !open);
+        document.body.classList.toggle('overflow-hidden', open);
+        toggle.setAttribute('aria-expanded', String(open));
+        if (open) panel.querySelector('summary, input')?.focus();
+        else toggle.focus();
+    };
+    toggle.addEventListener('click', () => setOpen(true));
+    document.querySelectorAll('[data-filter-close]').forEach((b) => b.addEventListener('click', () => setOpen(false)));
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && toggle.getAttribute('aria-expanded') === 'true') setOpen(false);
+    });
+    // Saat layar dilebarkan ke desktop, kembalikan sidebar ke bentuk biasa
+    window.matchMedia('(min-width: 1024px)').addEventListener('change', (m) => {
+        if (m.matches && toggle.getAttribute('aria-expanded') === 'true') setOpen(false);
+    });
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
+    initMobileFilters();
     const sortSel = el('catalog-sort');
     if (!isApplicant) sortSel.querySelector('[data-applicant-only]')?.remove();
     if (!isApplicant) el('catalog-subtitle').textContent = 'Cari dan bandingkan lowongan yang sedang dibuka. Masuk sebagai pelamar untuk melihat skor kecocokan dengan skill di profilmu.';

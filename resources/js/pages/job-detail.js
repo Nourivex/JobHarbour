@@ -232,7 +232,7 @@ function applyButton(job, applied) {
     }
 
     const href = loggedIn ? `/apply?job=${job.id}` : `/login?next=${encodeURIComponent('/jobs/' + job.id)}`;
-    return `<a href="${href}" class="btn-press group w-full inline-flex items-center justify-center gap-2.5 h-14 rounded-2xl bg-[#F26A1B] hover:bg-[#FF7D33] text-white text-lg font-extrabold shadow-[0_14px_28px_-14px_rgba(242,106,27,0.9)]">
+    return `<a href="${href}" class="btn-press group w-full inline-flex items-center justify-center gap-2.5 h-14 rounded-2xl bg-[#C8460B] hover:bg-[#A93A08] text-white text-lg font-extrabold shadow-[0_14px_28px_-14px_rgba(200,70,11,0.8)]">
         <svg class="w-5 h-5 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4z"/></svg>
         Lamar Sekarang</a>`;
 }
@@ -391,4 +391,36 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
     renderMatch(job, applied);
+    renderStickyApply(job, applied);
 });
+
+/**
+ * Bar lamar yang menempel di bawah layar (ponsel dan tablet saja). Di layar kecil panel skor dan tombol
+ * Lamar berada jauh di bawah deskripsi, jadi aksi utama dibuat selalu terjangkau. Bar disembunyikan
+ * selama tombol lamar utama sudah terlihat supaya tidak tampil dobel.
+ */
+function renderStickyApply(job, applied) {
+    const main = document.getElementById('detail-match');
+    if (!main || document.getElementById('detail-sticky-apply')) return;
+    const salary = salaryRange(job);
+    const bar = document.createElement('div');
+    bar.id = 'detail-sticky-apply';
+    bar.className = 'lg:hidden fixed left-0 right-0 z-30 bg-white/95 backdrop-blur-md border-t border-[#E2E7ED] px-4 py-3 flex items-center gap-3 transition-transform duration-200';
+    bar.style.bottom = 'calc(var(--jh-bottom-nav, 61px) + env(safe-area-inset-bottom, 0px))';
+    bar.innerHTML = `
+        <div class="min-w-0 flex-1">
+            <p class="text-sm font-bold text-[#0B1B2B] truncate">${esc(job.title)}</p>
+            <p class="text-xs text-[#627080] truncate">${esc(salary || job.company || '')}</p>
+        </div>
+        <div class="shrink-0 w-[46%] max-w-[220px] [&_a]:h-11 [&_a]:text-sm [&_a]:rounded-xl [&_a]:shadow-none [&_p]:h-11 [&_p]:leading-[2.75rem] [&_p]:text-sm [&_p]:rounded-xl [&_p:not(:first-child)]:hidden [&_.space-y-3>p]:hidden">${applyButton(job, applied)}</div>`;
+    document.body.appendChild(bar);
+
+    // Sembunyikan bar saat panel kecocokan (berisi tombol lamar utama) ada di layar
+    const target = main;
+    if ('IntersectionObserver' in window) {
+        new IntersectionObserver(([entry]) => {
+            bar.style.transform = entry.isIntersecting ? 'translateY(150%)' : 'none';
+            bar.setAttribute('aria-hidden', String(entry.isIntersecting));
+        }).observe(target);
+    }
+}
