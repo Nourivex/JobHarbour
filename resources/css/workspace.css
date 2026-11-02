@@ -678,3 +678,117 @@ html.dark .ws-bar { background: #3B5C80; }
 .ws-bar-value { font-size: 12px; font-weight: 700; color: var(--ws-text); font-variant-numeric: tabular-nums; }
 .ws-stat { padding: 1rem 1.1rem; border-radius: var(--ws-r-lg); background: var(--ws-surface); border: 1px solid var(--ws-border); }
 .ws-stat-value { margin-top: 0.35rem; font-family: var(--font-heading); font-size: 1.75rem; font-weight: 800; line-height: 1; color: var(--ws-text); font-variant-numeric: tabular-nums; }
+
+/* ==================================================================== */
+/* Ruang kerja rekrutmen v2: strip tahap, toolbar, baris kandidat,      */
+/* filter, paginasi, dan laci bertab. Skala: teks 12/13/14/16/20,       */
+/* jarak 4/8/12/16/24/32.                                                */
+/* ==================================================================== */
+
+/* Strip tahap: ringkasan sebaran sekaligus saringan tahap */
+.ws-strip { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(6.5rem, 1fr); gap: 0.25rem; overflow-x: auto; scrollbar-width: none; padding-bottom: 0.25rem; }
+.ws-strip::-webkit-scrollbar { display: none; }
+.ws-stage-btn { position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 0.15rem; padding: 0.6rem 0.75rem 0.75rem; border-radius: var(--ws-r-md); text-align: left; color: var(--ws-muted); cursor: pointer; transition: background-color 150ms ease, color 150ms ease; }
+.ws-stage-btn:hover { background: var(--ws-surface-2); color: var(--ws-text-2); }
+.ws-stage-btn:focus-visible { outline: none; box-shadow: var(--ws-focus); }
+.ws-stage-label { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 13px; font-weight: 500; white-space: nowrap; }
+.ws-stage-num { font-size: 20px; line-height: 1.2; font-weight: 700; color: var(--ws-text); font-variant-numeric: tabular-nums; }
+.ws-stage-btn[aria-pressed="true"] { background: var(--ws-surface); color: var(--ws-text); box-shadow: 0 0 0 1px var(--ws-border); }
+.ws-stage-btn[aria-pressed="true"] .ws-stage-label { color: var(--ws-text); font-weight: 600; }
+.ws-stage-btn.is-empty .ws-stage-num { color: var(--ws-border-strong); }
+.ws-proportion { display: flex; gap: 2px; height: 4px; margin-top: 0.5rem; border-radius: 9999px; overflow: hidden; background: var(--ws-surface-2); }
+.ws-proportion > span { transition: flex-grow 500ms var(--ws-ease); }
+
+/* Toolbar satu baris dan chip saringan aktif */
+.ws-wbar { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+.ws-wbar .ws-search { flex: 1 1 220px; max-width: 26rem; }
+.ws-fchips { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem; }
+.ws-fchip { display: inline-flex; align-items: center; gap: 0.35rem; height: 1.85rem; padding: 0 0.4rem 0 0.65rem; border-radius: 9999px; background: var(--ws-primary-soft); color: var(--ws-text); font-size: 13px; font-weight: 500; }
+.ws-fchip button { width: 1.35rem; height: 1.35rem; border-radius: 9999px; display: inline-flex; align-items: center; justify-content: center; color: var(--ws-muted); cursor: pointer; }
+.ws-fchip button:hover { background: var(--ws-surface); color: var(--ws-text); }
+
+/* Panel filter (popover) */
+.ws-pop-wrap { position: relative; }
+.ws-pop { position: absolute; z-index: 45; top: calc(100% + 0.4rem); left: 0; width: min(20rem, calc(100vw - 2rem)); padding: 1rem; border-radius: var(--ws-r-lg); background: var(--ws-surface); border: 1px solid var(--ws-border); box-shadow: var(--ws-shadow-pop); transform-origin: top left; animation: ws-pop-in 160ms var(--ws-ease); }
+@keyframes ws-pop-in { from { opacity: 0; transform: translateY(-4px) scale(0.98); } to { opacity: 1; transform: none; } }
+.ws-pop-title { font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ws-muted); margin-bottom: 0.5rem; }
+.ws-pop-section + .ws-pop-section { margin-top: 1rem; }
+.ws-opt { display: flex; align-items: center; gap: 0.6rem; min-height: 2.1rem; padding: 0 0.4rem; border-radius: var(--ws-r-sm); font-size: 14px; color: var(--ws-text-2); cursor: pointer; }
+.ws-opt:hover { background: var(--ws-surface-2); }
+.ws-opt input { accent-color: var(--ws-navy); }
+html.dark .ws-opt input { accent-color: #E8EDF4; }
+.ws-skill-pick { display: flex; flex-wrap: wrap; gap: 0.35rem; max-height: 8.5rem; overflow-y: auto; }
+.ws-skill-pick button { height: 1.85rem; padding: 0 0.6rem; border-radius: 9999px; border: 1px solid var(--ws-border); font-size: 13px; color: var(--ws-text-2); cursor: pointer; transition: background-color 120ms ease, border-color 120ms ease; }
+.ws-skill-pick button:hover { border-color: var(--ws-border-strong); }
+.ws-skill-pick button[aria-pressed="true"] { background: var(--ws-navy); border-color: var(--ws-navy); color: #FFFFFF; }
+html.dark .ws-skill-pick button[aria-pressed="true"] { background: #E8EDF4; border-color: #E8EDF4; color: #0B111C; }
+
+/* Daftar kandidat: tabel tanpa kartu bersarang */
+.ws-clist { border-top: 1px solid var(--ws-border); }
+.ws-ctable { width: 100%; border-collapse: collapse; font-size: 14px; }
+.ws-ctable th { padding: 0.65rem 0.75rem; text-align: left; font-size: 12px; font-weight: 600; color: var(--ws-muted); white-space: nowrap; border-bottom: 1px solid var(--ws-border); }
+.ws-ctable td { padding: 0.75rem; border-bottom: 1px solid var(--ws-border); vertical-align: middle; color: var(--ws-text-2); }
+.ws-ctable tbody tr { cursor: pointer; transition: background-color 120ms ease; }
+.ws-ctable tbody tr:hover { background: color-mix(in srgb, var(--ws-surface-2) 70%, transparent); }
+.ws-ctable tbody tr.is-selected { background: var(--ws-primary-soft); }
+.ws-ctable tbody tr.is-final .ws-cname-title, .ws-ctable tbody tr.is-final .ws-score-num { color: var(--ws-muted); font-weight: 500; }
+.ws-ctable .c-check { width: 2.5rem; padding-right: 0; }
+.ws-ctable .c-act { width: 3rem; text-align: right; }
+.ws-cname { display: flex; align-items: center; gap: 0.75rem; min-width: 0; }
+.ws-cname-text { min-width: 0; }
+.ws-cname-title { display: block; max-width: 100%; font-weight: 600; color: var(--ws-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left; cursor: pointer; }
+.ws-cname-title:hover { text-decoration: underline; text-underline-offset: 3px; }
+.ws-cname-sub { display: block; font-size: 13px; color: var(--ws-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ws-ava { width: 2.25rem; height: 2.25rem; flex-shrink: 0; border-radius: 9999px; display: inline-flex; align-items: center; justify-content: center; background: var(--ws-surface-2); color: var(--ws-text-2); font-size: 13px; font-weight: 600; }
+.ws-score { display: inline-flex; align-items: center; gap: 0.6rem; }
+.ws-score-num { min-width: 2.6rem; font-weight: 600; color: var(--ws-text); font-variant-numeric: tabular-nums; }
+.ws-score-bar { width: 3.5rem; height: 4px; border-radius: 9999px; background: var(--ws-surface-2); overflow: hidden; }
+.ws-score-bar > span { display: block; height: 100%; border-radius: inherit; }
+.ws-req { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.ws-req strong { font-weight: 600; color: var(--ws-text); }
+.ws-req-miss { display: block; max-width: 14rem; font-size: 13px; color: var(--ws-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ws-stage { display: inline-flex; align-items: center; gap: 0.45rem; font-weight: 500; color: var(--ws-text); white-space: nowrap; }
+.ws-stage-sub { display: block; margin-top: 0.15rem; font-size: 13px; color: var(--ws-muted); white-space: nowrap; }
+.ws-row-menu .ws-icon-btn { width: 2rem; height: 2rem; opacity: 0.55; }
+.ws-ctable tbody tr:hover .ws-row-menu .ws-icon-btn, .ws-row-menu .ws-icon-btn:focus-visible, .ws-row-menu.is-open .ws-icon-btn { opacity: 1; }
+.ws-cmeta { display: none; }
+
+/* Ponsel: baris menjadi daftar dua tingkat, tanpa geser ke samping */
+@media (max-width: 767px) {
+    .ws-ctable thead { display: none; }
+    .ws-ctable tbody tr { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: start; column-gap: 0.75rem; padding: 0.85rem 0.25rem; border-bottom: 1px solid var(--ws-border); }
+    .ws-ctable td { padding: 0; border: 0; }
+    .ws-ctable .c-check { width: auto; padding-top: 0.55rem; }
+    .ws-ctable .c-score, .ws-ctable .c-req, .ws-ctable .c-stage, .ws-ctable .c-date { display: none; }
+    .ws-cmeta { display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem 0.85rem; margin-top: 0.4rem; font-size: 13px; color: var(--ws-muted); }
+    .ws-row-menu .ws-icon-btn { opacity: 1; }
+    .ws-cname { align-items: flex-start; }
+    .ws-ava { width: 2rem; height: 2rem; font-size: 12px; }
+}
+
+/* Paginasi */
+.ws-pager { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0.85rem 0.25rem 0; font-size: 13px; color: var(--ws-muted); }
+.ws-pager-btns { display: inline-flex; gap: 0.35rem; }
+
+/* Kanban v2: kartu ringkas, tombol maju muncul saat diarahkan */
+.ws-kcard2 { padding: 0.75rem 0.8rem; border-radius: var(--ws-r-md); background: var(--ws-surface); border: 1px solid var(--ws-border); cursor: pointer; transition: border-color 150ms ease, box-shadow 150ms ease, opacity 150ms ease, transform 150ms var(--ws-ease); }
+.ws-kcard2:hover { border-color: var(--ws-border-strong); box-shadow: 0 8px 20px -16px rgba(13, 35, 56, 0.5); }
+.ws-kcard2:focus-visible { outline: none; box-shadow: var(--ws-focus); }
+.ws-kcard2[draggable="true"] { cursor: grab; }
+.ws-kcard2.is-dragging { opacity: 0.5; transform: rotate(1.5deg) scale(0.98); }
+.ws-kcard2.is-arrived { animation: ws-arrive 600ms var(--ws-ease); }
+.ws-kcard2-foot { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.6rem; min-height: 1.75rem; font-size: 13px; color: var(--ws-muted); }
+.ws-kcard2-foot > span { min-width: 0; }
+.ws-kcard2 { position: relative; }
+.ws-kcard2 .ws-kcard-next { position: absolute; right: 0.6rem; bottom: 0.6rem; opacity: 0; box-shadow: 0 0 0 4px var(--ws-surface); transition: opacity 120ms ease, background-color 150ms ease, color 150ms ease; }
+.ws-kcard2:hover .ws-kcard-next, .ws-kcard2:focus-within .ws-kcard-next { opacity: 1; }
+@media (hover: none) { .ws-kcard2 .ws-kcard-next { opacity: 1; } }
+
+/* Laci kandidat v2: menempel di tepi kanan layar, bertab, navigasi antar kandidat */
+.ws-drawer { position: fixed; inset: 0 0 0 auto; width: min(720px, 100vw); }
+.ws-dtabs { display: flex; gap: 0.25rem; padding: 0 1.25rem; border-bottom: 1px solid var(--ws-border); overflow-x: auto; scrollbar-width: none; }
+.ws-dtabs::-webkit-scrollbar { display: none; }
+.ws-dtabs .ws-tab { height: 2.6rem; }
+.ws-dnav { display: inline-flex; align-items: center; gap: 0.15rem; font-size: 13px; color: var(--ws-muted); font-variant-numeric: tabular-nums; }
+.ws-dnav .ws-icon-btn { width: 2rem; height: 2rem; }
+.ws-kbd { display: inline-flex; align-items: center; justify-content: center; min-width: 1.25rem; height: 1.25rem; padding: 0 0.3rem; border-radius: 0.3rem; border: 1px solid var(--ws-border); font-size: 11px; color: var(--ws-muted); }

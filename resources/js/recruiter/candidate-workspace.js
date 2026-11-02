@@ -1,34 +1,44 @@
 /**
  * Ruang kerja kandidat yang dipakai halaman Kandidat (semua lowongan) dan halaman satu lowongan.
- * Dua tampilan atas data yang sama:
- * - Tabel: mencari, menyortir, membandingkan, dan memproses banyak kandidat sekaligus.
- * - Kanban: melihat alur seleksi dan memindahkan kandidat dengan seret dan lepas.
- * Klik kandidat membuka laci berisi penjelasan skor, catatan, linimasa, dan aksi tahap.
+ *
+ * Susunan dari atas ke bawah:
+ * 1. Strip tahap: sebaran kandidat per tahap sekaligus saringan tahap.
+ * 2. Satu baris toolbar: cari, Filter (skor, skill, tanggal melamar), urutkan, Tabel/Kanban.
+ * 3. Daftar kandidat (tabel berpaginasi atau kanban).
+ * 4. Laci kandidat bertab dengan navigasi ke kandidat sebelum/berikutnya.
+ *
+ * Semua angka berasal dari GET /applications dan GET /jobs/my; perpindahan tahap lewat moveCandidate()
+ * yang mengikuti aturan backend (maju satu langkah atau ditolak).
  */
-import { toast, confirm } from '../api.js';
+import { toast, confirm, util } from '../api.js';
 import { jobById, moveCandidate } from './data.js';
 import { setNavCounts } from './shell.js';
-import { openDialog, setBusy, debounce } from './components.js';
+import { openDialog, setBusy, debounce, menu } from './components.js';
 import {
-    matchSection, skillsSection, profileSection, documentsSection, timelineSection, notesSection,
+    matchSection, profileSection, documentsSection, historySection, timelineSection, notesSection,
     renderActions, bindCvDownload, bindNotes,
 } from './candidate-view.js';
 import {
-    esc, icon, hydrateIcons, STAGES, STAGE, stageOf, nextStageOf, stageEnteredAt, interviewOf, scoreInfo, scoreRing,
-    stageBadge, relativeTime, formatDateTime, daysSince, initials, emptyState, errorMessage,
+    esc, icon, hydrateIcons, STAGES, STAGE, stageOf, nextStageOf, stageEnteredAt, interviewOf, scoreInfo,
+    matchBreakdown, relativeTime, formatDate, formatDateTime, daysSince, initials, emptyState, errorMessage,
 } from './ui.js';
 
 const VIEW_KEY = 'jh_ws_view';
+const PAGE_SIZE = 25;
 const desktop = window.matchMedia('(min-width: 1024px)');
-const SORTERS = {
-    score: (a, b) => (Number(b.match_score) || 0) - (Number(a.match_score) || 0),
-    newest: (a, b) => new Date(b.created_at) - new Date(a.created_at),
-    waiting: (a, b) => new Date(stageEnteredAt(a)) - new Date(stageEnteredAt(b)),
+const SORTS = {
+    score: ['Skor tertinggi', (a, b) => (Number(b.match_score) || 0) - (Number(a.match_score) || 0)],
+    newest: ['Lamaran terbaru', (a, b) => new Date(b.created_at) - new Date(a.created_at)],
+    waiting: ['Terlama di tahap', (a, b) => new Date(stageEnteredAt(a)) - new Date(stageEnteredAt(b))],
+    name: ['Nama (A sampai Z)', (a, b) => String(a.applicant?.name || '').localeCompare(String(b.applicant?.name || ''), 'id')],
 };
+const SCORE_BANDS = { excellent: '80% ke atas', good: '50 sampai 79%', under: 'Di bawah 50%' };
+const APPLIED = { 7: '7 hari terakhir', 30: '30 hari terakhir' };
 
 function readView() {
     try { return localStorage.getItem(VIEW_KEY) === 'board' ? 'board' : 'table'; } catch (e) { return 'table'; }
 }
+const norm = (s) => String(s || '').toLowerCase().trim();
 
 /**
  * @param {object} opts
@@ -44,67 +54,100 @@ export function mountCandidateWorkspace({ root, jobs, apps, jobId = null, navApp
     const state = {
         job: jobId ? String(jobId) : (params.get('job') || 'all'),
         stage: STAGES.includes(params.get('stage')) ? params.get('stage') : 'all',
-        cat: ['excellent', 'good', 'under'].includes(params.get('cat')) ? params.get('cat') : 'all',
+        cat: SCORE_BANDS[params.get('cat')] ? params.get('cat') : 'all',
+        skills: new Set((params.get('skill') || '').split(',').map(norm).filter(Boolean)),
+        applied: APPLIED[params.get('applied')] ? params.get('applied') : 'all',
         q: params.get('q') || '',
-        sort: SORTERS[params.get('sort')] ? params.get('sort') : 'score',
+        sort: SORTS[params.get('sort')] ? params.get('sort') : 'score',
         view: ['table', 'board'].includes(params.get('view')) ? params.get('view') : readView(),
+        page: 1,
         open: { hired: false, rejected: false },
         selected: new Set(),
         dragFrom: null,
+        filterOpen: false,
+        drawerId: null,
+        drawerTab: 'summary',
     };
     if (state.job !== 'all' && !jobById(jobs, state.job)) state.job = 'all';
     if (state.stage === 'hired' || state.stage === 'rejected') state.open[state.stage] = true;
 
-    const showJobColumn = !jobId;
+    const showJob = !jobId;
     root.innerHTML = `
-        <div class="ws-toolbar mb-3">
-            ${showJobColumn ? `
-            <label for="cw-job" class="sr-only">Saring lowongan</label>
-            <select id="cw-job" class="ws-input w-full sm:w-[280px]"></select>` : ''}
-            <div class="ws-search flex-1 min-w-[200px] sm:max-w-sm">
+        <section aria-label="Sebaran kandidat per tahap" class="mb-5">
+            <div id="cw-strip" class="ws-strip"></div>
+            <div id="cw-prop" class="ws-proportion" aria-hidden="true"></div>
+        </section>
+        <div class="ws-wbar mb-3">
+            ${showJob ? `<label for="cw-job" class="sr-only">Lowongan</label><select id="cw-job" class="ws-input w-full sm:w-[260px]"></select>` : ''}
+            <div class="ws-search">
                 ${icon('search')}
                 <label for="cw-search" class="sr-only">Cari kandidat</label>
                 <input id="cw-search" type="search" class="ws-input" placeholder="Cari nama atau skill" autocomplete="off">
             </div>
+            <div class="ws-pop-wrap" id="cw-filter-wrap">
+                <button type="button" id="cw-filter-btn" class="ws-btn ws-btn-secondary" aria-expanded="false" aria-controls="cw-filter-pop">${icon('list-filter')}Filter<span id="cw-filter-count" class="ws-count hidden"></span></button>
+                <div id="cw-filter-pop" class="ws-pop hidden" role="dialog" aria-label="Saring kandidat"></div>
+            </div>
             <label for="cw-sort" class="sr-only">Urutkan</label>
-            <select id="cw-sort" class="ws-input w-auto">
-                <option value="score">Skor tertinggi</option>
-                <option value="newest">Lamaran terbaru</option>
-                <option value="waiting">Terlama di tahap</option>
-            </select>
-            <div class="ws-seg ml-auto" role="group" aria-label="Tampilan">
+            <select id="cw-sort" class="ws-input w-auto">${Object.entries(SORTS).map(([k, [label]]) => `<option value="${k}">${label}</option>`).join('')}</select>
+            <div class="ws-seg sm:ml-auto" role="group" aria-label="Tampilan">
                 <button type="button" data-view="table" aria-pressed="false">${icon('table-2', 'w-4 h-4')}Tabel</button>
                 <button type="button" data-view="board" aria-pressed="false">${icon('kanban', 'w-4 h-4')}Kanban</button>
             </div>
         </div>
-        <div class="flex flex-wrap items-center gap-2 mb-3">
-            <div class="ws-seg" role="group" aria-label="Saring skor kecocokan" id="cw-cat">
-                <button type="button" data-cat="all">Semua skor</button>
-                <button type="button" data-cat="excellent"><span class="ws-dot" style="--c:#15803D"></span>80% ke atas</button>
-                <button type="button" data-cat="good"><span class="ws-dot" style="--c:#1B65A6"></span>50 sampai 79%</button>
-                <button type="button" data-cat="under"><span class="ws-dot" style="--c:#B45309"></span>Di bawah 50%</button>
-            </div>
-        </div>
-        <div id="cw-tabs" class="ws-tabs mb-4" role="tablist" aria-label="Tahap seleksi"></div>
+        <div id="cw-chips" class="ws-fchips mb-3"></div>
         <div id="cw-view" aria-live="polite"></div>
         <div id="cw-bulk" class="ws-bulk hidden" role="region" aria-label="Aksi untuk kandidat terpilih"></div>`;
 
     const $ = (sel) => root.querySelector(sel);
     const drawer = ensureDrawer();
     const rejectDialog = ensureRejectDialog();
+    const jobOf = (app) => jobById(jobs, app.job_vacancy_id) || app.job_vacancy;
+    const findApp = (id) => apps.find((a) => String(a.id) === String(id));
 
     // ------------------------------------------------------------------ data turunan
     const scoped = () => (state.job === 'all' ? apps : apps.filter((a) => String(a.job_vacancy_id) === state.job));
-    const filtered = () => {
-        const q = state.q.trim().toLowerCase();
+
+    /** Lamaran setelah semua saringan kecuali tahap (dipakai strip supaya hitungan per tahap tetap terlihat). */
+    function filteredNoStage() {
+        const q = norm(state.q);
+        const since = state.applied === 'all' ? null : Date.now() - Number(state.applied) * 86400000;
         return scoped().filter((a) => {
             if (state.cat !== 'all' && scoreInfo(a.match_score).key !== state.cat) return false;
+            if (since && new Date(a.created_at).getTime() < since) return false;
+            if (state.skills.size) {
+                const have = new Set([...(a.matched_skills || []), ...(a.applicant?.skills || [])].map(norm));
+                for (const s of state.skills) if (!have.has(s)) return false;
+            }
             if (!q) return true;
             return [a.applicant?.name, a.job_vacancy?.title, ...(a.matched_skills || []), ...(a.applicant?.skills || [])]
                 .filter(Boolean).join(' ').toLowerCase().includes(q);
-        }).sort(SORTERS[state.sort]);
+        }).sort(SORTS[state.sort][1]);
+    }
+    const visibleList = () => {
+        const list = filteredNoStage();
+        return state.stage === 'all' ? list : list.filter((a) => stageOf(a) === state.stage);
     };
-    const findApp = (id) => apps.find((a) => String(a.id) === String(id));
+
+    /** Skill wajib: berapa yang dimiliki dari total, memakai bobot lowongan yang sama dengan MatchmakingService. */
+    function requiredInfo(app) {
+        const b = matchBreakdown(app, jobOf(app));
+        const req = b.rows.filter((r) => r.level === 'required');
+        if (!req.length) return null;
+        return { ok: req.filter((r) => r.ok).length, total: req.length, missing: req.filter((r) => !r.ok).map((r) => r.name) };
+    }
+
+    function skillOptions() {
+        const counts = new Map();
+        scoped().forEach((a) => {
+            const job = jobOf(a);
+            (job?.requirements || []).forEach((r) => {
+                const n = util.skillName(r);
+                if (n) counts.set(n, (counts.get(n) || 0) + 1);
+            });
+        });
+        return [...counts.keys()].sort((x, y) => x.localeCompare(y, 'id'));
+    }
 
     function syncUrl() {
         const p = new URLSearchParams(window.location.search);
@@ -112,165 +155,249 @@ export function mountCandidateWorkspace({ root, jobs, apps, jobId = null, navApp
         if (!jobId) set('job', state.job, 'all');
         set('stage', state.stage, 'all');
         set('cat', state.cat, 'all');
+        set('applied', state.applied, 'all');
+        set('skill', [...state.skills].join(','), '');
         set('q', state.q.trim(), '');
         set('sort', state.sort, 'score');
         p.delete('view');
+        if (state.drawerId) p.set('candidate', state.drawerId); else p.delete('candidate');
         history.replaceState(null, '', `${location.pathname}${p.toString() ? `?${p}` : ''}`);
     }
 
-    // ------------------------------------------------------------------ render
-    function renderTabs(list) {
+    // ------------------------------------------------------------------ strip tahap
+    function renderStrip(list) {
         const counts = Object.fromEntries(STAGES.map((s) => [s, 0]));
         list.forEach((a) => { counts[stageOf(a)] += 1; });
-        const tabs = [['all', 'Semua', list.length, null], ...STAGES.map((s) => [s, STAGE[s].label, counts[s], STAGE[s].color])];
-        $('#cw-tabs').innerHTML = tabs.map(([key, label, n, color]) => `
-            <button type="button" role="tab" class="ws-tab" data-stage="${key}" aria-selected="${state.stage === key}">
-                ${color ? `<span class="ws-dot" style="--c:${color}"></span>` : ''}${label}<span class="ws-count">${n}</span>
+        const items = [['all', 'Semua', list.length, null], ...STAGES.map((s) => [s, STAGE[s].label, counts[s], STAGE[s].color])];
+        $('#cw-strip').innerHTML = items.map(([key, label, n, color]) => `
+            <button type="button" class="ws-stage-btn ${n ? '' : 'is-empty'}" data-stage="${key}" aria-pressed="${state.stage === key}">
+                <span class="ws-stage-label">${color ? `<span class="ws-dot" style="--c:${color}"></span>` : ''}${label}</span>
+                <span class="ws-stage-num">${n}</span>
             </button>`).join('');
-        // Di Kanban desktop semua kolom terlihat, tab tahap hanya dibutuhkan di layar kecil
-        $('#cw-tabs').classList.toggle('lg:hidden', state.view === 'board');
+        $('#cw-prop').innerHTML = list.length
+            ? STAGES.filter((s) => counts[s]).map((s) => `<span style="flex-grow:${counts[s]};background:${STAGE[s].color}" title="${STAGE[s].label}: ${counts[s]}"></span>`).join('')
+            : '';
     }
 
+    // ------------------------------------------------------------------ filter
+    function activeFilterCount() {
+        return (state.cat !== 'all') + (state.applied !== 'all') + state.skills.size;
+    }
+
+    function renderFilterPop() {
+        const opts = skillOptions();
+        $('#cw-filter-pop').innerHTML = `
+            <div class="ws-pop-section">
+                <p class="ws-pop-title">Skor kecocokan</p>
+                ${[['all', 'Semua skor'], ...Object.entries(SCORE_BANDS)].map(([k, label]) => `
+                    <label class="ws-opt"><input type="radio" name="cw-cat" value="${k}" ${state.cat === k ? 'checked' : ''}>${label}</label>`).join('')}
+            </div>
+            <div class="ws-pop-section">
+                <p class="ws-pop-title">Tanggal melamar</p>
+                ${[['all', 'Kapan saja'], ...Object.entries(APPLIED)].map(([k, label]) => `
+                    <label class="ws-opt"><input type="radio" name="cw-applied" value="${k}" ${state.applied === k ? 'checked' : ''}>${label}</label>`).join('')}
+            </div>
+            <div class="ws-pop-section">
+                <p class="ws-pop-title">Memiliki skill</p>
+                ${opts.length ? `<div class="ws-skill-pick">${opts.map((s) => `<button type="button" data-skill="${esc(s)}" aria-pressed="${state.skills.has(norm(s))}">${esc(s)}</button>`).join('')}</div>`
+                    : '<p class="ws-meta">Lowongan belum punya syarat skill.</p>'}
+            </div>
+            <div class="flex justify-between items-center mt-4 pt-3 border-t border-[var(--ws-border)]">
+                <button type="button" class="ws-btn ws-btn-ghost ws-btn-sm" data-filter-reset ${activeFilterCount() ? '' : 'disabled'}>Hapus semua</button>
+                <button type="button" class="ws-btn ws-btn-primary ws-btn-sm" data-filter-close>Selesai</button>
+            </div>`;
+    }
+
+    function setFilterOpen(open) {
+        state.filterOpen = open;
+        $('#cw-filter-pop').classList.toggle('hidden', !open);
+        $('#cw-filter-btn').setAttribute('aria-expanded', String(open));
+        if (open) {
+            renderFilterPop();
+            $('#cw-filter-pop').querySelector('input:checked')?.focus();
+        }
+    }
+
+    function renderChips() {
+        const chips = [];
+        if (state.cat !== 'all') chips.push(['cat', `Skor ${SCORE_BANDS[state.cat]}`]);
+        if (state.applied !== 'all') chips.push(['applied', `Melamar ${APPLIED[state.applied]}`]);
+        state.skills.forEach((s) => chips.push([`skill:${s}`, `Skill: ${s}`]));
+        $('#cw-chips').innerHTML = chips.map(([k, label]) => `<span class="ws-fchip">${esc(label)}<button type="button" data-chip="${esc(k)}" aria-label="Hapus saringan ${esc(label)}">${icon('x', 'w-3.5 h-3.5')}</button></span>`).join('')
+            + (chips.length > 1 ? '<button type="button" class="ws-btn ws-btn-ghost ws-btn-sm" data-filter-reset>Hapus semua</button>' : '');
+        $('#cw-chips').classList.toggle('hidden', !chips.length);
+        const n = activeFilterCount();
+        $('#cw-filter-count').textContent = n;
+        $('#cw-filter-count').classList.toggle('hidden', !n);
+    }
+
+    // ------------------------------------------------------------------ render utama
     function render() {
-        const list = filtered();
+        const all = filteredNoStage();
         root.querySelectorAll('[data-view]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.view === state.view)));
-        root.querySelectorAll('#cw-cat [data-cat]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.cat === state.cat)));
-        renderTabs(list);
+        renderStrip(all);
+        renderChips();
         setNavCounts(navApps);
 
         if (!scoped().length) {
-            $('#cw-view').innerHTML = `<div class="ws-card">${emptyState({
+            $('#cw-view').innerHTML = `<div class="ws-clist">${emptyState({
                 iconName: 'users',
-                title: 'Belum ada kandidat',
+                title: 'Belum ada pelamar',
                 text: jobs.some((j) => j.status === 'open') ? 'Kandidat muncul di sini setelah pelamar mengirim lamaran.' : 'Publikasikan lowongan agar pelamar bisa mulai melamar.',
                 action: jobId ? '' : '<a href="/recruiter/jobs" class="ws-btn ws-btn-primary">Kelola lowongan</a>',
             })}</div>`;
-            renderBulk();
-            hydrateIcons(root);
-            return;
+        } else if (state.view === 'board') {
+            renderBoard(all);
+        } else {
+            renderTable(visibleList());
         }
-        if (state.view === 'board') renderBoard(list);
-        else renderTable(list);
         renderBulk();
         hydrateIcons(root);
     }
 
-    function renderTable(list) {
-        const rows = state.stage === 'all' ? list : list.filter((a) => stageOf(a) === state.stage);
+    function noResults() {
+        const filtered = state.q || activeFilterCount();
+        return `<div class="ws-clist">${emptyState({
+            iconName: 'search',
+            title: filtered ? 'Tidak ada kandidat yang cocok' : `Belum ada kandidat di tahap ${STAGE[state.stage]?.label || ''}`,
+            text: filtered ? 'Ubah kata kunci atau hapus sebagian saringan.' : 'Kandidat muncul di sini saat dipindahkan ke tahap ini.',
+            action: filtered ? '<button type="button" class="ws-btn ws-btn-secondary" data-filter-reset>Hapus saringan</button>' : '',
+        })}</div>`;
+    }
+
+    // ------------------------------------------------------------------ tabel
+    function renderTable(rows) {
+        const pages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
+        state.page = Math.min(state.page, pages);
+        const start = (state.page - 1) * PAGE_SIZE;
+        const pageRows = rows.slice(start, start + PAGE_SIZE);
         // Kandidat terpilih yang tidak lagi terlihat dilepas supaya aksi massal tidak mengenai baris tersembunyi
-        const visibleIds = new Set(rows.map((a) => String(a.id)));
+        const visibleIds = new Set(pageRows.map((a) => String(a.id)));
         [...state.selected].forEach((id) => { if (!visibleIds.has(id)) state.selected.delete(id); });
 
         if (!rows.length) {
-            $('#cw-view').innerHTML = `<div class="ws-card">${emptyState({ iconName: 'search', title: 'Tidak ada kandidat', text: state.q || state.cat !== 'all' ? 'Tidak ada yang cocok dengan saringan. Ubah kata kunci atau rentang skor.' : `Belum ada kandidat di tahap ${STAGE[state.stage]?.label || ''}.` })}</div>`;
+            $('#cw-view').innerHTML = noResults();
             return;
         }
-        const selectable = rows.filter((a) => !['hired', 'rejected'].includes(stageOf(a)));
+        const selectable = pageRows.filter((a) => !['hired', 'rejected'].includes(stageOf(a)));
         const allChecked = selectable.length > 0 && selectable.every((a) => state.selected.has(String(a.id)));
         $('#cw-view').innerHTML = `
-            <div class="ws-card">
-                <div class="ws-table-wrap">
-                    <table class="ws-table">
-                        <thead><tr>
-                            <th class="cell-check"><input type="checkbox" class="ws-check" data-check-all ${allChecked ? 'checked' : ''} ${selectable.length ? '' : 'disabled'} aria-label="Pilih semua kandidat aktif di daftar"></th>
-                            <th>Kandidat</th>
-                            <th>Skor kecocokan</th>
-                            <th class="hidden md:table-cell">Skill</th>
-                            <th>Tahap</th>
-                            <th class="hidden lg:table-cell">Melamar</th>
-                            <th class="num"><span class="sr-only">Aksi</span></th>
-                        </tr></thead>
-                        <tbody>${rows.map(tableRow).join('')}</tbody>
-                    </table>
-                </div>
-            </div>`;
+            <div class="ws-clist">
+                <table class="ws-ctable">
+                    <thead><tr>
+                        <th class="c-check"><input type="checkbox" class="ws-check" data-check-all ${allChecked ? 'checked' : ''} ${selectable.length ? '' : 'disabled'} aria-label="Pilih semua kandidat aktif di halaman ini"></th>
+                        <th>Kandidat</th>
+                        <th class="c-score">Skor</th>
+                        <th class="c-req">Skill wajib</th>
+                        <th class="c-stage">Tahap</th>
+                        <th class="c-date hidden lg:table-cell">Melamar</th>
+                        <th class="c-act"><span class="sr-only">Aksi</span></th>
+                    </tr></thead>
+                    <tbody>${pageRows.map(tableRow).join('')}</tbody>
+                </table>
+            </div>
+            ${pages > 1 || rows.length > 10 ? `
+            <div class="ws-pager">
+                <span>Menampilkan ${start + 1} sampai ${start + pageRows.length} dari ${rows.length} kandidat</span>
+                ${pages > 1 ? `<span class="ws-pager-btns">
+                    <button type="button" class="ws-btn ws-btn-secondary ws-btn-sm" data-goto-page="${state.page - 1}" ${state.page === 1 ? 'disabled' : ''}>${icon('arrow-left')}Sebelumnya</button>
+                    <button type="button" class="ws-btn ws-btn-secondary ws-btn-sm" data-goto-page="${state.page + 1}" ${state.page === pages ? 'disabled' : ''}>Berikutnya${icon('arrow-right')}</button>
+                </span>` : ''}
+            </div>` : ''}`;
+    }
+
+    function rowActions(app) {
+        const stage = stageOf(app);
+        const next = nextStageOf(stage);
+        const final = stage === 'hired' || stage === 'rejected';
+        const items = [{ label: 'Lihat detail', icon: icon('eye'), attrs: `data-open="${app.id}"` }];
+        if (!final && next) {
+            const label = next === 'interview' ? 'Jadwalkan wawancara' : next === 'hired' ? 'Tandai diterima' : `Majukan ke ${STAGE[next].label}`;
+            items.push({ label, icon: icon(next === 'interview' ? 'calendar-clock' : next === 'hired' ? 'party-popper' : 'arrow-right'), attrs: `data-advance="${app.id}"` });
+        }
+        items.push({ label: 'Tulis catatan', icon: icon('sticky-note'), attrs: `data-open="${app.id}" data-tab="notes"` });
+        if (!final) items.push('-', { label: 'Tolak kandidat', icon: icon('circle-x'), danger: true, attrs: `data-reject="${app.id}"` });
+        return menu(`Aksi untuk ${esc(app.applicant?.name || 'kandidat')}`, items, { icon: icon('ellipsis', 'w-4 h-4') });
+    }
+
+    function scoreCell(app) {
+        const info = scoreInfo(app.match_score);
+        return `<span class="ws-score" title="${info.label}"><span class="ws-score-num">${info.score}%</span><span class="ws-score-bar" aria-hidden="true"><span style="width:${info.score}%;background:${info.color}"></span></span></span>`;
+    }
+
+    function stageSub(app, stage) {
+        const final = stage === 'hired' || stage === 'rejected';
+        const schedule = stage === 'interview' ? interviewOf(app) : null;
+        if (schedule) return `${formatDateTime(schedule.datetime)}`;
+        if (final) return formatDate(stageEnteredAt(app));
+        const days = daysSince(stageEnteredAt(app));
+        return days === null ? '' : days === 0 ? 'Masuk hari ini' : `${days} hari di tahap ini`;
     }
 
     function tableRow(app) {
         const a = app.applicant || {};
         const stage = stageOf(app);
         const final = stage === 'hired' || stage === 'rejected';
-        const info = scoreInfo(app.match_score);
-        const next = nextStageOf(stage);
-        const matched = app.matched_skills || [];
-        const missing = app.missing_skills || [];
-        const days = daysSince(stageEnteredAt(app));
-        const schedule = stage === 'interview' ? interviewOf(app) : null;
         const checked = state.selected.has(String(app.id));
+        const req = requiredInfo(app);
+        const reqText = req ? `<span class="ws-req"><strong>${req.ok}</strong>/${req.total}</span>` : '<span class="ws-meta">-</span>';
+        const sub = showJob ? (app.job_vacancy?.title || '-') : (a.location || a.email || '');
         return `
-            <tr data-app="${app.id}" class="${checked ? 'is-selected' : ''}">
-                <td class="cell-check" data-stop><input type="checkbox" class="ws-check" data-check="${app.id}" ${checked ? 'checked' : ''} ${final ? 'disabled' : ''} aria-label="Pilih ${esc(a.name || 'kandidat')}"></td>
-                <td class="min-w-[200px]">
-                    <button type="button" class="ws-row-link text-left" data-open="${app.id}">${esc(a.name || 'Kandidat')}</button>
-                    <p class="ws-meta truncate max-w-[260px]">${showJobColumn ? esc(app.job_vacancy?.title || '-') : esc(a.location || a.email || '')}</p>
-                </td>
-                <td>
-                    <span class="inline-flex items-center gap-2.5">${scoreRing(app.match_score, 'sm')}<span class="text-sm font-semibold whitespace-nowrap" style="color:${info.color}">${info.label}</span></span>
-                </td>
-                <td class="hidden md:table-cell min-w-[200px]">
-                    <div class="ws-skill-line">
-                        ${matched.slice(0, 3).map((s) => `<span class="ws-chip ws-chip-ok">${esc(s)}</span>`).join('')}
-                        ${matched.length > 3 ? `<span class="ws-chip">+${matched.length - 3}</span>` : ''}
-                        ${missing.length ? `<span class="ws-chip ws-chip-miss" title="Belum dimiliki: ${esc(missing.join(', '))}">${missing.length} kurang</span>` : ''}
-                        ${!matched.length && !missing.length ? '<span class="ws-meta">-</span>' : ''}
+            <tr data-app="${app.id}" class="${checked ? 'is-selected' : ''} ${final ? 'is-final' : ''}">
+                <td class="c-check" data-stop><input type="checkbox" class="ws-check" data-check="${app.id}" ${checked ? 'checked' : ''} ${final ? 'disabled' : ''} aria-label="Pilih ${esc(a.name || 'kandidat')}"></td>
+                <td class="min-w-0">
+                    <div class="ws-cname">
+                        <span class="ws-ava" aria-hidden="true">${esc(initials(a.name))}</span>
+                        <span class="ws-cname-text">
+                            <button type="button" class="ws-cname-title" data-open="${app.id}">${esc(a.name || 'Kandidat')}</button>
+                            <span class="ws-cname-sub">${esc(sub)}</span>
+                            <span class="ws-cmeta">${scoreCell(app)}<span class="ws-stage"><span class="ws-dot" style="--c:${STAGE[stage].color}"></span>${STAGE[stage].label}</span>${req ? `<span>${req.ok}/${req.total} skill wajib</span>` : ''}</span>
+                        </span>
                     </div>
                 </td>
-                <td class="whitespace-nowrap">
-                    ${stageBadge(stage)}
-                    <p class="ws-meta mt-1">${schedule ? `${icon('calendar-clock', 'w-3.5 h-3.5 inline -mt-0.5')} ${formatDateTime(schedule.datetime)}` : days === null || final ? '' : days === 0 ? 'Masuk hari ini' : `${days} hari di tahap ini`}</p>
-                </td>
-                <td class="hidden lg:table-cell whitespace-nowrap ws-meta">${relativeTime(app.created_at)}</td>
-                <td class="num whitespace-nowrap" data-stop>
-                    ${next && !final ? `<button type="button" class="ws-kcard-next" data-advance="${app.id}" aria-label="Majukan ${esc(a.name || 'kandidat')} ke ${STAGE[next].label}">${STAGE[next].label}${icon('arrow-right', 'w-3.5 h-3.5')}</button>` : ''}
-                </td>
+                <td class="c-score">${scoreCell(app)}</td>
+                <td class="c-req">${reqText}${req?.missing.length ? `<span class="ws-req-miss" title="Belum dimiliki: ${esc(req.missing.join(', '))}">Kurang: ${esc(req.missing.join(', '))}</span>` : ''}</td>
+                <td class="c-stage"><span class="ws-stage"><span class="ws-dot" style="--c:${STAGE[stage].color}"></span>${STAGE[stage].label}</span><span class="ws-stage-sub">${esc(stageSub(app, stage))}</span></td>
+                <td class="c-date hidden lg:table-cell"><span class="whitespace-nowrap">${formatDate(app.created_at)}</span><span class="ws-stage-sub">${relativeTime(app.created_at)}</span></td>
+                <td class="c-act" data-stop><span class="ws-row-menu">${rowActions(app)}</span></td>
             </tr>`;
     }
 
+    // ------------------------------------------------------------------ kanban
     function kanbanCard(app, stage) {
         const a = app.applicant || {};
-        const top = (app.matched_skills || []).slice(0, 3);
-        const more = (app.matched_skills || []).length - top.length;
-        const missing = (app.missing_skills || []).length;
-        const days = daysSince(stageEnteredAt(app));
-        const schedule = stage === 'interview' ? interviewOf(app) : null;
         const final = stage === 'hired' || stage === 'rejected';
-        const ready = stage === 'screening' && Number(app.match_score) >= 80;
         const next = nextStageOf(stage);
+        const req = requiredInfo(app);
+        const info = scoreInfo(app.match_score);
+        const schedule = stage === 'interview' ? interviewOf(app) : null;
         return `
-            <article class="ws-kcard" draggable="${final ? 'false' : 'true'}" data-app="${app.id}" data-stage="${stage}" tabindex="0"
-                aria-label="${esc(a.name || 'Kandidat')}, skor ${Math.round(app.match_score || 0)} persen. Tekan Enter untuk detail.">
-                <div class="flex items-start gap-3">
-                    <div class="min-w-0 flex-1">
-                        <h3 class="font-semibold text-[15px] leading-snug truncate">${esc(a.name || 'Kandidat')}</h3>
-                        <p class="ws-meta truncate">${showJobColumn ? esc(app.job_vacancy?.title || '-') : esc(a.location || '')}</p>
+            <article class="ws-kcard2" draggable="${final ? 'false' : 'true'}" data-app="${app.id}" data-stage="${stage}" tabindex="0"
+                aria-label="${esc(a.name || 'Kandidat')}, skor ${info.score} persen. Tekan Enter untuk detail.">
+                <div class="flex items-start justify-between gap-3">
+                    <div class="min-w-0">
+                        <h3 class="font-semibold text-[14px] leading-snug truncate">${esc(a.name || 'Kandidat')}</h3>
+                        <p class="ws-meta truncate">${esc(showJob ? (app.job_vacancy?.title || '-') : (a.location || ''))}</p>
                     </div>
-                    ${scoreRing(app.match_score, 'sm')}
+                    <span class="ws-score-num text-right" style="color:${info.color}">${info.score}%</span>
                 </div>
-                ${top.length || missing ? `
-                <div class="mt-3 flex flex-wrap gap-1">
-                    ${top.map((s) => `<span class="ws-chip">${esc(s)}</span>`).join('')}
-                    ${more > 0 ? `<span class="ws-chip">+${more}</span>` : ''}
-                    ${missing ? `<span class="ws-chip ws-chip-miss" title="Belum dimiliki: ${esc((app.missing_skills || []).join(', '))}">${missing} kurang</span>` : ''}
-                </div>` : ''}
-                ${ready ? `<p class="mt-2.5 inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--ws-success)]">${icon('sparkles', 'w-3.5 h-3.5')}Skor tinggi, siap ditinjau</p>` : ''}
-                ${schedule ? `<p class="mt-2.5 inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--ws-warning)]">${icon('calendar-clock', 'w-3.5 h-3.5')}${formatDateTime(schedule.datetime)}</p>` : ''}
-                <div class="mt-3 pt-2.5 border-t border-[var(--ws-border)] flex items-center gap-2">
-                    <span class="ws-meta">${days === null || final ? '' : days === 0 ? 'Masuk hari ini' : `${days} hari di tahap ini`}</span>
-                    ${next && !final ? `<button type="button" class="ws-kcard-next ml-auto" data-advance="${app.id}" aria-label="Majukan ${esc(a.name || 'kandidat')} ke ${STAGE[next].label}">${STAGE[next].label}${icon('arrow-right', 'w-3.5 h-3.5')}</button>` : ''}
+                ${req ? `<p class="mt-2 text-[13px] ${req.missing.length ? 'text-[var(--ws-text-2)]' : 'text-[var(--ws-success)]'}">${req.missing.length ? `Kurang ${req.missing.length} skill wajib` : 'Semua skill wajib terpenuhi'}</p>` : ''}
+                <div class="ws-kcard2-foot">
+                    <span>${schedule ? `${icon('calendar-clock', 'w-3.5 h-3.5 inline -mt-0.5')} ${formatDateTime(schedule.datetime)}` : esc(stageSub(app, stage))}</span>
+                    ${next && !final ? `<button type="button" class="ws-kcard-next" data-advance="${app.id}" aria-label="Majukan ${esc(a.name || 'kandidat')} ke ${STAGE[next].label}">${STAGE[next].label}${icon('arrow-right', 'w-3.5 h-3.5')}</button>` : ''}
                 </div>
             </article>`;
     }
 
     function renderBoard(list) {
         state.selected.clear();
+        if (!list.length) {
+            $('#cw-view').innerHTML = noResults();
+            return;
+        }
         const grouped = Object.fromEntries(STAGES.map((s) => [s, []]));
         list.forEach((a) => grouped[stageOf(a)].push(a));
         const mobileStage = state.stage === 'all' ? 'screening' : state.stage;
-        const emptyText = (s) => (state.cat !== 'all' || state.q ? 'Tidak ada yang cocok dengan saringan.' : {
-            screening: 'Belum ada lamaran baru.', assessment: 'Belum ada yang dinilai.', interview: 'Belum ada jadwal wawancara.',
-            offering: 'Belum ada penawaran.', hired: 'Belum ada yang diterima.', rejected: 'Belum ada yang ditolak.',
-        }[s]);
-
         $('#cw-view').innerHTML = `
             <div class="ws-board ${state.open.hired ? 'show-hired' : ''} ${state.open.rejected ? 'show-rejected' : ''}" data-mobile-stage="${mobileStage}">
                 ${STAGES.map((s) => {
@@ -292,24 +419,22 @@ export function mountCandidateWorkspace({ root, jobs, apps, jobId = null, navApp
                                 ${foldable ? `<button type="button" class="ws-icon-btn w-8 h-8 hidden lg:inline-flex ml-auto" data-toggle="${s}" aria-expanded="true" aria-label="Lipat kolom ${STAGE[s].label}">${icon('chevron-right', 'w-4 h-4')}</button>` : ''}
                             </header>`}
                         <div class="ws-col-body">
-                            ${folded ? '' : (items.length ? items.map((a) => kanbanCard(a, s)).join('') : `<p class="ws-col-empty">${emptyText(s)}</p>`)}
+                            ${folded ? '' : (items.length ? items.map((a) => kanbanCard(a, s)).join('') : `<p class="ws-col-empty">${state.q || activeFilterCount() ? 'Tidak ada yang cocok.' : 'Kosong'}</p>`)}
                         </div>
                     </section>`;
                 }).join('')}
             </div>`;
     }
 
-    // ------------------------------------------------------------------ aksi massal (tampilan tabel)
-    function selectedApps() {
-        return [...state.selected].map(findApp).filter(Boolean);
-    }
+    // ------------------------------------------------------------------ aksi massal (tabel)
+    const selectedApps = () => [...state.selected].map(findApp).filter(Boolean);
 
     function bulkAdvanceTarget(list) {
         if (!list.length) return null;
         const stages = new Set(list.map(stageOf));
         if (stages.size !== 1) return null;
         const next = nextStageOf([...stages][0]);
-        // Interview butuh jadwal per kandidat dan Hired butuh konfirmasi tawaran: tetap satu per satu
+        // Wawancara butuh jadwal per kandidat dan penerimaan butuh konfirmasi tawaran: tetap satu per satu
         return next === 'assessment' || next === 'offering' ? next : null;
     }
 
@@ -394,7 +519,7 @@ export function mountCandidateWorkspace({ root, jobs, apps, jobId = null, navApp
     // ------------------------------------------------------------------ perpindahan satu kandidat
     async function quickMove(app, target) {
         if (target === 'interview' || target === 'hired' || target === 'rejected') {
-            openDrawer(app, target === 'rejected' ? 'reject' : 'advance');
+            openDrawer(app, { mode: target === 'rejected' ? 'reject' : 'advance' });
             return;
         }
         const ok = await confirm({
@@ -419,64 +544,168 @@ export function mountCandidateWorkspace({ root, jobs, apps, jobId = null, navApp
         render();
         onChange();
         const moved = $(`#cw-view [data-app="${app.id}"]`);
-        if (moved?.classList.contains('ws-kcard')) moved.classList.add('is-arrived');
+        if (moved?.classList.contains('ws-kcard2')) moved.classList.add('is-arrived');
         moved?.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
     }
 
     // ------------------------------------------------------------------ laci kandidat
-    function openDrawer(app, mode = null) {
+    const DRAWER_TABS = [['summary', 'Ringkasan'], ['profile', 'Profil & dokumen'], ['notes', 'Catatan'], ['history', 'Riwayat']];
+
+    function otherSkills(app) {
+        const known = new Set([...(app.matched_skills || []), ...(app.missing_skills || [])].map(norm));
+        const other = (app.applicant?.skills || []).filter((s) => !known.has(norm(s)));
+        return other.length ? `
+            <section class="space-y-2">
+                <h3 class="ws-h2">Skill lain di profil</h3>
+                <p class="ws-meta">Tidak dihitung dalam skor karena tidak diminta lowongan ini.</p>
+                <div class="flex flex-wrap gap-1.5">${other.map((s) => `<span class="ws-chip">${esc(s)}</span>`).join('')}</div>
+            </section>` : '';
+    }
+
+    function drawerBody(app, tab) {
+        const job = jobOf(app);
+        if (tab === 'profile') return [profileSection(app), documentsSection(app)].join('<div class="ws-divider"></div>');
+        if (tab === 'notes') return notesSection(app);
+        if (tab === 'history') return [timelineSection(app), historySection(app, apps)].join('<div class="ws-divider"></div>');
+        return [matchSection(app, job), otherSkills(app)].filter(Boolean).join('<div class="ws-divider"></div>');
+    }
+
+    function paintDrawerTab(app) {
+        drawer.querySelectorAll('[data-dtab]').forEach((t) => t.setAttribute('aria-selected', String(t.dataset.dtab === state.drawerTab)));
+        const body = drawer.querySelector('[data-d-body]');
+        body.innerHTML = drawerBody(app, state.drawerTab);
+        bindCvDownload(body);
+        if (state.drawerTab === 'notes') bindNotes(body, app);
+        hydrateIcons(body);
+        body.scrollTop = 0;
+    }
+
+    function openDrawer(app, { mode = null, tab = 'summary' } = {}) {
         if (!app) return;
-        const job = jobById(jobs, app.job_vacancy_id) || app.job_vacancy;
+        state.drawerId = String(app.id);
+        state.drawerTab = tab;
+        const list = visibleList();
+        const idx = list.findIndex((a) => String(a.id) === String(app.id));
         drawer.querySelector('[data-d-avatar]').textContent = initials(app.applicant?.name);
         drawer.querySelector('[data-d-name]').textContent = app.applicant?.name || 'Kandidat';
         drawer.querySelector('[data-d-job]').textContent = `${app.job_vacancy?.title || '-'} · melamar ${relativeTime(app.created_at)}`;
-        drawer.querySelector('[data-d-stage]').innerHTML = stageBadge(stageOf(app));
+        const stage = stageOf(app);
+        drawer.querySelector('[data-d-stage]').innerHTML = `<span class="ws-stage"><span class="ws-dot" style="--c:${STAGE[stage].color}"></span>${STAGE[stage].label}</span>`;
         drawer.querySelector('[data-d-full]').href = `/recruiter/candidates/${app.id}`;
-        const body = drawer.querySelector('[data-d-body]');
-        body.innerHTML = [matchSection(app, job), skillsSection(app), notesSection(app), profileSection(app), documentsSection(app), timelineSection(app)]
-            .join('<div class="ws-divider"></div>');
-        bindCvDownload(body);
-        bindNotes(body, app);
+        drawer.querySelector('[data-d-pos]').textContent = idx >= 0 ? `${idx + 1} / ${list.length}` : '';
+        drawer.querySelector('[data-d-prev]').disabled = idx <= 0;
+        drawer.querySelector('[data-d-next]').disabled = idx < 0 || idx >= list.length - 1;
+        paintDrawerTab(app);
         renderActions(drawer.querySelector('[data-d-actions]'), app, {
             mode,
             onMoved: (moved, target) => {
-                drawer.close();
                 afterMove(moved, target);
+                // Tetap di laci supaya recruiter bisa lanjut ke kandidat berikutnya
+                openDrawer(moved, { tab: state.drawerTab });
             },
         });
         hydrateIcons(drawer);
         openDialog(drawer);
-        body.scrollTop = 0;
-        const p = new URLSearchParams(window.location.search);
-        p.set('candidate', app.id);
-        history.replaceState(null, '', `${location.pathname}?${p}`);
+        syncUrl();
     }
 
-    drawer.addEventListener('close', () => {
-        const p = new URLSearchParams(window.location.search);
-        p.delete('candidate');
-        history.replaceState(null, '', `${location.pathname}${p.toString() ? `?${p}` : ''}`);
-    });
+    function stepDrawer(delta) {
+        const list = visibleList();
+        const idx = list.findIndex((a) => String(a.id) === state.drawerId);
+        const next = list[idx + delta];
+        if (next) openDrawer(next, { tab: state.drawerTab });
+    }
+
+    drawer.onclick = (e) => {
+        const t = e.target.closest('[data-dtab]');
+        if (t) {
+            state.drawerTab = t.dataset.dtab;
+            paintDrawerTab(findApp(state.drawerId));
+            return;
+        }
+        if (e.target.closest('[data-d-prev]')) stepDrawer(-1);
+        if (e.target.closest('[data-d-next]')) stepDrawer(1);
+    };
+    drawer.onkeydown = (e) => {
+        if (e.target.closest('input, textarea, select')) return;
+        if (e.key === 'j' || e.key === 'ArrowDown') { e.preventDefault(); stepDrawer(1); }
+        if (e.key === 'k' || e.key === 'ArrowUp') { e.preventDefault(); stepDrawer(-1); }
+    };
+    drawer.onclose = () => {
+        state.drawerId = null;
+        syncUrl();
+    };
+    drawer.querySelector('[data-dtabs]').innerHTML = DRAWER_TABS.map(([k, label]) => `<button type="button" role="tab" class="ws-tab" data-dtab="${k}" aria-selected="false">${label}</button>`).join('');
 
     // ------------------------------------------------------------------ pendengar
-    if (showJobColumn) {
+    if (showJob) {
         const sel = $('#cw-job');
         const options = jobs.filter((j) => j.status !== 'archived' || apps.some((a) => String(a.job_vacancy_id) === String(j.id)));
-        sel.innerHTML = `<option value="all">Semua lowongan (${apps.length} kandidat)</option>` + options.map((j) => {
+        sel.innerHTML = `<option value="all">Semua lowongan (${apps.length})</option>` + options.map((j) => {
             const n = apps.filter((a) => String(a.job_vacancy_id) === String(j.id)).length;
             const tag = j.status === 'open' ? '' : ` · ${j.status === 'draft' ? 'draft' : j.status === 'closed' ? 'ditutup' : 'arsip'}`;
             return `<option value="${j.id}">${esc(j.title)} (${n})${tag}</option>`;
         }).join('');
         sel.value = state.job;
-        sel.addEventListener('change', () => { state.job = sel.value; state.selected.clear(); syncUrl(); render(); });
+        sel.addEventListener('change', () => { state.job = sel.value; state.skills.clear(); state.page = 1; state.selected.clear(); syncUrl(); render(); });
     }
 
     $('#cw-search').value = state.q;
     $('#cw-sort').value = state.sort;
-    $('#cw-search').addEventListener('input', debounce((e) => { state.q = e.target.value; syncUrl(); render(); }, 180));
+    $('#cw-search').addEventListener('input', debounce((e) => { state.q = e.target.value; state.page = 1; syncUrl(); render(); }, 180));
     $('#cw-sort').addEventListener('change', (e) => { state.sort = e.target.value; syncUrl(); render(); });
 
+    const resetFilters = () => {
+        state.cat = 'all';
+        state.applied = 'all';
+        state.skills.clear();
+        state.q = '';
+        $('#cw-search').value = '';
+        state.page = 1;
+        if (state.filterOpen) renderFilterPop();
+        syncUrl();
+        render();
+    };
+
+    $('#cw-filter-btn').addEventListener('click', () => setFilterOpen(!state.filterOpen));
+    $('#cw-filter-pop').addEventListener('change', (e) => {
+        if (e.target.name === 'cw-cat') state.cat = e.target.value;
+        if (e.target.name === 'cw-applied') state.applied = e.target.value;
+        state.page = 1;
+        syncUrl();
+        render();
+    });
+    document.addEventListener('click', (e) => {
+        if (state.filterOpen && !e.target.closest('#cw-filter-wrap')) setFilterOpen(false);
+    });
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && state.filterOpen) { setFilterOpen(false); $('#cw-filter-btn').focus(); }
+    });
+
     root.addEventListener('click', (e) => {
+        if (e.target.closest('[data-filter-reset]')) { resetFilters(); return; }
+        if (e.target.closest('[data-filter-close]')) { setFilterOpen(false); $('#cw-filter-btn').focus(); return; }
+        const sk = e.target.closest('[data-skill]');
+        if (sk) {
+            const s = norm(sk.dataset.skill);
+            if (state.skills.has(s)) state.skills.delete(s); else state.skills.add(s);
+            sk.setAttribute('aria-pressed', String(state.skills.has(s)));
+            state.page = 1;
+            syncUrl();
+            render();
+            return;
+        }
+        const chip = e.target.closest('[data-chip]');
+        if (chip) {
+            const k = chip.dataset.chip;
+            if (k === 'cat') state.cat = 'all';
+            else if (k === 'applied') state.applied = 'all';
+            else if (k.startsWith('skill:')) state.skills.delete(k.slice(6));
+            state.page = 1;
+            syncUrl();
+            render();
+            return;
+        }
         const view = e.target.closest('[data-view]');
         if (view) {
             state.view = view.dataset.view;
@@ -484,16 +713,17 @@ export function mountCandidateWorkspace({ root, jobs, apps, jobId = null, navApp
             render();
             return;
         }
-        const cat = e.target.closest('#cw-cat [data-cat]');
-        if (cat) { state.cat = cat.dataset.cat; syncUrl(); render(); return; }
-        const tab = e.target.closest('#cw-tabs [data-stage]');
-        if (tab) {
-            state.stage = tab.dataset.stage;
+        const st = e.target.closest('#cw-strip [data-stage]');
+        if (st) {
+            state.stage = st.dataset.stage;
+            state.page = 1;
             if (state.stage === 'hired' || state.stage === 'rejected') state.open[state.stage] = true;
             syncUrl();
             render();
             return;
         }
+        const pg = e.target.closest('[data-goto-page]');
+        if (pg && !pg.disabled) { state.page = Number(pg.dataset.gotoPage) || 1; render(); $('#cw-strip').scrollIntoView({ block: 'nearest', behavior: 'smooth' }); return; }
         const bulk = e.target.closest('[data-bulk]');
         if (bulk) {
             if (bulk.dataset.bulk === 'clear') { state.selected.clear(); render(); }
@@ -508,17 +738,20 @@ export function mountCandidateWorkspace({ root, jobs, apps, jobId = null, navApp
             if (app) quickMove(app, nextStageOf(stageOf(app)));
             return;
         }
+        const rej = e.target.closest('[data-reject]');
+        if (rej) { openDrawer(findApp(rej.dataset.reject), { mode: 'reject' }); return; }
         const toggle = e.target.closest('[data-toggle]');
         if (toggle) { state.open[toggle.dataset.toggle] = !state.open[toggle.dataset.toggle]; render(); return; }
+        const opener = e.target.closest('[data-open]');
+        if (opener) { openDrawer(findApp(opener.dataset.open), { tab: opener.dataset.tab || 'summary' }); return; }
         if (e.target.closest('[data-stop]')) return;
-        const row = e.target.closest('[data-open], tr[data-app], .ws-kcard');
-        if (row) openDrawer(findApp(row.dataset.open || row.dataset.app));
+        const row = e.target.closest('tr[data-app], .ws-kcard2');
+        if (row) openDrawer(findApp(row.dataset.app));
     });
 
     root.addEventListener('change', (e) => {
         if (e.target.matches('[data-check-all]')) {
-            const rows = [...root.querySelectorAll('[data-check]:not(:disabled)')];
-            rows.forEach((c) => (e.target.checked ? state.selected.add(c.dataset.check) : state.selected.delete(c.dataset.check)));
+            root.querySelectorAll('[data-check]:not(:disabled)').forEach((c) => (e.target.checked ? state.selected.add(c.dataset.check) : state.selected.delete(c.dataset.check)));
             render();
         } else if (e.target.matches('[data-check]')) {
             if (e.target.checked) state.selected.add(e.target.dataset.check);
@@ -532,7 +765,7 @@ export function mountCandidateWorkspace({ root, jobs, apps, jobId = null, navApp
     });
 
     root.addEventListener('keydown', (e) => {
-        const c = e.target.closest('.ws-kcard');
+        const c = e.target.closest('.ws-kcard2');
         if (c && e.target === c && (e.key === 'Enter' || e.key === ' ')) {
             e.preventDefault();
             openDrawer(findApp(c.dataset.app));
@@ -544,7 +777,7 @@ export function mountCandidateWorkspace({ root, jobs, apps, jobId = null, navApp
 
     function initDrag() {
         root.addEventListener('dragstart', (e) => {
-            const c = e.target.closest('.ws-kcard');
+            const c = e.target.closest('.ws-kcard2');
             if (!c) return;
             state.dragFrom = c.dataset.stage;
             e.dataTransfer.setData('text/plain', c.dataset.app);
@@ -599,20 +832,30 @@ function ensureDrawer() {
     d.className = 'ws-drawer';
     d.setAttribute('aria-labelledby', 'cw-d-name');
     d.innerHTML = `
-        <header class="flex items-start gap-3 p-5 border-b border-[var(--ws-border)]">
-            <span class="ws-avatar w-12 h-12 text-base" data-d-avatar>?</span>
-            <div class="min-w-0 flex-1">
-                <h2 id="cw-d-name" class="text-lg font-bold truncate" data-d-name>Kandidat</h2>
-                <p class="ws-meta truncate" data-d-job>-</p>
-                <div class="mt-2 flex flex-wrap items-center gap-2" data-d-stage></div>
+        <header class="px-5 pt-4 pb-3">
+            <div class="flex items-center justify-between gap-3 mb-3">
+                <span class="ws-dnav">
+                    <button type="button" class="ws-icon-btn" data-d-prev aria-label="Kandidat sebelumnya" title="Sebelumnya (K)">${icon('arrow-left', 'w-4 h-4')}</button>
+                    <button type="button" class="ws-icon-btn" data-d-next aria-label="Kandidat berikutnya" title="Berikutnya (J)">${icon('arrow-right', 'w-4 h-4')}</button>
+                    <span data-d-pos class="ml-1"></span>
+                </span>
+                <span class="flex items-center gap-1">
+                    <a href="#" class="ws-btn ws-btn-ghost ws-btn-sm" data-d-full>Halaman penuh${icon('arrow-up-right')}</a>
+                    <button type="button" class="ws-icon-btn" data-dialog-close aria-label="Tutup">${icon('x', 'w-5 h-5')}</button>
+                </span>
             </div>
-            <button type="button" class="ws-icon-btn -mr-2 -mt-1" data-dialog-close aria-label="Tutup">${icon('x', 'w-5 h-5')}</button>
+            <div class="flex items-start gap-3">
+                <span class="ws-ava w-11 h-11 text-[15px]" data-d-avatar aria-hidden="true">?</span>
+                <div class="min-w-0 flex-1">
+                    <h2 id="cw-d-name" class="text-[20px] leading-tight font-bold truncate" data-d-name>Kandidat</h2>
+                    <p class="ws-meta truncate mt-0.5" data-d-job>-</p>
+                </div>
+                <div data-d-stage class="pt-1"></div>
+            </div>
+            <div class="mt-4" data-d-actions></div>
         </header>
-        <div class="flex-1 overflow-y-auto p-5 space-y-7" data-d-body></div>
-        <footer class="border-t border-[var(--ws-border)] p-5 space-y-3">
-            <div data-d-actions></div>
-            <a href="#" class="ws-btn ws-btn-ghost ws-btn-sm w-full" data-d-full>Buka halaman lengkap kandidat${icon('arrow-up-right')}</a>
-        </footer>`;
+        <nav class="ws-dtabs" role="tablist" aria-label="Bagian detail kandidat" data-dtabs></nav>
+        <div class="flex-1 overflow-y-auto p-5 space-y-7" data-d-body></div>`;
     document.body.appendChild(d);
     return d;
 }

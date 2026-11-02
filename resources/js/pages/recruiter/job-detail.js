@@ -32,23 +32,20 @@ function renderHeader() {
     $('jd-actions').innerHTML = btns.join('');
 }
 
-/** Empat angka yang menjawab "bagaimana lowongan ini berjalan", semuanya dari data lamaran. */
+/** Satu baris konteks lowongan. Sebaran per tahap ditampilkan oleh strip di ruang kerja kandidat. */
 function renderStats() {
     const j = state.job;
     const apps = appsOfJob(state.apps, j.id);
     const c = stageCounts(apps);
     const avg = averageScore(apps);
-    const inProcess = c.assessment + c.interview + c.offering;
     const left = j.expires_at ? Math.ceil((new Date(j.expires_at) - Date.now()) / 86400000) : null;
-    const stat = (label, value, sub) => `
-        <div class="ws-stat"><dt class="ws-kpi-label">${label}</dt><dd class="ws-stat-value">${value}</dd><p class="ws-kpi-sub">${sub}</p></div>`;
-    $('jd-stats').innerHTML = [
-        stat('Pelamar', apps.length, c.screening ? `${c.screening} menunggu screening` : 'Tidak ada yang menunggu'),
-        stat('Rata-rata skor', avg === null ? '-' : `<span style="color:${scoreInfo(avg).color}">${avg}%</span>`, avg === null ? 'Belum ada lamaran' : scoreInfo(avg).label),
-        stat('Dalam proses', inProcess, `${c.interview} di tahap wawancara`),
-        stat('Diterima', `${c.hired}<span class="text-base font-semibold text-[var(--ws-muted)]">/${Number(j.quota) || 0}</span>`,
-            left === null ? 'Tanpa batas waktu' : left < 0 ? 'Batas lamaran sudah lewat' : `Ditutup ${left} hari lagi`),
-    ].join('');
+    const item = (ic, text) => `<span class="inline-flex items-center gap-1.5">${icon(ic, 'w-3.5 h-3.5')}${text}</span>`;
+    $('jd-meta').innerHTML = [
+        item('users', `${apps.length} pelamar`),
+        avg === null ? '' : item('target', `Rata-rata skor <strong class="font-semibold" style="color:${scoreInfo(avg).color}">${avg}%</strong>`),
+        item('user-check', `${c.hired} dari ${Number(j.quota) || 0} kuota terisi`),
+        item('clock', left === null ? 'Tanpa batas lamaran' : left < 0 ? 'Batas lamaran sudah lewat' : `Ditutup ${left} hari lagi`),
+    ].filter(Boolean).join('');
     $('jd-count').textContent = apps.length;
 }
 
@@ -147,7 +144,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             apps: appsOfJob(state.apps, jobId),
             jobId,
             navApps: state.apps,
-            onChange: () => { renderStats(); hydrateIcons($('jd-stats')); },
+            onChange: () => { renderStats(); },
         });
     } catch (err) {
         $('jd-content').classList.add('hidden');

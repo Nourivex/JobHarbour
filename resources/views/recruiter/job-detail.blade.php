@@ -10,12 +10,11 @@
                     <div id="jd-badges" class="flex flex-wrap items-center gap-2 mb-2"></div>
                     <h1 id="jd-title" class="ws-h1"><span class="inline-block h-8 w-72 rounded animate-skeleton ws-skel"></span></h1>
                     <p id="jd-sub" class="ws-lead"></p>
+                    <p id="jd-meta" class="ws-meta mt-2 flex flex-wrap gap-x-4 gap-y-1"></p>
                 </div>
                 <div id="jd-actions" class="flex flex-wrap gap-2"></div>
             </header>
 
-            <!-- Ringkasan cepat lowongan -->
-            <dl id="jd-stats" class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6"></dl>
 
             <div class="ws-tabs mb-5" role="tablist" aria-label="Bagian lowongan">
                 <button type="button" role="tab" class="ws-tab" id="jd-tab-candidates" aria-controls="jd-panel-candidates" aria-selected="true" data-panel="candidates"><i data-lucide="users" class="w-4 h-4"></i>Kandidat <span id="jd-count" class="ws-count">0</span></button>
