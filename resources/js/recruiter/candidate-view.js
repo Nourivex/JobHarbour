@@ -166,6 +166,19 @@ export function skillsSection(app) {
         </section>`;
 }
 
+/** Skill di profil kandidat yang tidak diminta lowongan, jadi tidak ikut dihitung dalam skor. */
+export function otherSkillsSection(app) {
+    const norm = (x) => String(x || '').toLowerCase().trim();
+    const known = new Set([...(app.matched_skills || []), ...(app.missing_skills || [])].map(norm));
+    const other = (app.applicant?.skills || []).filter((s) => !known.has(norm(s)));
+    return other.length ? `
+        <section class="space-y-2">
+            <h3 class="ws-h2">Skill lain di profil</h3>
+            <p class="ws-meta">Tidak dihitung dalam skor karena tidak diminta lowongan ini.</p>
+            <div class="flex flex-wrap gap-1.5">${other.map((s) => `<span class="ws-chip">${esc(s)}</span>`).join('')}</div>
+        </section>` : '';
+}
+
 export function profileSection(app) {
     const a = app.applicant || {};
     const rows = [

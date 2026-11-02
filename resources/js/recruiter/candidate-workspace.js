@@ -15,7 +15,7 @@ import { jobById, moveCandidate } from './data.js';
 import { setNavCounts } from './shell.js';
 import { openDialog, setBusy, debounce, menu } from './components.js';
 import {
-    matchSection, profileSection, documentsSection, historySection, timelineSection, notesSection,
+    matchSection, otherSkillsSection, profileSection, documentsSection, historySection, timelineSection, notesSection,
     renderActions, bindCvDownload, bindNotes,
 } from './candidate-view.js';
 import {
@@ -551,23 +551,12 @@ export function mountCandidateWorkspace({ root, jobs, apps, jobId = null, navApp
     // ------------------------------------------------------------------ laci kandidat
     const DRAWER_TABS = [['summary', 'Ringkasan'], ['profile', 'Profil & dokumen'], ['notes', 'Catatan'], ['history', 'Riwayat']];
 
-    function otherSkills(app) {
-        const known = new Set([...(app.matched_skills || []), ...(app.missing_skills || [])].map(norm));
-        const other = (app.applicant?.skills || []).filter((s) => !known.has(norm(s)));
-        return other.length ? `
-            <section class="space-y-2">
-                <h3 class="ws-h2">Skill lain di profil</h3>
-                <p class="ws-meta">Tidak dihitung dalam skor karena tidak diminta lowongan ini.</p>
-                <div class="flex flex-wrap gap-1.5">${other.map((s) => `<span class="ws-chip">${esc(s)}</span>`).join('')}</div>
-            </section>` : '';
-    }
-
     function drawerBody(app, tab) {
         const job = jobOf(app);
         if (tab === 'profile') return [profileSection(app), documentsSection(app)].join('<div class="ws-divider"></div>');
         if (tab === 'notes') return notesSection(app);
         if (tab === 'history') return [timelineSection(app), historySection(app, apps)].join('<div class="ws-divider"></div>');
-        return [matchSection(app, job), otherSkills(app)].filter(Boolean).join('<div class="ws-divider"></div>');
+        return [matchSection(app, job), otherSkillsSection(app)].filter(Boolean).join('<div class="ws-divider"></div>');
     }
 
     function paintDrawerTab(app) {
