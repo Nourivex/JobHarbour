@@ -57,7 +57,7 @@
                     <a href="/login" class="hidden sm:inline-flex items-center h-10 px-5 rounded-lg text-sm font-semibold text-white ring-1 ring-white/45 hover:ring-white hover:bg-white/8 transition">
                         Masuk
                     </a>
-                    <a href="/login?tab=register" class="btn-press group whitespace-nowrap inline-flex items-center gap-1.5 h-10 px-4 sm:px-5 rounded-lg text-sm font-semibold text-white bg-[#C8460B] hover:bg-[#A93A08] transition-colors">
+                    <a href="/login?tab=register" class="btn-press group whitespace-nowrap inline-flex items-center gap-1.5 h-10 px-4 sm:px-5 rounded-lg text-sm font-semibold text-white bg-orange-harbour hover:bg-orange-harbour-hover transition-colors">
                         Daftar<span class="hidden sm:inline">&nbsp;Gratis</span>
                         <svg class="hidden sm:block w-4 h-4 transition-transform group-hover:translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
                     </a>

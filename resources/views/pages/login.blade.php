@@ -140,7 +140,7 @@
                                 </div>
                                 <div class="auth-input">
                                     {!! $svg('lock', 'auth-input-icon w-5 h-5') !!}
-                                    <input id="login-password" name="password" type="password" autocomplete="current-password" placeholder="Minimal 6 karakter" required minlength="6">
+                                    <input id="login-password" name="password" type="password" autocomplete="current-password" placeholder="Masukkan kata sandi" required>
                                     <button type="button" class="auth-eye" data-toggle-password="login-password" aria-label="Tampilkan kata sandi" aria-pressed="false">
                                         {!! $svg('eye-off', 'eye-closed w-5 h-5') !!}{!! $svg('eye', 'eye-open w-5 h-5') !!}
                                     </button>
@@ -176,7 +176,7 @@
                             </div>
                         </div>
 
-                        <p class="mt-6 text-center text-[15px] text-[#3D4B5C]">Belum punya akun? <button type="button" data-switch="register" class="font-bold text-[#C8460B] hover:text-[#A93A08] cursor-pointer">Daftar Baru</button></p>
+                        <p class="mt-6 text-center text-[15px] text-[#3D4B5C]">Belum punya akun? <button type="button" data-switch="register" class="font-bold text-[#C8460B] hover:text-orange-harbour-hover cursor-pointer">Daftar Baru</button></p>
                     </div>
 
                     <!-- ================= DAFTAR ================= -->
@@ -227,11 +227,11 @@
                             </div>
 
                             <div class="grid sm:grid-cols-2 gap-4 items-start">
-                                <div class="auth-field" data-validate="password">
+                                <div class="auth-field" data-validate="newPassword">
                                     <label for="reg-password" class="auth-label">Kata Sandi <span class="text-[#C8460B]">*</span></label>
                                     <div class="auth-input">
                                         {!! $svg('lock', 'auth-input-icon w-5 h-5') !!}
-                                        <input id="reg-password" name="password" type="password" autocomplete="new-password" placeholder="Minimal 6 karakter" required minlength="6" aria-describedby="pw-strength-label">
+                                        <input id="reg-password" name="password" type="password" autocomplete="new-password" placeholder="Minimal 8 karakter" required minlength="8" aria-describedby="pw-strength-label">
                                         <button type="button" class="auth-eye" data-toggle-password="reg-password" aria-label="Tampilkan kata sandi" aria-pressed="false">
                                             {!! $svg('eye-off', 'eye-closed w-5 h-5') !!}{!! $svg('eye', 'eye-open w-5 h-5') !!}
                                         </button>
@@ -291,7 +291,7 @@
                             </button>
                         </form>
 
-                        <p class="mt-6 text-center text-[15px] text-[#3D4B5C]">Sudah punya akun? <button type="button" data-switch="login" class="font-bold text-[#C8460B] hover:text-[#A93A08] cursor-pointer">Masuk</button></p>
+                        <p class="mt-6 text-center text-[15px] text-[#3D4B5C]">Sudah punya akun? <button type="button" data-switch="login" class="font-bold text-[#C8460B] hover:text-orange-harbour-hover cursor-pointer">Masuk</button></p>
                     </div>
                 </div>
             </section>

@@ -1,5 +1,5 @@
 import { jobs, matchmaking, session, util } from '../api.js';
-import { companyTile, icon, rupiah, salaryRange, savedJobs, jobSourceBadge, EMPLOYMENT_SHORT, jobCode, scoreCategory } from '../job-ui.js';
+import { companyTile, icon, rupiah, salaryRange, savedJobs, jobSourceBadge, EMPLOYMENT_SHORT, scoreCategory } from '../job-ui.js';
 
 const esc = util.escapeHtml;
 
@@ -67,7 +67,7 @@ function renderSummary() {
             ${statItem(total, 'Total Lowongan', 'briefcase', '#0C2238')}
             ${statItem(companies, 'Perusahaan', 'building', '#1B65A6')}
             ${statItem(cities, 'Kota', 'pin', '#C8460B')}
-            ${session.isLoggedIn() ? '' : `<a href="/login?next=${encodeURIComponent('/catalog')}" class="btn-press inline-flex items-center gap-1.5 h-10 px-4 rounded-lg bg-[#C8460B] hover:bg-[#A93A08] text-white text-sm font-semibold">Masuk untuk lihat skor ${icon('arrow')}</a>`}
+            ${session.isLoggedIn() ? '' : `<a href="/login?next=${encodeURIComponent('/catalog')}" class="btn-press inline-flex items-center gap-1.5 h-10 px-4 rounded-lg bg-orange-harbour hover:bg-orange-harbour-hover text-white text-sm font-semibold">Masuk untuk lihat skor ${icon('arrow')}</a>`}
         `;
     }
 }
@@ -185,7 +185,6 @@ function card(job) {
 
             <div class="md:w-52 shrink-0 flex md:flex-col justify-between md:items-end items-center border-t md:border-t-0 pt-3 md:pt-0 border-[#F0F3F6] gap-3">
                 <div class="flex md:flex-col md:items-end items-center gap-2">
-                    <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-[#F4F6F8] text-[#627080] num-tabular">${jobCode(job)}</span>
                     <p class="text-sm sm:text-[15px] font-semibold text-right">
                         ${salary ? `<b class="text-[#C8460B] num-tabular font-bold">${salary}</b> <span class="text-xs text-[#627080] font-normal">/ bulan</span>` : '<span class="text-xs text-[#8C98A8]">Gaji tidak dicantumkan</span>'}
                     </p>

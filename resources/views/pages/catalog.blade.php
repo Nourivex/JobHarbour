@@ -10,17 +10,17 @@
         </picture>
         <div class="catalog-banner-fade absolute inset-0 pointer-events-none" aria-hidden="true"></div>
 
-        <div class="relative max-w-[1240px] mx-auto px-5 sm:px-8 pt-10 sm:pt-12 pb-10 grid lg:grid-cols-[minmax(0,1fr)_auto] gap-8 items-end">
+        <div class="relative max-w-[1240px] mx-auto px-5 sm:px-8 pt-7 sm:pt-12 pb-6 sm:pb-10 grid lg:grid-cols-[minmax(0,1fr)_auto] gap-5 sm:gap-8 items-end">
             <div class="hero-in" style="--d: 0ms">
-                <p class="text-sm font-extrabold uppercase tracking-[0.12em] text-[#C8460B]">Job Discovery</p>
-                <h1 class="mt-2 text-[2.1rem] sm:text-[2.6rem] leading-[1.08] font-extrabold text-[#0B1B2B]">
+                <p class="text-xs sm:text-sm font-extrabold uppercase tracking-[0.12em] text-[#C8460B]">Job Discovery</p>
+                <h1 class="mt-2 text-[1.85rem] sm:text-[2.6rem] leading-[1.08] font-extrabold text-[#0B1B2B]">
                     Temukan lowongan<br>yang <span class="text-[#F26A1B]">paling sesuai</span> denganmu.
                 </h1>
-                <p id="catalog-subtitle" class="mt-3 text-[15px] text-[#3D4B5C] max-w-[34rem]">Lowongan diurutkan dan dinilai berdasarkan skill di profilmu.</p>
+                <p id="catalog-subtitle" class="mt-2 sm:mt-3 text-sm sm:text-[15px] text-[#3D4B5C] max-w-[34rem]">Lowongan diurutkan dan dinilai berdasarkan skill di profilmu.</p>
             </div>
 
             <!-- Ringkasan: isi diatur oleh catalog.js sesuai status login -->
-            <div id="catalog-summary" class="hero-in bg-white/95 backdrop-blur rounded-2xl border border-[#E2E7ED] shadow-[0_18px_40px_-24px_rgba(12,34,56,0.35)] px-5 py-4 flex flex-wrap items-center gap-x-6 gap-y-4" style="--d: 120ms">
+            <div id="catalog-summary" class="hero-in bg-white/95 backdrop-blur rounded-2xl border border-[#E2E7ED] shadow-[0_18px_40px_-24px_rgba(12,34,56,0.35)] px-4 py-3 sm:px-5 sm:py-4 flex flex-wrap items-center gap-x-6 gap-y-3 sm:gap-y-4" style="--d: 120ms">
                 <div class="h-12 w-[420px] max-w-full rounded-xl animate-skeleton bg-[#F4F6F8]"></div>
             </div>
         </div>

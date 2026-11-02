@@ -232,7 +232,7 @@ function applyButton(job, applied) {
     }
 
     const href = loggedIn ? `/apply?job=${job.id}` : `/login?next=${encodeURIComponent('/jobs/' + job.id)}`;
-    return `<a href="${href}" class="btn-press group w-full inline-flex items-center justify-center gap-2.5 h-14 rounded-2xl bg-[#C8460B] hover:bg-[#A93A08] text-white text-lg font-extrabold shadow-[0_14px_28px_-14px_rgba(200,70,11,0.8)]">
+    return `<a href="${href}" class="btn-press group w-full inline-flex items-center justify-center gap-2.5 h-14 rounded-2xl bg-orange-harbour hover:bg-orange-harbour-hover text-white text-lg font-extrabold shadow-[0_14px_28px_-14px_rgba(200,70,11,0.8)]">
         <svg class="w-5 h-5 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4z"/></svg>
         Lamar Sekarang</a>`;
 }

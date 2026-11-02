@@ -25,6 +25,7 @@
     --color-text-tertiary: #627080;
 
     --color-orange-harbour: #C8460B;
+    --color-orange-harbour-hover: #A93A08;
     --color-orange-bright: #F26A1B;
     --color-orange-soft: #FFF3EA;
     --color-orange-deep: #8A2E05;
@@ -742,9 +743,9 @@
     transition: background-color 200ms ease, transform 120ms ease, box-shadow 200ms ease;
 }
 
-.auth-submit:hover { background: #A93A08; }
+.auth-submit:hover { background: var(--color-orange-harbour-hover); }
 .auth-submit:disabled { cursor: default; }
-.auth-submit.is-loading { background: #A93A08; }
+.auth-submit.is-loading { background: var(--color-orange-harbour-hover); }
 .auth-submit.is-success { background: var(--color-status-success); box-shadow: 0 14px 26px -16px rgba(21, 127, 59, 0.9); }
 .auth-submit-label { animation: fadeInFast 180ms ease-out; }
 

@@ -68,7 +68,7 @@
 
                         
                     </div>
-                    <button type="submit" class="btn-press group inline-flex items-center justify-center gap-2 min-h-12 px-6 rounded-xl bg-[#C8460B] hover:bg-[#A93A08] text-white font-bold text-[15px] cursor-pointer">
+                    <button type="submit" class="btn-press group inline-flex items-center justify-center gap-2 min-h-12 px-6 rounded-xl bg-orange-harbour hover:bg-orange-harbour-hover text-white font-bold text-[15px] cursor-pointer">
                         Cari lowongan
                         <x-icon name="arrow-right" class="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
                     </button>
@@ -145,7 +145,7 @@
                 <p class="text-sm font-bold text-[#C8460B]">Jelajahi peluang</p>
                 <h2 class="mt-2 text-3xl sm:text-[2.2rem] leading-tight font-extrabold text-[#0B1B2B]">Cari berdasarkan keahlian yang kamu punya</h2>
                 <p class="mt-3 text-[#3D4B5C] leading-relaxed">Skill yang paling sering diminta di lowongan saat ini. Pilih satu untuk melihat lowongan yang membutuhkannya.</p>
-                <a href="/catalog" class="group mt-5 inline-flex items-center gap-2 font-semibold text-[#C8460B] hover:text-[#A93A08]">
+                <a href="/catalog" class="group mt-5 inline-flex items-center gap-2 font-semibold text-[#C8460B] hover:text-orange-harbour-hover">
                     Lihat semua lowongan
                     <x-icon name="arrow-right" class="w-4 h-4 transition-transform group-hover:translate-x-1" />
                 </a>
@@ -241,7 +241,7 @@
                 <p class="text-sm font-bold text-[#C8460B]">Peluang terbuka</p>
                 <h2 class="mt-2 text-3xl sm:text-[2.2rem] leading-tight font-extrabold text-[#0B1B2B]">Lowongan terbaru</h2>
             </div>
-            <a href="/catalog" class="group inline-flex items-center gap-2 font-semibold text-[#C8460B] hover:text-[#A93A08]">
+            <a href="/catalog" class="group inline-flex items-center gap-2 font-semibold text-[#C8460B] hover:text-orange-harbour-hover">
                 Lihat semua lowongan
                 <x-icon name="arrow-right" class="w-4 h-4 transition-transform group-hover:translate-x-1" />
             </a>
