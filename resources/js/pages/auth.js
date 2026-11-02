@@ -109,7 +109,8 @@ function initModeSwitch() {
 // ------------------------------------------------------------------ validasi per kolom
 const VALIDATORS = {
     email: (v) => (!v ? 'Alamat email wajib diisi.' : /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ? '' : 'Format email belum benar, contoh: nama@domain.com.'),
-    password: (v) => (!v ? 'Kata sandi wajib diisi.' : v.length < 6 ? 'Kata sandi minimal 6 karakter.' : ''),
+    password: (v) => (!v ? 'Kata sandi wajib diisi.' : ''),
+    newPassword: (v) => (!v ? 'Kata sandi wajib diisi.' : v.length < 8 ? 'Kata sandi minimal 8 karakter.' : ''),
     required: (v) => (v ? '' : 'Kolom ini wajib diisi.'),
     phone: (v) => (!v || /^[0-9+\-\s]{8,20}$/.test(v) ? '' : 'Nomor HP hanya berisi angka, 8 sampai 20 digit.'),
 };
@@ -131,7 +132,7 @@ function validateField(field) {
     const input = field.querySelector('input');
     if (!rule || !input) return true;
     const value = input.value.trim();
-    const message = VALIDATORS[rule](rule === 'password' ? input.value : value);
+    const message = VALIDATORS[rule](rule === 'password' || rule === 'newPassword' ? input.value : value);
     // Kolom opsional yang kosong tidak diberi tanda centang
     setFieldState(field, message, Boolean(value));
     return !message;
@@ -277,7 +278,7 @@ function initLogin() {
 // ------------------------------------------------------------------ form daftar
 function passwordStrength(pw) {
     if (!pw) return { level: 0, label: '-' };
-    if (pw.length < 6) return { level: 1, label: 'Lemah' };
+    if (pw.length < 8) return { level: 1, label: 'Lemah' };
     let points = 1;
     if (pw.length >= 10) points += 1;
     if (/[a-z]/.test(pw) && /[A-Z]/.test(pw)) points += 1;
