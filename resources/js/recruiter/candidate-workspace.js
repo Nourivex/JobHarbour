@@ -19,7 +19,7 @@ import {
     renderActions, bindCvDownload, bindNotes,
 } from './candidate-view.js';
 import {
-    esc, icon, hydrateIcons, STAGES, STAGE, stageOf, nextStageOf, stageEnteredAt, interviewOf, scoreInfo,
+    esc, icon, hydrateIcons, STAGES, STAGE, stageOf, nextStageOf, stageEnteredAt, interviewOf, interviewOverdue, scoreInfo,
     matchBreakdown, relativeTime, formatDate, formatDateTime, daysSince, initials, emptyState, errorMessage,
 } from './ui.js';
 
@@ -367,7 +367,7 @@ export function mountCandidateWorkspace({ root, jobs, apps, jobId = null, navApp
                 </td>
                 <td class="c-score">${scoreCell(app)}</td>
                 <td class="c-req">${reqText}${req?.missing.length ? `<span class="ws-req-miss" title="Belum dimiliki: ${esc(req.missing.join(', '))}">Kurang: ${esc(req.missing.join(', '))}</span>` : ''}</td>
-                <td class="c-stage"><span class="ws-stage"><span class="ws-dot" style="--c:${STAGE[stage].color}"></span>${STAGE[stage].label}</span><span class="ws-stage-sub">${esc(stageSub(app, stage))}</span></td>
+                <td class="c-stage"><span class="ws-stage"><span class="ws-dot" style="--c:${STAGE[stage].color}"></span>${STAGE[stage].label}</span><span class="ws-stage-sub">${esc(stageSub(app, stage))}</span>${interviewOverdue(app) ? `<span class="ws-overdue">${icon('clock', 'w-3.5 h-3.5')}Perlu keputusan</span>` : ''}</td>
                 <td class="c-date hidden lg:table-cell"><span class="whitespace-nowrap">${formatDate(app.created_at)}</span><span class="ws-stage-sub">${relativeTime(app.created_at)}</span></td>
                 <td class="c-act" data-stop><span class="ws-row-menu">${rowActions(app)}</span></td>
             </tr>`;
@@ -392,6 +392,7 @@ export function mountCandidateWorkspace({ root, jobs, apps, jobId = null, navApp
                     <span class="ws-score-num text-right" style="color:${info.color}">${info.score}%</span>
                 </div>
                 ${req ? `<p class="mt-2 text-[13px] ${req.missing.length ? 'text-[var(--ws-text-2)]' : 'text-[var(--ws-success)]'}">${req.missing.length ? `Kurang ${req.missing.length} skill wajib` : 'Semua skill wajib terpenuhi'}</p>` : ''}
+                ${interviewOverdue(app) ? `<p class="ws-overdue mt-2">${icon('clock', 'w-3.5 h-3.5')}Wawancara sudah lewat, perlu keputusan</p>` : ''}
                 <div class="ws-kcard2-foot">
                     <span>${schedule ? `${icon('calendar-clock', 'w-3.5 h-3.5 inline -mt-0.5')} ${formatDateTime(schedule.datetime)}` : esc(stageSub(app, stage))}</span>
                     ${next && !final ? `<button type="button" class="ws-kcard-next" data-advance="${app.id}" aria-label="Majukan ${esc(a.name || 'kandidat')} ke ${STAGE[next].label}">${STAGE[next].label}${icon('arrow-right', 'w-3.5 h-3.5')}</button>` : ''}

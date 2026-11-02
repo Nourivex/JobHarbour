@@ -93,6 +93,13 @@ export function interviewOf(app) {
     return null;
 }
 
+/** Kandidat masih di tahap Interview padahal jadwalnya sudah lewat lebih dari satu jam: perlu keputusan. */
+export function interviewOverdue(app) {
+    if (stageOf(app) !== 'interview') return false;
+    const at = new Date(interviewOf(app)?.datetime || '').getTime();
+    return !Number.isNaN(at) && at < Date.now() - 3600000;
+}
+
 export function stageBadge(stage) {
     const s = STAGE[stage] || STAGE.screening;
     return `<span class="ws-badge" style="--c:${s.color}"><span class="ws-dot"></span>${s.label}</span>`;

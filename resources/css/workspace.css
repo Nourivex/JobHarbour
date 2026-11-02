@@ -859,3 +859,8 @@ html.dark .ws-skill-pick button[aria-pressed="true"] { background: #E8EDF4; bord
 }
 .ws-count.is-bumped { animation: ws-bump 420ms var(--ws-ease); }
 @keyframes ws-bump { 40% { transform: scale(1.25); background: var(--ws-accent-soft); color: var(--ws-accent-text); } }
+
+/* ------------------------------------------------------------------ wawancara lewat jadwal */
+.ws-callout-warning { background: var(--ws-warning-soft); }
+.ws-callout-warning svg { color: var(--ws-warning); }
+.ws-overdue { display: flex; align-items: center; gap: 0.3rem; margin-top: 0.15rem; font-size: 12px; font-weight: 600; color: var(--ws-warning); }

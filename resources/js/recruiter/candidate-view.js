@@ -6,7 +6,7 @@ import { applications, toast, confirm } from '../api.js';
 import { moveCandidate } from './data.js';
 import { setBusy } from './components.js';
 import {
-    esc, icon, STAGE, STAGE_ID, LEVEL, stageOf, nextStageOf, interviewOf, scoreInfo, scoreRing, matchBreakdown,
+    esc, icon, STAGE, STAGE_ID, LEVEL, stageOf, nextStageOf, interviewOf, interviewOverdue, scoreInfo, scoreRing, matchBreakdown,
     formatDate, formatDateTime, relativeTime, stageBadge, errorMessage,
 } from './ui.js';
 
@@ -280,7 +280,13 @@ export function renderActions(container, app, { mode = null, onMoved = () => {} 
     const rerender = (m) => renderActions(container, app, { mode: m, onMoved });
 
     if (!mode) {
+        const overdue = interviewOverdue(app);
         container.innerHTML = `
+            ${overdue ? `
+            <div class="ws-callout ws-callout-warning mb-3" role="note">
+                ${icon('clock', 'w-4 h-4')}
+                <p>Jadwal wawancara <strong>${formatDateTime(interviewOf(app).datetime)}</strong> sudah lewat. Tentukan hasilnya: majukan ke ${STAGE[next].label} atau tolak.</p>
+            </div>` : ''}
             <div class="flex flex-wrap items-center gap-2">
                 <button type="button" class="ws-btn ws-btn-danger-ghost" data-mode="reject">${icon('circle-x')}Tolak</button>
                 <button type="button" class="ws-btn ws-btn-primary ml-auto" data-mode="advance">${next === 'hired' ? icon('party-popper') : icon('arrow-right')}${next === 'hired' ? 'Tandai Hired' : `Majukan ke ${STAGE[next].label}`}</button>

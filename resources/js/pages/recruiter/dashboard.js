@@ -31,7 +31,18 @@ function renderOnboarding(ctx, jobs) {
         { done: Boolean(ctx.company) && !(ctx.company.missing_profile_fields || []).length, title: 'Lengkapi profil perusahaan', text: 'Nama, industri, alamat, dan kontak.', href: '/recruiter/company', cta: 'Buka profil' },
         { done: ['pending', 'verified'].includes(status), title: 'Ajukan verifikasi', text: 'Unggah NIB atau dokumen legal lainnya.', href: '/recruiter/verification', cta: 'Ajukan' },
         { done: status === 'verified', title: 'Tunggu persetujuan admin', text: 'Biasanya diperiksa dalam 1 sampai 2 hari kerja.', href: '/recruiter/verification', cta: 'Lihat status' },
-        { done: jobs.some((j) => j.status === 'open'), title: 'Publikasikan lowongan pertama', text: 'Draft bisa disiapkan sejak sekarang.', href: '#', cta: 'Buat lowongan', newJob: true },
+        // Langkah terakhir baru dianggap selesai setelah verifikasi, supaya urutan centang tidak melompat.
+        // Lowongan yang terbit sebelum aturan verifikasi ada tetap disebut apa adanya.
+        {
+            done: status === 'verified' && jobs.some((j) => j.status === 'open'),
+            title: 'Publikasikan lowongan pertama',
+            text: status !== 'verified' && jobs.some((j) => j.status === 'open')
+                ? 'Lowongan yang sudah terbit tetap tampil. Lowongan baru bisa dipublikasikan setelah verifikasi.'
+                : 'Draft bisa disiapkan sejak sekarang.',
+            href: '#',
+            cta: 'Buat lowongan',
+            newJob: true,
+        },
     ];
     if (steps.every((s) => s.done)) return;
     const current = steps.findIndex((s) => !s.done);

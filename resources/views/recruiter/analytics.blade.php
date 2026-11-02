@@ -8,7 +8,7 @@
             <label for="an-job" class="sr-only">Lowongan</label>
             <select id="an-job" class="ws-input w-full sm:w-[260px]"><option value="all">Semua lowongan</option></select>
             <label for="an-period" class="sr-only">Periode lamaran</label>
-            <select id="an-period" class="ws-input w-auto">
+            <select id="an-period" class="ws-input w-full sm:w-[180px] shrink-0">
                 <option value="all">Semua waktu</option>
                 <option value="30">30 hari terakhir</option>
                 <option value="90">90 hari terakhir</option>
