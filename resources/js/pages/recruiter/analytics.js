@@ -59,15 +59,18 @@ function render() {
     const rejected = apps.filter((a) => stageOf(a) === 'rejected');
     const active = apps.length - hired.length - rejected.length;
 
-    // Waktu: lamaran masuk sampai keputusan pertama, dan sampai diterima
+    // Waktu: lamaran masuk sampai keputusan pertama, dan sampai diterima.
+    // Titik awal memakai tahap pertama di linimasa (bukan created_at) agar semua
+    // selisih dihitung dari sumber waktu yang sama.
+    const startOf = (a, st) => st[0]?.entered_at || a.created_at;
     const firstMove = apps.map((a) => {
         const st = a.pipeline_timeline?.stages || [];
-        return st.length > 1 ? days(a.created_at, st[1].entered_at) : null;
+        return st.length > 1 ? days(startOf(a, st), st[1].entered_at) : null;
     }).filter((x) => x !== null && x >= 0);
     const toHire = hired.map((a) => {
         const st = a.pipeline_timeline?.stages || [];
         const last = st[st.length - 1];
-        return last?.completed_at ? days(a.created_at, last.completed_at) : null;
+        return last?.completed_at ? days(startOf(a, st), last.completed_at) : null;
     }).filter((x) => x !== null && x >= 0);
     const fmtDays = (x) => (x === null ? '-' : x < 1 ? '< 1 hari' : `${Math.round(x)} hari`);
 
