@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AdminVerificationController;
 use App\Http\Controllers\Api\ApplicationController;
+use App\Http\Controllers\Api\ApplicationNoteController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CompanyController;
 use App\Http\Controllers\Api\JobVacancyController;
@@ -161,6 +162,13 @@ Route::middleware('jwt.auth')->group(function () {
 
     // Method DELETE: Membatalkan pengajuan lamaran yang belum disetujui/ditolak
     Route::delete('/applications/{id}', [ApplicationController::class, 'destroy']);
+});
+
+// Catatan internal recruiter per lamaran (tidak terlihat oleh pelamar)
+Route::middleware('jwt.auth:recruiter')->group(function () {
+    Route::get('/applications/{id}/notes', [ApplicationNoteController::class, 'index'])->whereNumber('id');
+    Route::post('/applications/{id}/notes', [ApplicationNoteController::class, 'store'])->whereNumber('id');
+    Route::delete('/applications/{id}/notes/{noteId}', [ApplicationNoteController::class, 'destroy'])->whereNumber(['id', 'noteId']);
 });
 
 // =========================================================================

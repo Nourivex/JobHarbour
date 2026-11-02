@@ -183,6 +183,10 @@ export const applications = {
         });
     },
     cancel: (id) => api.del('/applications/' + id),
+    // Catatan internal recruiter (tidak terlihat oleh pelamar)
+    notes: (id) => api.get('/applications/' + id + '/notes'),
+    addNote: (id, body) => api.post('/applications/' + id + '/notes', { body }),
+    deleteNote: (id, noteId) => api.del('/applications/' + id + '/notes/' + noteId),
     async downloadCv(id) {
         const res = await fetch(API_BASE + '/applications/' + id + '/cv', {
             headers: { Authorization: 'Bearer ' + session.token(), Accept: 'application/pdf' },

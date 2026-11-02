@@ -14,10 +14,19 @@
     --ws-muted: #5D6B7E;
     --ws-navy: #0D2338;
     --ws-navy-2: #15304B;
+    /* Navy untuk aksi utama, oranye hanya untuk aksen penting (penanda aktif, highlight, fokus) */
+    --ws-primary: #0D2338;
+    --ws-primary-hover: #1E3A5C;
+    --ws-primary-soft: #E9EEF5;
+    --ws-on-primary: #FFFFFF;
     --ws-accent: #F45B0B;
-    --ws-primary: #C8460B;
-    --ws-primary-hover: #A93A08;
-    --ws-primary-soft: #FFF1E8;
+    --ws-accent-text: #C8460B;
+    --ws-accent-soft: #FFF1E8;
+    --ws-r-sm: 0.5rem;
+    --ws-r-md: 0.7rem;
+    --ws-r-lg: 1rem;
+    --ws-r-xl: 1.1rem;
+    --ws-shadow-card: 0 1px 2px rgba(13, 35, 56, 0.04);
     --ws-success: #15803D;
     --ws-success-soft: #E8F5EC;
     --ws-info: #1B65A6;
@@ -47,7 +56,12 @@ html.dark .ws-body {
     --ws-muted: #8C98A8;
     --ws-navy: #0A1523;
     --ws-navy-2: #12233A;
-    --ws-primary-soft: #33200F;
+    --ws-primary: #E8EDF4;
+    --ws-primary-hover: #FFFFFF;
+    --ws-primary-soft: #1B2A3F;
+    --ws-on-primary: #0B111C;
+    --ws-accent-text: #FF9B62;
+    --ws-accent-soft: #33200F;
     --ws-success: #4ADE80;
     --ws-success-soft: #11291C;
     --ws-info: #7CC4F5;
@@ -67,7 +81,7 @@ html.dark .ws-body {
     padding: 0.6rem 1rem;
     border-radius: 0.6rem;
     background: var(--ws-primary);
-    color: #FFFFFF;
+    color: var(--ws-on-primary);
     font-weight: 600;
 }
 
@@ -214,6 +228,8 @@ html.dark .ws-avatar { background: #2B4A6B; }
 @media (min-width: 1280px) { .ws-banner-inner { padding: 0.75rem 2.5rem; } }
 .ws-banner-info { background: var(--ws-info-soft); }
 .ws-banner-info > div > svg { color: var(--ws-info); }
+.ws-banner-warning { background: var(--ws-warning-soft); }
+.ws-banner-warning > div > svg { color: var(--ws-warning); }
 .ws-banner-danger { background: var(--ws-danger-soft); }
 .ws-banner-danger > div > svg { color: var(--ws-danger); }
 .ws-banner strong { color: var(--ws-text); font-weight: 600; }
@@ -256,7 +272,7 @@ html.dark .ws-avatar { background: #2B4A6B; }
 .ws-btn:focus-visible { outline: none; box-shadow: var(--ws-focus); }
 .ws-btn:disabled, .ws-btn[aria-disabled="true"] { opacity: 0.5; cursor: not-allowed; }
 .ws-btn-sm { height: 2.25rem; padding: 0 0.8rem; font-size: 13px; border-radius: 0.6rem; }
-.ws-btn-primary { background: var(--ws-primary); color: #FFFFFF; }
+.ws-btn-primary { background: var(--ws-primary); color: var(--ws-on-primary); }
 .ws-btn-primary:hover:not(:disabled) { background: var(--ws-primary-hover); }
 .ws-btn-secondary { background: var(--ws-surface); border-color: var(--ws-border-strong); color: var(--ws-text); }
 .ws-btn-secondary:hover:not(:disabled) { background: var(--ws-surface-2); }
@@ -357,8 +373,7 @@ select.ws-input { appearance: none; padding-right: 2.25rem; cursor: pointer; bac
 .ws-tab[aria-selected="true"] { color: var(--ws-text); font-weight: 600; }
 .ws-tab[aria-selected="true"]::after { transform: scaleX(1); }
 .ws-count { min-width: 1.35rem; height: 1.35rem; padding: 0 0.4rem; border-radius: 9999px; background: var(--ws-surface-2); color: var(--ws-muted); font-size: 11.5px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; font-variant-numeric: tabular-nums; }
-.ws-tab[aria-selected="true"] .ws-count { background: var(--ws-primary-soft); color: var(--ws-primary); }
-html.dark .ws-tab[aria-selected="true"] .ws-count { color: #FFB38A; }
+.ws-tab[aria-selected="true"] .ws-count { background: var(--ws-accent-soft); color: var(--ws-accent-text); }
 
 .ws-panel-enter { animation: ws-fade-up 240ms var(--ws-ease); }
 @keyframes ws-fade-up { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
@@ -375,8 +390,7 @@ html.dark .ws-tab[aria-selected="true"] .ws-count { color: #FFB38A; }
 .ws-table tbody tr:last-child td { border-bottom: 0; }
 .ws-table .num { text-align: right; font-variant-numeric: tabular-nums; }
 .ws-row-link { font-weight: 600; color: var(--ws-text); }
-.ws-row-link:hover { color: var(--ws-primary); text-decoration: underline; text-underline-offset: 3px; }
-html.dark .ws-row-link:hover { color: #FF9B62; }
+.ws-row-link:hover { color: var(--ws-accent-text); text-decoration: underline; text-underline-offset: 3px; }
 
 /* Bar sebaran tahap */
 .ws-dist { display: flex; gap: 2px; height: 0.45rem; border-radius: 9999px; overflow: hidden; background: var(--ws-surface-2); }
@@ -454,7 +468,6 @@ html.dark .ws-row-link:hover { color: #FF9B62; }
 /* ------------------------------------------------------------------ keadaan kosong & skeleton */
 .ws-empty { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 3rem 1.5rem; }
 .ws-empty-icon { width: 3rem; height: 3rem; margin-bottom: 0.9rem; display: inline-flex; align-items: center; justify-content: center; border-radius: 0.9rem; background: var(--ws-primary-soft); color: var(--ws-primary); }
-html.dark .ws-empty-icon { color: #FF9B62; }
 .ws-empty-title { font-weight: 700; color: var(--ws-text); }
 .ws-empty-text { margin-top: 0.3rem; max-width: 26rem; font-size: 14px; color: var(--ws-muted); }
 .ws-empty .ws-btn { margin-top: 1.1rem; }
@@ -480,9 +493,9 @@ html.dark .ws-step.is-done .ws-step-mark { color: #0B111C; }
 
 /* Unggah dokumen */
 .ws-drop { display: flex; flex-direction: column; align-items: center; gap: 0.4rem; padding: 1.5rem; border-radius: 0.9rem; border: 1.5px dashed var(--ws-border-strong); background: var(--ws-surface-2); text-align: center; cursor: pointer; transition: border-color 150ms ease, background-color 150ms ease; }
-.ws-drop:hover, .ws-drop.is-over { border-color: var(--ws-accent); background: var(--ws-primary-soft); }
+.ws-drop:hover, .ws-drop.is-over { border-color: var(--ws-accent); background: var(--ws-accent-soft); }
 .ws-drop:focus-within { box-shadow: var(--ws-focus); }
-.ws-drop svg { width: 1.5rem; height: 1.5rem; color: var(--ws-primary); }
+.ws-drop svg { width: 1.5rem; height: 1.5rem; color: var(--ws-accent-text); }
 
 .ws-file { display: flex; align-items: center; gap: 0.75rem; padding: 0.65rem 0.75rem; border-radius: 0.75rem; border: 1px solid var(--ws-border); background: var(--ws-surface); animation: ws-fade-up 200ms var(--ws-ease); }
 
@@ -538,7 +551,7 @@ html.dark .ws-seg button[aria-pressed="true"] { background: #E8EDF4; color: #0B1
 .ws-col-fold:hover { background: var(--ws-surface-2); }
 .ws-col-fold:focus-visible { outline: none; box-shadow: var(--ws-focus); }
 .ws-col-fold-label { writing-mode: vertical-rl; transform: rotate(180deg); font-size: 13px; font-weight: 600; }
-.ws-col.is-drop-ok { border: 1.5px dashed var(--ws-accent); background: var(--ws-primary-soft); }
+.ws-col.is-drop-ok { border: 1.5px dashed var(--ws-accent); background: var(--ws-accent-soft); }
 .ws-col.is-drop-over { border-style: solid; }
 .ws-col.is-drop-no { opacity: 0.4; }
 
@@ -550,8 +563,7 @@ html.dark .ws-seg button[aria-pressed="true"] { background: #E8EDF4; color: #0B1
 .ws-kcard.is-arrived { animation: ws-arrive 600ms var(--ws-ease); }
 @keyframes ws-arrive { 0% { transform: translateY(-6px); box-shadow: 0 0 0 3px rgba(244, 91, 11, 0.35); } 100% { transform: none; box-shadow: 0 0 0 0 rgba(244, 91, 11, 0); } }
 .ws-kcard-next { display: inline-flex; align-items: center; gap: 0.3rem; height: 1.9rem; padding: 0 0.6rem; border-radius: 0.55rem; background: var(--ws-primary-soft); color: var(--ws-primary); font-size: 12px; font-weight: 600; cursor: pointer; transition: background-color 150ms ease, color 150ms ease; }
-html.dark .ws-kcard-next { color: #FFB38A; }
-.ws-kcard-next:hover { background: var(--ws-primary); color: #FFFFFF; }
+.ws-kcard-next:hover { background: var(--ws-primary); color: var(--ws-on-primary); }
 .ws-kcard-next:focus-visible { outline: none; box-shadow: var(--ws-focus); }
 
 /* Tooltip sederhana dari atribut data-tip */
@@ -581,3 +593,88 @@ html.dark .ws-kcard-next { color: #FFB38A; }
 @media (prefers-reduced-motion: reduce) {
     .ws-body *, .ws-body *::before, .ws-body *::after, .ws-dialog::backdrop, .ws-drawer::backdrop { animation-duration: 1ms !important; transition-duration: 1ms !important; }
 }
+
+/* ------------------------------------------------------------------ sidebar ringkas (desktop) */
+.ws-collapse-btn { display: none; }
+@media (min-width: 1024px) {
+    .ws-collapse-btn { display: inline-flex; color: #8FA0B6; }
+    .ws-collapse-btn:hover { color: #FFFFFF; background: rgba(255, 255, 255, 0.07); }
+    .ws-sidebar, .ws-content { transition: width 220ms var(--ws-ease), margin-left 220ms var(--ws-ease); }
+    .ws-collapsed .ws-body { --ws-sidebar-w: 76px; }
+    .ws-collapsed .ws-brand { flex-direction: column; padding: 1rem 0.5rem 0.75rem; }
+    .ws-collapsed .ws-brand-text,
+    .ws-collapsed .ws-company-card > span:last-child,
+    .ws-collapsed .ws-nav-label,
+    .ws-collapsed .ws-nav-link > span:not(.ws-nav-count):not(.ws-nav-dot) { display: none; }
+    .ws-collapsed .ws-company-card { justify-content: center; margin: 0 0.6rem 0.5rem; padding: 0.55rem; }
+    .ws-collapsed .ws-nav { padding: 0.5rem 0.6rem 1rem; }
+    .ws-collapsed .ws-nav-link { justify-content: center; padding: 0; }
+    .ws-collapsed .ws-nav-link[aria-current="page"]::before { left: -0.6rem; }
+    .ws-collapsed .ws-nav-count, .ws-collapsed .ws-nav-dot { position: absolute; top: 0.3rem; right: 0.35rem; margin: 0; min-width: 1.1rem; height: 1.1rem; font-size: 10px; padding: 0 0.25rem; }
+    .ws-collapsed .ws-nav-dot { width: 0.5rem; height: 0.5rem; min-width: 0; padding: 0; }
+    .ws-collapsed .ws-sidebar-foot { padding: 0.6rem; }
+    .ws-collapsed .ws-collapse-btn svg { transform: rotate(180deg); }
+}
+
+/* ------------------------------------------------------------------ ruang kerja kandidat */
+.ws-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem; }
+.ws-check { width: 1.05rem; height: 1.05rem; border-radius: 0.3rem; accent-color: var(--ws-navy); cursor: pointer; }
+html.dark .ws-check { accent-color: #E8EDF4; }
+.ws-table tr.is-selected td { background: color-mix(in srgb, var(--ws-primary-soft) 70%, transparent); }
+.ws-table td.cell-check, .ws-table th.cell-check { width: 2.75rem; padding-right: 0; }
+.ws-table tbody tr[data-app] { cursor: pointer; }
+.ws-bulk {
+    position: sticky;
+    bottom: 1rem;
+    z-index: 20;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.6rem;
+    margin-top: 1rem;
+    padding: 0.65rem 0.75rem 0.65rem 1rem;
+    border-radius: var(--ws-r-lg);
+    background: var(--ws-navy);
+    color: #FFFFFF;
+    box-shadow: var(--ws-shadow-pop);
+    animation: ws-fade-up 200ms var(--ws-ease);
+}
+.ws-bulk .ws-btn-secondary { background: rgba(255, 255, 255, 0.08); border-color: rgba(255, 255, 255, 0.2); color: #FFFFFF; }
+.ws-bulk .ws-btn-secondary:hover:not(:disabled) { background: rgba(255, 255, 255, 0.16); }
+.ws-bulk .ws-btn-ghost { color: #C9D4E2; }
+.ws-bulk .ws-btn-ghost:hover:not(:disabled) { background: rgba(255, 255, 255, 0.08); color: #FFFFFF; }
+.ws-skill-line { display: flex; flex-wrap: wrap; gap: 0.25rem; }
+
+/* ------------------------------------------------------------------ catatan recruiter */
+.ws-note { padding: 0.75rem 0.85rem; border-radius: var(--ws-r-md); background: var(--ws-surface-2); animation: ws-fade-up 200ms var(--ws-ease); }
+.ws-note-meta { display: flex; align-items: center; gap: 0.5rem; font-size: 12.5px; color: var(--ws-muted); }
+.ws-note-body { margin-top: 0.3rem; font-size: 14px; line-height: 1.55; color: var(--ws-text-2); white-space: pre-line; word-break: break-word; }
+.ws-callout { display: flex; gap: 0.6rem; padding: 0.7rem 0.85rem; border-radius: var(--ws-r-md); background: var(--ws-info-soft); color: var(--ws-text-2); font-size: 13px; line-height: 1.5; }
+.ws-callout svg { color: var(--ws-info); margin-top: 0.1rem; }
+
+/* ------------------------------------------------------------------ jadwal wawancara */
+.ws-day { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 3.25rem; flex-shrink: 0; padding: 0.35rem 0; border-radius: var(--ws-r-md); border: 1px solid var(--ws-border); background: var(--ws-surface); }
+.ws-day-month { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ws-accent-text); }
+.ws-day-num { font-family: var(--font-heading); font-size: 1.35rem; font-weight: 800; line-height: 1.05; color: var(--ws-text); font-variant-numeric: tabular-nums; }
+.ws-iv { display: flex; align-items: center; gap: 1rem; padding: 0.9rem 1.1rem; border-bottom: 1px solid var(--ws-border); transition: background-color 140ms ease; }
+.ws-iv:last-child { border-bottom: 0; }
+.ws-iv:hover { background: color-mix(in srgb, var(--ws-surface-2) 60%, transparent); }
+.ws-iv.is-past { opacity: 0.72; }
+.ws-group-label { display: flex; align-items: center; gap: 0.5rem; padding: 0.8rem 1.1rem 0.5rem; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ws-muted); }
+
+/* ------------------------------------------------------------------ analitik */
+.ws-funnel { display: grid; gap: 0.7rem; }
+.ws-funnel-row { display: grid; grid-template-columns: 7.5rem minmax(0, 1fr) 6.5rem; align-items: center; gap: 0.85rem; }
+@media (max-width: 639px) { .ws-funnel-row { grid-template-columns: 6rem minmax(0, 1fr) 4rem; gap: 0.5rem; } }
+.ws-funnel-track { height: 2rem; border-radius: var(--ws-r-sm); background: var(--ws-surface-2); overflow: hidden; }
+.ws-funnel-bar { height: 100%; border-radius: var(--ws-r-sm); display: flex; align-items: center; padding: 0 0.6rem; color: #FFFFFF; font-size: 12.5px; font-weight: 700; font-variant-numeric: tabular-nums; transition: width 700ms var(--ws-ease); }
+.ws-conv { font-size: 12.5px; color: var(--ws-muted); text-align: right; font-variant-numeric: tabular-nums; }
+.ws-bars { display: flex; align-items: flex-end; gap: 0.5rem; height: 9.5rem; padding-top: 1rem; }
+.ws-bars > div { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 0.35rem; height: 100%; justify-content: flex-end; }
+.ws-bar { width: 100%; max-width: 2.75rem; border-radius: 0.4rem 0.4rem 0.15rem 0.15rem; background: var(--ws-navy-2); transition: height 700ms var(--ws-ease); }
+html.dark .ws-bar { background: #3B5C80; }
+.ws-bar.is-current { background: var(--ws-accent); }
+.ws-bar-label { font-size: 11px; color: var(--ws-muted); white-space: nowrap; }
+.ws-bar-value { font-size: 12px; font-weight: 700; color: var(--ws-text); font-variant-numeric: tabular-nums; }
+.ws-stat { padding: 1rem 1.1rem; border-radius: var(--ws-r-lg); background: var(--ws-surface); border: 1px solid var(--ws-border); }
+.ws-stat-value { margin-top: 0.35rem; font-family: var(--font-heading); font-size: 1.75rem; font-weight: 800; line-height: 1; color: var(--ws-text); font-variant-numeric: tabular-nums; }

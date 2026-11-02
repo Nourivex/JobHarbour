@@ -1,17 +1,17 @@
 import { jobs as jobsApi, toast, confirm, util } from '../../api.js';
-import { bootShell, setReviewCount, canPublish } from '../../recruiter/shell.js';
+import { bootShell, canPublish } from '../../recruiter/shell.js';
 import { data, jobById, appsOfJob, stageCounts, averageScore } from '../../recruiter/data.js';
 import { initMenus } from '../../recruiter/components.js';
 import { initJobForm, openJobForm, skillSuggestions } from '../../recruiter/job-form.js';
+import { mountCandidateWorkspace } from '../../recruiter/candidate-workspace.js';
 import {
-    esc, icon, hydrateIcons, STAGES, STAGE, LEVEL, stageOf, stageBadge, jobStatusBadge, scoreRing, formatDate, relativeTime,
-    emptyState, errorMessage,
+    esc, icon, hydrateIcons, LEVEL, jobStatusBadge, scoreInfo, formatDate, relativeTime, emptyState, errorMessage,
 } from '../../recruiter/ui.js';
 import { EMPLOYMENT_SHORT, salaryRange } from '../../job-ui.js';
 
 const $ = (id) => document.getElementById(id);
 const jobId = $('jd-root').dataset.jobId;
-const state = { ctx: null, jobs: [], apps: [], job: null, filter: 'all' };
+const state = { ctx: null, jobs: [], apps: [], job: null, workspace: null };
 
 function renderHeader() {
     const j = state.job;
@@ -32,20 +32,29 @@ function renderHeader() {
     $('jd-actions').innerHTML = btns.join('');
 }
 
-function renderSide() {
+/** Empat angka yang menjawab "bagaimana lowongan ini berjalan", semuanya dari data lamaran. */
+function renderStats() {
     const j = state.job;
     const apps = appsOfJob(state.apps, j.id);
     const c = stageCounts(apps);
-    const max = Math.max(1, ...Object.values(c));
-    $('jd-funnel').innerHTML = STAGES.map((s) => `
-        <button type="button" class="w-full text-left group" data-filter="${s}" aria-pressed="${state.filter === s}">
-            <span class="flex items-center justify-between text-sm mb-1">
-                <span class="inline-flex items-center gap-2 ${state.filter === s ? 'font-semibold' : ''}"><span class="ws-dot" style="--c:${STAGE[s].color}"></span>${STAGE[s].label}</span>
-                <span class="ws-num font-semibold">${c[s]}</span>
-            </span>
-            <span class="block h-2 rounded-full bg-[var(--ws-surface-2)] overflow-hidden"><span class="block h-full rounded-full transition-[width] duration-700" style="width:${(c[s] / max) * 100}%;background:${STAGE[s].color}"></span></span>
-        </button>`).join('');
+    const avg = averageScore(apps);
+    const inProcess = c.assessment + c.interview + c.offering;
+    const left = j.expires_at ? Math.ceil((new Date(j.expires_at) - Date.now()) / 86400000) : null;
+    const stat = (label, value, sub) => `
+        <div class="ws-stat"><dt class="ws-kpi-label">${label}</dt><dd class="ws-stat-value">${value}</dd><p class="ws-kpi-sub">${sub}</p></div>`;
+    $('jd-stats').innerHTML = [
+        stat('Pelamar', apps.length, c.screening ? `${c.screening} menunggu screening` : 'Tidak ada yang menunggu'),
+        stat('Rata-rata skor', avg === null ? '-' : `<span style="color:${scoreInfo(avg).color}">${avg}%</span>`, avg === null ? 'Belum ada lamaran' : scoreInfo(avg).label),
+        stat('Dalam proses', inProcess, `${c.interview} di tahap wawancara`),
+        stat('Diterima', `${c.hired}<span class="text-base font-semibold text-[var(--ws-muted)]">/${Number(j.quota) || 0}</span>`,
+            left === null ? 'Tanpa batas waktu' : left < 0 ? 'Batas lamaran sudah lewat' : `Ditutup ${left} hari lagi`),
+    ].join('');
+    $('jd-count').textContent = apps.length;
+}
 
+function renderDetail() {
+    const j = state.job;
+    $('jd-description').textContent = j.description || '';
     const reqs = j.requirements || [];
     const total = reqs.reduce((s, r) => s + (Number(r.weight) || LEVEL[r.level]?.weight || 1), 0);
     $('jd-reqs').innerHTML = reqs.length ? `
@@ -55,64 +64,33 @@ function renderSide() {
                 const w = Number(r.weight) || lv.weight;
                 return `<li class="flex items-center gap-3 text-sm">
                     <span class="flex-1 min-w-0 truncate font-medium">${esc(util.skillName(r))}</span>
-                    <span class="ws-meta">${lv.label}</span>
+                    <span class="ws-meta">${lv.label} · ${w}</span>
                     <span class="w-16 h-1.5 rounded-full bg-[var(--ws-surface-2)] overflow-hidden" title="${Math.round((w / total) * 100)}% dari total bobot"><span class="block h-full" style="width:${(w / total) * 100}%;background:${lv.color}"></span></span>
                 </li>`;
             }).join('')}
-        </ul>` : '<p class="ws-meta">Belum ada syarat skill.</p>';
+        </ul>` : '<p class="ws-meta">Belum ada syarat skill. Tanpa syarat, skor kecocokan tidak bisa dihitung.</p>';
 
     const salary = salaryRange(j);
-    const avg = averageScore(apps);
     $('jd-info').innerHTML = [
         ['Gaji', salary || 'Tidak dicantumkan'],
-        ['Kuota', `${c.hired} diterima dari ${Number(j.quota) || 0}`],
-        ['Rata-rata skor', avg === null ? '-' : `${avg}%`],
+        ['Kuota', `${Number(j.quota) || 0} orang`],
         ['Batas lamaran', j.expires_at ? formatDate(j.expires_at) : 'Tanpa batas'],
         ['Dibuat', formatDate(j.created_at)],
         ['Diperbarui', relativeTime(j.updated_at)],
     ].map(([k, v]) => `<div class="flex justify-between gap-3"><dt class="ws-meta">${k}</dt><dd class="text-right font-medium">${esc(v)}</dd></div>`).join('');
 }
 
-function renderApplicants() {
-    const all = appsOfJob(state.apps, state.job.id).sort((a, b) => (Number(b.match_score) || 0) - (Number(a.match_score) || 0));
-    const list = state.filter === 'all' ? all : all.filter((a) => stageOf(a) === state.filter);
-    $('jd-app-title').innerHTML = `Pelamar <span class="ws-count ml-1">${all.length}</span>${state.filter !== 'all' ? ` <button type="button" class="ws-pill ws-pill-neutral ml-2" data-filter="all">${STAGE[state.filter].label} ${icon('x', 'w-3 h-3')}</button>` : ''}`;
-    $('jd-pipeline-link').href = `/recruiter/pipeline?job=${state.job.id}`;
-
-    if (!all.length) {
-        $('jd-applicants').innerHTML = emptyState({
-            iconName: 'users',
-            title: 'Belum ada pelamar',
-            text: state.job.status === 'open' ? 'Pelamar akan muncul di sini setelah mengirim lamaran.' : 'Lowongan ini belum dipublikasikan, jadi belum bisa dilamar.',
-        });
-        return;
-    }
-    if (!list.length) {
-        $('jd-applicants').innerHTML = `<p class="ws-meta py-6 text-center">Tidak ada pelamar di tahap ${STAGE[state.filter].label}.</p>`;
-        return;
-    }
-    $('jd-applicants').innerHTML = `
-        <ul class="divide-y divide-[var(--ws-border)] -my-2">
-            ${list.map((a) => `
-                <li>
-                    <a href="/recruiter/candidates/${a.id}" class="flex items-center gap-3 py-3 -mx-2 px-2 rounded-xl hover:bg-[var(--ws-surface-2)] transition-colors">
-                        ${scoreRing(a.match_score, 'sm')}
-                        <span class="min-w-0 flex-1">
-                            <span class="block font-semibold truncate">${esc(a.applicant?.name || 'Kandidat')}</span>
-                            <span class="block ws-meta truncate">${(a.matched_skills || []).length} skill cocok · ${(a.missing_skills || []).length} kurang · melamar ${relativeTime(a.created_at)}</span>
-                        </span>
-                        ${stageBadge(stageOf(a))}
-                    </a>
-                </li>`).join('')}
-        </ul>`;
-}
-
 function renderAll() {
     renderHeader();
-    renderSide();
-    renderApplicants();
-    $('jd-description').textContent = state.job.description || '';
+    renderStats();
+    renderDetail();
     hydrateIcons($('ws-main'));
+}
+
+function showPanel(name) {
+    document.querySelectorAll('[data-panel]').forEach((t) => t.setAttribute('aria-selected', String(t.dataset.panel === name)));
+    $('jd-panel-candidates').classList.toggle('hidden', name !== 'candidates');
+    $('jd-panel-detail').classList.toggle('hidden', name !== 'detail');
 }
 
 async function setStatus(status, confirmOpts) {
@@ -144,14 +122,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     document.addEventListener('click', (e) => {
-        const f = e.target.closest('[data-filter]');
-        if (f) {
-            state.filter = state.filter === f.dataset.filter ? 'all' : f.dataset.filter;
-            renderSide();
-            renderApplicants();
-            hydrateIcons($('ws-main'));
-            return;
-        }
+        const tab = e.target.closest('[data-panel]');
+        if (tab) { showPanel(tab.dataset.panel); return; }
         const a = e.target.closest('[data-act]');
         if (!a || a.disabled) return;
         const act = a.dataset.act;
@@ -164,10 +136,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     try {
         [state.jobs, state.apps] = await Promise.all([data.jobs(), data.applications()]);
-        setReviewCount(state.apps.filter((x) => stageOf(x) === 'screening').length);
         state.job = jobById(state.jobs, jobId);
         if (!state.job) throw Object.assign(new Error('not found'), { status: 404 });
         renderAll();
+        // Lowongan tanpa pelamar yang belum dibuka: tampilkan detailnya dulu
+        if (!appsOfJob(state.apps, jobId).length && state.job.status !== 'open') showPanel('detail');
+        state.workspace = mountCandidateWorkspace({
+            root: $('jd-workspace'),
+            jobs: state.jobs,
+            apps: appsOfJob(state.apps, jobId),
+            jobId,
+            navApps: state.apps,
+            onChange: () => { renderStats(); hydrateIcons($('jd-stats')); },
+        });
     } catch (err) {
         $('jd-content').classList.add('hidden');
         $('jd-error').classList.remove('hidden');

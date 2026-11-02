@@ -2,7 +2,9 @@
     $nav = [
         ['key' => 'dashboard', 'href' => '/recruiter', 'icon' => 'layout-dashboard', 'label' => 'Dasbor'],
         ['key' => 'jobs', 'href' => '/recruiter/jobs', 'icon' => 'briefcase-business', 'label' => 'Lowongan'],
-        ['key' => 'pipeline', 'href' => '/recruiter/pipeline', 'icon' => 'kanban', 'label' => 'Pipeline Kandidat'],
+        ['key' => 'pipeline', 'href' => '/recruiter/pipeline', 'icon' => 'users', 'label' => 'Kandidat'],
+        ['key' => 'interviews', 'href' => '/recruiter/interviews', 'icon' => 'calendar-days', 'label' => 'Wawancara'],
+        ['key' => 'analytics', 'href' => '/recruiter/analytics', 'icon' => 'chart-column', 'label' => 'Analitik'],
     ];
     $companyNav = [
         ['key' => 'company', 'href' => '/recruiter/company', 'icon' => 'building-2', 'label' => 'Profil Perusahaan'],
@@ -20,7 +22,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="icon" href="/images/favicon-jobharbour.ico" sizes="any">
-    <script>try { var t = localStorage.getItem('jh_theme'); if (t === 'dark') document.documentElement.classList.add('dark'); } catch (e) {}</script>
+    <script>try { var t = localStorage.getItem('jh_theme'); if (t === 'dark') document.documentElement.classList.add('dark'); if (localStorage.getItem('jh_ws_collapsed') === '1') document.documentElement.classList.add('ws-collapsed'); } catch (e) {}</script>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('styles')
@@ -36,11 +38,14 @@
             <div class="ws-brand">
                 <a href="/recruiter" class="flex items-center gap-2.5 min-w-0" aria-label="JobHarbour, ke dasbor">
                     <img src="/images/logo-icon-256.png" alt="" class="w-8 h-8 rounded-lg">
-                    <span class="min-w-0">
+                    <span class="ws-brand-text min-w-0">
                         <span class="block font-heading font-extrabold text-[17px] text-white leading-tight">JobHarbour</span>
                         <span class="block text-[11px] font-semibold tracking-wide text-[#8CC8F2]">Portal Recruiter</span>
                     </span>
                 </a>
+                <button type="button" class="ws-icon-btn ws-collapse-btn w-8 h-8" data-sidebar-collapse aria-label="Ringkas sidebar" aria-pressed="false" title="Ringkas sidebar">
+                    <i data-lucide="chevrons-left"></i>
+                </button>
                 <button type="button" class="ws-icon-btn ws-sidebar-close lg:hidden" data-sidebar-close aria-label="Tutup menu">
                     <i data-lucide="x"></i>
                 </button>
@@ -58,11 +63,14 @@
             <nav class="ws-nav">
                 <p class="ws-nav-label">Rekrutmen</p>
                 @foreach ($nav as $item)
-                    <a href="{{ $item['href'] }}" class="ws-nav-link" @if (($active ?? '') === $item['key']) aria-current="page" @endif>
+                    <a href="{{ $item['href'] }}" class="ws-nav-link" title="{{ $item['label'] }}" @if (($active ?? '') === $item['key']) aria-current="page" @endif>
                         <i data-lucide="{{ $item['icon'] }}"></i>
                         <span>{{ $item['label'] }}</span>
                         @if ($item['key'] === 'pipeline')
                             <span id="ws-nav-review" class="ws-nav-count hidden" title="Lamaran perlu ditinjau"></span>
+                        @endif
+                        @if ($item['key'] === 'interviews')
+                            <span id="ws-nav-interviews" class="ws-nav-count hidden" title="Wawancara 7 hari ke depan"></span>
                         @endif
                     </a>
                 @endforeach
@@ -70,7 +78,7 @@
                 <div id="ws-company-nav">
                 <p class="ws-nav-label">Perusahaan</p>
                 @foreach ($companyNav as $item)
-                    <a href="{{ $item['href'] }}" class="ws-nav-link" @if (($active ?? '') === $item['key']) aria-current="page" @endif>
+                    <a href="{{ $item['href'] }}" class="ws-nav-link" title="{{ $item['label'] }}" @if (($active ?? '') === $item['key']) aria-current="page" @endif>
                         <i data-lucide="{{ $item['icon'] }}"></i>
                         <span>{{ $item['label'] }}</span>
                         @if (! empty($item['badge']))

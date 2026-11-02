@@ -11,6 +11,7 @@
             <div class="ws-tabs" role="tablist" aria-label="Status pengajuan" id="av-tabs">
                 <button type="button" role="tab" class="ws-tab" data-status="pending" aria-selected="true">Menunggu <span class="ws-count" data-count="pending">0</span></button>
                 <button type="button" role="tab" class="ws-tab" data-status="approved" aria-selected="false">Disetujui <span class="ws-count" data-count="approved">0</span></button>
+                <button type="button" role="tab" class="ws-tab" data-status="revision_required" aria-selected="false">Perlu revisi <span class="ws-count" data-count="revision_required">0</span></button>
                 <button type="button" role="tab" class="ws-tab" data-status="rejected" aria-selected="false">Ditolak <span class="ws-count" data-count="rejected">0</span></button>
             </div>
         </div>

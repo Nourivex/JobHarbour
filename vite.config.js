@@ -19,6 +19,8 @@ export default defineConfig({
                 'resources/js/pages/recruiter/jobs.js',
                 'resources/js/pages/recruiter/job-detail.js',
                 'resources/js/pages/recruiter/pipeline.js',
+                'resources/js/pages/recruiter/interviews.js',
+                'resources/js/pages/recruiter/analytics.js',
                 'resources/js/pages/recruiter/candidate.js',
                 'resources/js/pages/recruiter/company.js',
                 'resources/js/pages/recruiter/verification.js',

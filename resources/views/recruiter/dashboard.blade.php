@@ -5,7 +5,7 @@
             <p id="dash-lead" class="ws-lead">Ringkasan rekrutmen hari ini.</p>
         </div>
         <div class="flex flex-wrap gap-2">
-            <a href="/recruiter/pipeline" class="ws-btn ws-btn-secondary"><i data-lucide="kanban"></i>Lihat kandidat</a>
+            <a href="/recruiter/pipeline" class="ws-btn ws-btn-secondary"><i data-lucide="users"></i>Lihat kandidat</a>
             <button type="button" class="ws-btn ws-btn-primary" data-new-job><i data-lucide="plus"></i>Lowongan baru</button>
         </div>
     </div>
@@ -46,7 +46,8 @@
         <div class="space-y-6 min-w-0">
             <section class="ws-card" aria-labelledby="dash-iv-title">
                 <div class="ws-card-head">
-                    <h2 id="dash-iv-title" class="ws-h2">Jadwal interview</h2>
+                    <h2 id="dash-iv-title" class="ws-h2">Jadwal wawancara</h2>
+                    <a href="/recruiter/interviews" class="ws-btn ws-btn-ghost ws-btn-sm">Semua jadwal<i data-lucide="arrow-right"></i></a>
                 </div>
                 <div id="dash-interviews" class="ws-card-body"></div>
             </section>

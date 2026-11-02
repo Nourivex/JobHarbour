@@ -4,7 +4,7 @@
  */
 import JH, { session, toast } from '../api.js';
 import { data } from './data.js';
-import { hydrateIcons, icon, initials, VERIFY, esc, companyLogo } from './ui.js';
+import { hydrateIcons, icon, initials, VERIFY, esc, companyLogo, stageOf, interviewOf } from './ui.js';
 
 function initSidebar() {
     const sidebar = document.getElementById('ws-sidebar');
@@ -19,6 +19,21 @@ function initSidebar() {
     };
     openBtn?.addEventListener('click', () => setOpen(true));
     document.querySelectorAll('[data-sidebar-close]').forEach((el) => el.addEventListener('click', () => setOpen(false)));
+
+    // Desktop: sidebar ringkas (ikon saja), pilihan disimpan per peramban
+    const collapseBtn = document.querySelector('[data-sidebar-collapse]');
+    const syncCollapse = () => {
+        const on = document.documentElement.classList.contains('ws-collapsed');
+        collapseBtn?.setAttribute('aria-pressed', String(on));
+        collapseBtn?.setAttribute('aria-label', on ? 'Lebarkan sidebar' : 'Ringkas sidebar');
+        collapseBtn?.setAttribute('title', on ? 'Lebarkan sidebar' : 'Ringkas sidebar');
+    };
+    syncCollapse();
+    collapseBtn?.addEventListener('click', () => {
+        const on = document.documentElement.classList.toggle('ws-collapsed');
+        try { localStorage.setItem('jh_ws_collapsed', on ? '1' : '0'); } catch (e) { /* abaikan */ }
+        syncCollapse();
+    });
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && document.body.classList.contains('ws-nav-open')) setOpen(false);
     });
@@ -54,7 +69,7 @@ function renderCompany(user, company) {
     }
     nameEl.textContent = company.name;
     const v = VERIFY[company.verification_status] || VERIFY.unverified;
-    const color = { success: '#4ADE80', info: '#7CC4F5', danger: '#F87171', neutral: '#CBD5E1' }[v.tone];
+    const color = { success: '#4ADE80', info: '#7CC4F5', warning: '#FBBF24', danger: '#F87171', neutral: '#CBD5E1' }[v.tone];
     statusEl.innerHTML = `<span class="ws-status-dot" style="--c:${color}"></span>${v.label}`;
     logoEl.outerHTML = companyLogo(company, 'ws-company-logo');
 }
@@ -74,6 +89,7 @@ function renderBanner(user, company) {
         none: ['Lengkapi profil perusahaan untuk mulai merekrut.', 'Sebelum diverifikasi, lowongan hanya bisa disimpan sebagai draft.', '/recruiter/company', 'Lengkapi profil', 'info'],
         unverified: ['Perusahaanmu belum terverifikasi.', 'Lowongan bisa disimpan sebagai draft, tetapi baru bisa dipublikasikan setelah verifikasi disetujui.', '/recruiter/verification', 'Ajukan verifikasi', 'info'],
         pending: ['Pengajuan verifikasi sedang diperiksa admin.', 'Siapkan lowonganmu sebagai draft. Publikasikan setelah disetujui.', '/recruiter/verification', 'Lihat status', 'info'],
+        revision_required: ['Admin meminta perbaikan verifikasi.', esc(company?.verification_note || 'Lihat catatan admin lalu ajukan ulang.'), '/recruiter/verification', 'Perbaiki pengajuan', 'warning'],
         rejected: ['Pengajuan verifikasi ditolak.', esc(company?.verification_note || 'Lihat catatan admin lalu ajukan ulang.'), '/recruiter/verification', 'Perbaiki dan ajukan ulang', 'danger'],
         suspended: ['Perusahaan sedang ditangguhkan.', esc(company?.verification_note || 'Hubungi admin JobHarbour untuk informasi lebih lanjut.'), '/recruiter/verification', 'Lihat detail', 'danger'],
     }[status];
@@ -81,7 +97,7 @@ function renderBanner(user, company) {
     banner.className = `ws-banner ws-banner-${copy[4]}`;
     banner.innerHTML = `
         <div class="ws-banner-inner">
-            ${icon(copy[4] === 'danger' ? 'shield-alert' : 'info', 'w-5 h-5')}
+            ${icon({ danger: 'shield-alert', warning: 'file-pen-line' }[copy[4]] || 'info', 'w-5 h-5')}
             <p class="flex-1 min-w-0"><strong>${copy[0]}</strong> <span>${copy[1]}</span></p>
             <a href="${copy[2]}" class="ws-btn ws-btn-sm ws-btn-secondary whitespace-nowrap">${copy[3]}${icon('arrow-right', 'w-4 h-4')}</a>
         </div>`;
@@ -123,10 +139,25 @@ export async function bootShell({ page, roles = ['recruiter', 'admin'] } = {}) {
     return { user, company, isAdmin: user.role === 'admin' };
 }
 
-/** Lencana jumlah "perlu ditinjau" di menu Pipeline. */
+/** Lencana jumlah "perlu ditinjau" di menu Kandidat. */
 export function setReviewCount(n) {
     const el = document.getElementById('ws-nav-review');
     if (!el) return;
+    el.textContent = n;
+    el.classList.toggle('hidden', !n);
+}
+
+/** Lencana menu dihitung dari daftar lamaran: berkas di Screening dan wawancara 7 hari ke depan. */
+export function setNavCounts(apps) {
+    setReviewCount(apps.filter((a) => stageOf(a) === 'screening').length);
+    const el = document.getElementById('ws-nav-interviews');
+    if (!el) return;
+    const now = Date.now();
+    const n = apps.filter((a) => {
+        const s = stageOf(a) === 'interview' ? interviewOf(a) : null;
+        const t = s ? new Date(s.datetime).getTime() : NaN;
+        return t >= now - 3600000 && t <= now + 7 * 86400000;
+    }).length;
     el.textContent = n;
     el.classList.toggle('hidden', !n);
 }

@@ -62,9 +62,9 @@ function renderDialog(v) {
                 <li><button type="button" class="ws-menu-item border border-[var(--ws-border)]" data-doc="${esc(d.url)}" data-name="${esc(d.name)}">${icon('file-text')}<span class="flex-1 min-w-0 truncate">${esc(d.name)}</span><span class="ws-meta">${TYPES[d.type] || 'Lainnya'}${d.size ? ` · ${formatBytes(d.size)}` : ''}</span>${icon('download')}</button></li>`).join('')}
             </ul>
         </div>
-        ${v.status !== 'pending' ? `<div class="rounded-xl border border-[var(--ws-border)] p-3 text-sm"><p class="font-semibold">${v.status === 'approved' ? 'Disetujui' : 'Ditolak'} ${v.reviewed_at ? formatDate(v.reviewed_at, true) : ''}${v.reviewer ? ` oleh ${esc(v.reviewer.name)}` : ''}</p>${v.admin_notes ? `<p class="mt-1 text-[var(--ws-text-2)]">${esc(v.admin_notes)}</p>` : ''}</div>` : `
+        ${v.status !== 'pending' ? `<div class="rounded-xl border border-[var(--ws-border)] p-3 text-sm"><p class="font-semibold">${{ approved: 'Disetujui', revision_required: 'Diminta revisi' }[v.status] || 'Ditolak'} ${v.reviewed_at ? formatDate(v.reviewed_at, true) : ''}${v.reviewer ? ` oleh ${esc(v.reviewer.name)}` : ''}</p>${v.admin_notes ? `<p class="mt-1 text-[var(--ws-text-2)]">${esc(v.admin_notes)}</p>` : ''}</div>` : `
         <div>
-            <label for="av-note" class="ws-label">Catatan untuk recruiter <span class="opt">(wajib bila ditolak)</span></label>
+            <label for="av-note" class="ws-label">Catatan untuk recruiter <span class="opt">(wajib bila meminta revisi atau menolak)</span></label>
             <textarea id="av-note" rows="3" maxlength="1000" class="ws-input" placeholder="contoh: Dokumen NIB tidak terbaca, unggah ulang dalam resolusi lebih tinggi."></textarea>
             <p class="ws-error" id="av-note-error"></p>
         </div>`}`;
@@ -73,7 +73,8 @@ function renderDialog(v) {
     if (v.status === 'pending') {
         foot.innerHTML = `
             <button type="button" class="ws-btn ws-btn-ghost mr-auto" data-dialog-close>Tutup</button>
-            <button type="button" class="ws-btn ws-btn-danger-ghost" data-decide="reject">${icon('circle-x')}Tolak</button>
+            <button type="button" class="ws-btn ws-btn-danger-ghost" data-decide="reject" title="Pengajuan tidak valid atau mencurigakan">${icon('circle-x')}Tolak</button>
+            <button type="button" class="ws-btn ws-btn-secondary" data-decide="revision" title="Dokumen kurang atau tidak terbaca, recruiter memperbaiki lalu mengajukan ulang">${icon('file-pen-line')}Minta revisi</button>
             <button type="button" class="ws-btn ws-btn-primary" data-decide="approve">${icon('badge-check')}Setujui</button>`;
     } else if (c.verification_status === 'verified' || c.verification_status === 'suspended') {
         const suspended = c.verification_status === 'suspended';
@@ -126,15 +127,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         const decide = e.target.closest('[data-decide]');
         if (decide) {
             const note = $('av-note').value.trim();
-            if (decide.dataset.decide === 'reject' && !note) {
-                $('av-note-error').textContent = 'Tulis alasan penolakan.';
+            if (decide.dataset.decide !== 'approve' && !note) {
+                $('av-note-error').textContent = decide.dataset.decide === 'revision' ? 'Tulis bagian yang perlu diperbaiki.' : 'Tulis alasan penolakan.';
                 $('av-note').focus();
                 return;
             }
             setBusy(decide, true, 'Menyimpan...');
             try {
                 await admin.review(state.current.id, { decision: decide.dataset.decide, admin_notes: note || null });
-                toast(decide.dataset.decide === 'approve' ? 'Perusahaan diverifikasi.' : 'Pengajuan ditolak.', 'success');
+                toast({ approve: 'Perusahaan diverifikasi.', revision: 'Recruiter diminta memperbaiki pengajuan.' }[decide.dataset.decide] || 'Pengajuan ditolak.', 'success');
                 $('av-dialog').close();
                 await load();
             } catch (err) {

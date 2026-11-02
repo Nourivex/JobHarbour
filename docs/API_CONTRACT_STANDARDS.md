@@ -336,11 +336,11 @@ Dikembalikan ketika token valid tetapi user tidak memiliki akses (role tidak ses
 | `GET` | `/company/verification` | Status verifikasi, catatan admin, kolom profil yang kurang, dan riwayat pengajuan | ✅ recruiter |
 | `POST` | `/company/verification` | Kirim atau kirim ulang pengajuan (multipart: `legal_name`, `registration_number`, `tax_number?`, `applicant_position`, `notes?`, `documents[]` PDF/JPG/PNG maks 2 MB, 1 sampai 5 file, `document_types[]`). 409 bila masih diperiksa atau sudah terverifikasi, 403 `COMPANY_SUSPENDED` bila ditangguhkan | ✅ recruiter |
 | `GET` | `/verifications/{id}/documents/{index}` | Unduh dokumen pengajuan, hanya pemilik perusahaan atau admin | ✅ |
-| `GET` | `/admin/verifications?status=` | Daftar pengajuan (`pending`, `approved`, `rejected`) beserta `meta.counts` | ✅ admin |
-| `PATCH` | `/admin/verifications/{id}` | `{ "decision": "approve" \| "reject", "admin_notes" }`, catatan wajib saat menolak | ✅ admin |
+| `GET` | `/admin/verifications?status=` | Daftar pengajuan (`pending`, `approved`, `revision_required`, `rejected`) beserta `meta.counts` | ✅ admin |
+| `PATCH` | `/admin/verifications/{id}` | `{ "decision": "approve" \| "revision" \| "reject", "admin_notes" }`. `revision` meminta recruiter memperbaiki lalu mengajukan ulang; catatan wajib untuk `revision` dan `reject` | ✅ admin |
 | `PATCH` | `/admin/companies/{id}/status` | `{ "status": "suspended" \| "verified", "note" }` untuk menangguhkan atau memulihkan | ✅ admin |
 
-Status verifikasi perusahaan: `unverified`, `pending`, `verified`, `rejected`, `suspended`. Pendaftaran publik (`POST /auth/register`) hanya menerima peran `applicant` dan `recruiter`.
+Status verifikasi perusahaan: `unverified`, `pending`, `revision_required`, `verified`, `rejected`, `suspended`. Pengajuan ulang diizinkan dari `unverified`, `revision_required`, dan `rejected`. Pendaftaran publik (`POST /auth/register`) hanya menerima peran `applicant` dan `recruiter`.
 
 ---
 
@@ -509,6 +509,9 @@ Menutup lowongan (soft close). Sama seperti update, endpoint ini dijaga dengan v
 | `GET` | `/jobs/{jobId}/applications/ranked` | Lamaran terurut by match score | ✅ | Recruiter |
 | `GET` | `/applications/{id}/cv` | Mengunduh / membaca file resume CV PDF | ✅ | Applicant / Recruiter |
 | `DELETE` | `/applications/{id}` | Membatalkan lamaran (hanya jika tahap submitted/screening) | ✅ | Applicant |
+| `GET` | `/applications/{id}/notes` | Catatan internal recruiter untuk lamaran (tidak terlihat pelamar) | ✅ | Recruiter pemilik lowongan / Admin |
+| `POST` | `/applications/{id}/notes` | Tambah catatan `{ "body" }` (wajib, maks 2000). 201 + header `Location` | ✅ | Recruiter pemilik lowongan / Admin |
+| `DELETE` | `/applications/{id}/notes/{noteId}` | Hapus catatan, hanya oleh penulisnya (403 `NOTE_FORBIDDEN`) | ✅ | Penulis catatan |
 
 #### Mock: `POST /applications`
 

@@ -11,11 +11,11 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * Class Company
  *
  * Profil perusahaan milik satu akun recruiter beserta status verifikasinya.
- * Status verifikasi: unverified, pending, verified, rejected, suspended.
+ * Status verifikasi: unverified, pending, revision_required, verified, rejected, suspended.
  */
 class Company extends Model
 {
-    public const STATUSES = ['unverified', 'pending', 'verified', 'rejected', 'suspended'];
+    public const STATUSES = ['unverified', 'pending', 'revision_required', 'verified', 'rejected', 'suspended'];
 
     protected $fillable = [
         'owner_id',

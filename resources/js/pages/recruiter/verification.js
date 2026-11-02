@@ -17,13 +17,14 @@ function renderStatus() {
     const s = info.status;
     const v = VERIFY[s] || VERIFY.unverified;
     const last = info.submissions[0];
-    const tone = { success: 'success', info: 'info', danger: 'danger', neutral: 'neutral' }[v.tone];
+    const tone = { success: 'success', info: 'info', warning: 'warning', danger: 'danger', neutral: 'neutral' }[v.tone];
     const color = tone === 'neutral' ? 'var(--ws-muted)' : `var(--ws-${tone})`;
     const soft = tone === 'neutral' ? 'var(--ws-surface-2)' : `var(--ws-${tone}-soft)`;
     const detail = {
         unverified: info.missing_profile_fields.length ? 'Lengkapi profil perusahaan terlebih dahulu, lalu kirim dokumen di bawah.' : 'Profil sudah lengkap. Kirim dokumen legal untuk diperiksa admin.',
         pending: last ? `Dikirim ${formatDate(last.submitted_at, true)}. Pemeriksaan biasanya selesai dalam 1 sampai 2 hari kerja. Sementara itu, siapkan lowongan sebagai draft.` : '',
         verified: `Disetujui ${info.verified_at ? formatDate(info.verified_at) : ''}. Lowongan bisa langsung dipublikasikan.`,
+        revision_required: 'Data pengajuan sebelumnya sudah terisi di formulir di bawah.',
         rejected: 'Perbaiki sesuai catatan admin di bawah, lalu ajukan ulang.',
         suspended: 'Lowongan baru tidak dapat dipublikasikan selama penangguhan. Hubungi admin JobHarbour untuk penjelasan.',
     }[s] || '';
@@ -34,14 +35,14 @@ function renderStatus() {
             <div class="min-w-0 flex-1">
                 <div class="flex flex-wrap items-center gap-2"><h2 class="text-lg font-bold">${v.label}</h2>${verifyBadge(s)}</div>
                 <p class="mt-1 text-[var(--ws-text-2)]">${v.text} ${detail}</p>
-                ${info.note && (s === 'rejected' || s === 'suspended') ? `
+                ${info.note && ['revision_required', 'rejected', 'suspended'].includes(s) ? `
                     <div class="mt-3 rounded-xl p-3 text-sm" style="background:${soft}">
                         <p class="font-semibold" style="color:${color}">Catatan admin</p>
                         <p class="mt-0.5 text-[var(--ws-text)]">${esc(info.note)}</p>
                     </div>` : ''}
             </div>
             ${s === 'verified' ? '<a href="/recruiter/jobs?new=1" class="ws-btn ws-btn-primary">Buat lowongan</a>' : ''}
-            ${info.missing_profile_fields.length && ['unverified', 'rejected'].includes(s) ? '<a href="/recruiter/company" class="ws-btn ws-btn-primary">Lengkapi profil</a>' : ''}
+            ${info.missing_profile_fields.length && ['unverified', 'revision_required', 'rejected'].includes(s) ? '<a href="/recruiter/company" class="ws-btn ws-btn-primary">Lengkapi profil</a>' : ''}
         </div>`;
 }
 
@@ -51,8 +52,8 @@ function renderSteps() {
     const submitted = ['pending', 'verified', 'suspended'].includes(s);
     const steps = [
         { title: 'Lengkapi profil', text: profileDone ? 'Semua kolom wajib terisi' : `${info.missing_profile_fields.length} kolom belum terisi`, state: profileDone ? 'done' : 'current' },
-        { title: 'Kirim dokumen', text: s === 'rejected' ? 'Perlu dikirim ulang' : submitted ? 'Terkirim' : 'NIB dan dokumen pendukung', state: submitted ? 'done' : profileDone ? 'current' : '' },
-        { title: 'Pemeriksaan admin', text: s === 'pending' ? 'Sedang diperiksa' : s === 'rejected' ? 'Ditolak' : ['verified', 'suspended'].includes(s) ? 'Selesai' : 'Menunggu dokumen', state: s === 'pending' ? 'current' : s === 'rejected' ? 'failed' : ['verified', 'suspended'].includes(s) ? 'done' : '' },
+        { title: 'Kirim dokumen', text: s === 'rejected' || s === 'revision_required' ? 'Perlu dikirim ulang' : submitted ? 'Terkirim' : 'NIB dan dokumen pendukung', state: submitted ? 'done' : profileDone ? 'current' : '' },
+        { title: 'Pemeriksaan admin', text: s === 'pending' ? 'Sedang diperiksa' : s === 'rejected' ? 'Ditolak' : s === 'revision_required' ? 'Perlu revisi' : ['verified', 'suspended'].includes(s) ? 'Selesai' : 'Menunggu dokumen', state: s === 'pending' ? 'current' : s === 'rejected' ? 'failed' : s === 'revision_required' ? 'current' : ['verified', 'suspended'].includes(s) ? 'done' : '' },
         { title: 'Terverifikasi', text: s === 'suspended' ? 'Sedang ditangguhkan' : s === 'verified' ? 'Bisa publikasi lowongan' : 'Publikasi lowongan terbuka', state: s === 'verified' ? 'done' : s === 'suspended' ? 'failed' : '' },
     ];
     $('vf-steps').innerHTML = steps.map((st, i) => `
@@ -63,7 +64,7 @@ function renderSteps() {
 }
 
 function submissionCard(sub, { compact = false } = {}) {
-    const statusPill = { pending: '<span class="ws-pill ws-pill-info">Diperiksa</span>', approved: '<span class="ws-pill ws-pill-success">Disetujui</span>', rejected: '<span class="ws-pill ws-pill-danger">Ditolak</span>' }[sub.status];
+    const statusPill = { pending: '<span class="ws-pill ws-pill-info">Diperiksa</span>', approved: '<span class="ws-pill ws-pill-success">Disetujui</span>', revision_required: '<span class="ws-pill ws-pill-warning">Perlu revisi</span>', rejected: '<span class="ws-pill ws-pill-danger">Ditolak</span>' }[sub.status];
     return `
         <div class="${compact ? 'rounded-xl border border-[var(--ws-border)] p-3' : ''} space-y-3">
             <div class="flex items-center justify-between gap-2">
@@ -116,8 +117,8 @@ function renderMain() {
     main.innerHTML = `
         <form id="vf-form" class="ws-card ws-card-body space-y-5" novalidate>
             <div>
-                <h2 class="ws-h2">${s === 'rejected' ? 'Ajukan ulang verifikasi' : 'Ajukan verifikasi'}</h2>
-                <p class="ws-meta mt-0.5">${s === 'rejected' ? 'Data pengajuan sebelumnya sudah diisi ulang. Perbaiki bagian yang dicatat admin, lalu unggah dokumen yang benar.' : 'Isi data sesuai dokumen legal perusahaan.'}</p>
+                <h2 class="ws-h2">${s === 'rejected' || s === 'revision_required' ? 'Ajukan ulang verifikasi' : 'Ajukan verifikasi'}</h2>
+                <p class="ws-meta mt-0.5">${s === 'rejected' || s === 'revision_required' ? 'Data pengajuan sebelumnya sudah diisi ulang. Perbaiki bagian yang dicatat admin, lalu unggah dokumen yang benar.' : 'Isi data sesuai dokumen legal perusahaan.'}</p>
             </div>
             <div id="vf-alert" class="hidden"></div>
             <div class="grid sm:grid-cols-2 gap-4">
@@ -158,7 +159,7 @@ function renderMain() {
 
             <div>
                 <label for="vf-notes" class="ws-label">Catatan untuk admin <span class="opt">(opsional)</span></label>
-                <textarea id="vf-notes" name="notes" rows="3" maxlength="1000" class="ws-input" placeholder="${s === 'rejected' ? 'Jelaskan apa yang sudah diperbaiki.' : 'Informasi tambahan yang membantu pemeriksaan.'}"></textarea>
+                <textarea id="vf-notes" name="notes" rows="3" maxlength="1000" class="ws-input" placeholder="${s === 'rejected' || s === 'revision_required' ? 'Jelaskan apa yang sudah diperbaiki.' : 'Informasi tambahan yang membantu pemeriksaan.'}"></textarea>
             </div>
 
             <div id="vf-progress" class="hidden">

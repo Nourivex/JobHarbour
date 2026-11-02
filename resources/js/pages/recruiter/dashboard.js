@@ -1,4 +1,4 @@
-import { bootShell, setReviewCount, canPublish } from '../../recruiter/shell.js';
+import { bootShell, setNavCounts, canPublish } from '../../recruiter/shell.js';
 import { data, appsOfJob, stageCounts, averageScore } from '../../recruiter/data.js';
 import { initMenus } from '../../recruiter/components.js';
 import { initJobForm, openJobForm, skillSuggestions } from '../../recruiter/job-form.js';
@@ -75,7 +75,7 @@ function renderKpis(jobs, apps) {
         kpi('/recruiter/jobs?status=open', 'briefcase-business', 'Lowongan aktif', open.length, drafts ? `${drafts} draft belum terbit` : 'Tidak ada draft tertunda'),
         kpi('/recruiter/pipeline', 'users', 'Total kandidat', apps.length, week ? `${week} masuk 7 hari terakhir` : 'Belum ada yang baru minggu ini'),
         kpi('/recruiter/pipeline?stage=screening', 'inbox', 'Perlu ditinjau', counts.screening, ready ? `${ready} skor 80% ke atas` : 'Belum ada yang menonjol'),
-        kpi('/recruiter/pipeline?stage=interview', 'calendar-clock', 'Tahap interview', counts.interview, upcoming.length ? `Terdekat ${formatDateTime(upcoming[0].datetime)}` : 'Belum ada jadwal'),
+        kpi('/recruiter/interviews', 'calendar-clock', 'Tahap interview', counts.interview, upcoming.length ? `Terdekat ${formatDateTime(upcoming[0].datetime)}` : 'Belum ada jadwal'),
     ].join('');
 }
 
@@ -104,6 +104,12 @@ function renderActions(ctx, jobs, apps) {
 
     const review = apps.filter((a) => stageOf(a) === 'screening' && Number(a.match_score) < 80);
     if (review.length) items.push(actionItem('inbox', 'info', `${plural(review.length, 'berkas')} menunggu ditinjau`, esc(byJob(review)), '/recruiter/pipeline?stage=screening', 'Tinjau'));
+
+    const overdue = apps.filter((a) => {
+        const s = stageOf(a) === 'interview' ? interviewOf(a) : null;
+        return s && new Date(s.datetime).getTime() < Date.now() - 3600000;
+    });
+    if (overdue.length) items.push(actionItem('calendar-clock', 'warning', `${plural(overdue.length, 'wawancara')} sudah lewat`, 'Catat hasilnya lalu majukan atau tolak kandidat.', '/recruiter/interviews', 'Putuskan'));
 
     const offering = apps.filter((a) => stageOf(a) === 'offering');
     if (offering.length) items.push(actionItem('send', 'warning', `${plural(offering.length, 'penawaran')} belum dikonfirmasi`, 'Tandai Hired setelah kandidat menerima tawaran.', '/recruiter/pipeline?stage=offering', 'Buka'));
@@ -234,7 +240,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderPerformance(jobs, apps);
         renderInterviews(apps);
         renderActivity(apps);
-        setReviewCount(apps.filter((a) => stageOf(a) === 'screening').length);
+        setNavCounts(apps);
         hydrateIcons($('ws-main'));
     };
 

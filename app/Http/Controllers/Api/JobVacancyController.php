@@ -287,6 +287,7 @@ class JobVacancyController extends Controller
         $message = match ($company?->verification_status) {
             null => 'Lengkapi profil perusahaan dan ajukan verifikasi sebelum mempublikasikan lowongan. Lowongan tetap bisa disimpan sebagai draft.',
             'pending' => 'Verifikasi perusahaan masih diperiksa admin. Simpan lowongan sebagai draft dan publikasikan setelah disetujui.',
+            'revision_required' => 'Admin meminta perbaikan pengajuan verifikasi. Perbaiki lalu ajukan ulang; sementara itu lowongan bisa disimpan sebagai draft.',
             'suspended' => 'Perusahaan sedang ditangguhkan admin sehingga lowongan tidak dapat dipublikasikan.',
             default => 'Perusahaan belum terverifikasi. Ajukan verifikasi sebelum mempublikasikan lowongan. Lowongan tetap bisa disimpan sebagai draft.',
         };

@@ -44,6 +44,8 @@ Route::prefix('recruiter')->name('recruiter.')->group(function () {
     Route::view('/jobs', 'recruiter.jobs')->name('jobs');
     Route::get('/jobs/{id}', fn (int $id) => view('recruiter.job-detail', ['jobId' => $id]))->whereNumber('id')->name('job');
     Route::view('/pipeline', 'recruiter.pipeline')->name('pipeline');
+    Route::view('/interviews', 'recruiter.interviews')->name('interviews');
+    Route::view('/analytics', 'recruiter.analytics')->name('analytics');
     Route::get('/candidates/{id}', fn (int $id) => view('recruiter.candidate', ['applicationId' => $id]))->whereNumber('id')->name('candidate');
     Route::view('/company', 'recruiter.company')->name('company');
     Route::view('/verification', 'recruiter.verification')->name('verification');

@@ -1,6 +1,6 @@
 <x-layouts.workspace title="Detail Kandidat - Portal Recruiter JobHarbour" active="pipeline" crumb="Detail Kandidat">
     <div id="cd-root" data-application-id="{{ $applicationId }}">
-        <a href="/recruiter/pipeline" id="cd-back" class="ws-btn ws-btn-ghost ws-btn-sm -ml-3 mb-4"><i data-lucide="arrow-left"></i>Kembali ke pipeline</a>
+        <a href="/recruiter/pipeline" id="cd-back" class="ws-btn ws-btn-ghost ws-btn-sm -ml-3 mb-4"><i data-lucide="arrow-left"></i>Kembali ke lowongan</a>
 
         <div id="cd-error" class="hidden ws-card"></div>
 
@@ -17,6 +17,7 @@
                 <div class="space-y-6 min-w-0">
                     <div class="ws-card ws-card-body" id="cd-match"><div class="h-48 rounded-xl animate-skeleton ws-skel"></div></div>
                     <div class="ws-card ws-card-body" id="cd-skills"></div>
+                    <div class="ws-card ws-card-body" id="cd-notes"></div>
                     <div class="grid gap-6 xl:grid-cols-2">
                         <div class="ws-card ws-card-body" id="cd-profile"></div>
                         <div class="ws-card ws-card-body" id="cd-docs"></div>

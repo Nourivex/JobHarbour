@@ -2,7 +2,7 @@
  * Tampilan kandidat yang dipakai di laci Pipeline dan halaman Detail Kandidat:
  * penjelasan skor Weighted Jaccard, skill, profil, dokumen, riwayat, linimasa, dan aksi tahap.
  */
-import { applications, toast } from '../api.js';
+import { applications, toast, confirm } from '../api.js';
 import { moveCandidate } from './data.js';
 import { setBusy } from './components.js';
 import {
@@ -41,6 +41,7 @@ export function matchSection(app, job) {
                 </div>
                 <p class="mt-2 text-sm ws-num"><strong>${b.earned}</strong> dari <strong>${b.total}</strong> bobot terpenuhi &nbsp;→&nbsp; ${b.earned} ÷ ${b.total} × 100 = <strong>${b.total ? Math.round((b.earned / b.total) * 100) : 0}%</strong></p>
                 ${Math.round((b.earned / (b.total || 1)) * 100) !== info.score ? `<p class="ws-meta mt-1">Skor tersimpan ${info.score}% dihitung saat melamar; syarat lowongan mungkin berubah sesudahnya.</p>` : ''}
+                ${missingRequired.length ? `<p class="mt-3 text-sm text-[var(--ws-text-2)]"><strong>Perlu digali saat seleksi:</strong> ${missingRequired.map((r) => esc(r.name)).join(', ')}. Skill bisa saja dimiliki tetapi belum ditulis di profil.</p>` : ''}
 
                 <ul class="mt-4 divide-y divide-[var(--ws-border)]">
                     ${b.rows.map((r) => `
@@ -52,7 +53,97 @@ export function matchSection(app, job) {
                         </li>`).join('')}
                 </ul>
             </div>` : ''}
+            <p class="ws-callout mt-4">${icon('info', 'w-4 h-4 shrink-0')}<span>Skor dihitung dengan Weighted Jaccard dari skill yang ditulis kandidat. Gunakan sebagai alat bantu menyaring, bukan penentu otomatis diterima atau ditolak.</span></p>
         </section>`;
+}
+
+// ------------------------------------------------------------------ catatan recruiter
+const noteDate = (iso) => (iso ? new Date(iso).toLocaleString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '');
+
+function noteItem(n) {
+    return `
+        <li class="ws-note" data-note="${n.id}">
+            <div class="ws-note-meta">
+                <span class="font-semibold text-[var(--ws-text)]">${esc(n.author?.name || 'Recruiter')}</span>
+                <span>${noteDate(n.created_at)}</span>
+                ${n.can_delete ? `<button type="button" class="ws-icon-btn w-7 h-7 ml-auto" data-note-delete="${n.id}" aria-label="Hapus catatan">${icon('trash-2', 'w-3.5 h-3.5')}</button>` : ''}
+            </div>
+            <p class="ws-note-body">${esc(n.body)}</p>
+        </li>`;
+}
+
+/** Kerangka bagian catatan. Isi dimuat oleh bindNotes() supaya tidak memperlambat tampilan awal. */
+export function notesSection(app) {
+    return `
+        <section aria-labelledby="cv-notes-${app.id}" data-notes-root="${app.id}">
+            <div class="flex items-center justify-between gap-3">
+                <h3 id="cv-notes-${app.id}" class="ws-h2">Catatan recruiter</h3>
+                <span class="inline-flex items-center gap-1.5 ws-meta">${icon('lock', 'w-3.5 h-3.5')}Tidak terlihat oleh pelamar</span>
+            </div>
+            <form class="mt-3 space-y-2" data-note-form novalidate>
+                <label for="cv-note-new-${app.id}" class="sr-only">Tulis catatan</label>
+                <textarea id="cv-note-new-${app.id}" name="body" rows="2" maxlength="2000" class="ws-input" placeholder="Contoh: Komunikasi baik, perlu dites ulang di SQL."></textarea>
+                <p class="ws-error" data-error-for="body"></p>
+                <div class="flex justify-end"><button type="submit" class="ws-btn ws-btn-secondary ws-btn-sm">${icon('sticky-note')}Simpan catatan</button></div>
+            </form>
+            <ul class="mt-3 space-y-2" data-note-list><li>${'<div class="h-14 rounded-xl animate-skeleton ws-skel"></div>'}</li></ul>
+        </section>`;
+}
+
+/** Muat, tambah, dan hapus catatan untuk satu lamaran di dalam root. */
+export async function bindNotes(root, app) {
+    const box = root.querySelector(`[data-notes-root="${app.id}"]`);
+    if (!box) return;
+    const list = box.querySelector('[data-note-list]');
+    const form = box.querySelector('[data-note-form]');
+    const empty = '<li class="ws-meta">Belum ada catatan. Catat kesan screening atau hasil wawancara agar keputusan mudah ditelusuri.</li>';
+
+    const paint = (notes) => { list.innerHTML = notes.length ? notes.map(noteItem).join('') : empty; };
+    let notes = [];
+    try {
+        notes = (await applications.notes(app.id)).data || [];
+        paint(notes);
+    } catch (err) {
+        list.innerHTML = `<li class="ws-error">${esc(errorMessage(err, 'Catatan gagal dimuat.'))}</li>`;
+    }
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const err = form.querySelector('[data-error-for="body"]');
+        err.textContent = '';
+        const body = form.body.value.trim();
+        if (!body) {
+            err.textContent = 'Tulis isi catatan terlebih dahulu.';
+            form.body.focus();
+            return;
+        }
+        const btn = form.querySelector('[type="submit"]');
+        setBusy(btn, true, 'Menyimpan...');
+        try {
+            const res = await applications.addNote(app.id, body);
+            notes = [res.data, ...notes];
+            paint(notes);
+            form.reset();
+            toast('Catatan tersimpan.', 'success');
+        } catch (ex) {
+            err.textContent = ex?.errors?.body?.[0] || errorMessage(ex, 'Catatan gagal disimpan.');
+        }
+        setBusy(btn, false);
+    });
+
+    list.addEventListener('click', async (e) => {
+        const del = e.target.closest('[data-note-delete]');
+        if (!del) return;
+        if (!(await confirm({ title: 'Hapus catatan?', message: 'Catatan yang dihapus tidak bisa dikembalikan.', confirmText: 'Hapus', cancelText: 'Batal', danger: true }))) return;
+        try {
+            await applications.deleteNote(app.id, del.dataset.noteDelete);
+            notes = notes.filter((n) => String(n.id) !== del.dataset.noteDelete);
+            paint(notes);
+            toast('Catatan dihapus.', 'success');
+        } catch (ex) {
+            toast(errorMessage(ex, 'Catatan gagal dihapus.'), 'error');
+        }
+    });
 }
 
 export function skillsSection(app) {

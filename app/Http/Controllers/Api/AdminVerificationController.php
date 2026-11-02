@@ -23,14 +23,14 @@ class AdminVerificationController extends Controller
 
     /**
      * Method  : GET
-     * Endpoint: /api/admin/verifications?status=pending|approved|rejected
+     * Endpoint: /api/admin/verifications?status=pending|approved|revision_required|rejected
      */
     public function index(Request $request): JsonResponse
     {
         $status = $request->input('status');
 
         $submissions = CompanyVerification::with(['company.owner:id,name,email', 'reviewer:id,name'])
-            ->when(in_array($status, ['pending', 'approved', 'rejected'], true), fn ($q) => $q->where('status', $status))
+            ->when(in_array($status, ['pending', 'approved', 'revision_required', 'rejected'], true), fn ($q) => $q->where('status', $status))
             ->latest('id')
             ->get()
             ->map(fn (CompanyVerification $v) => $v->toApiArray() + [
@@ -55,22 +55,24 @@ class AdminVerificationController extends Controller
     }
 
     /**
-     * Menyetujui atau menolak satu pengajuan. Catatan wajib diisi saat menolak.
+     * Menyetujui, meminta revisi, atau menolak satu pengajuan.
+     * Revisi dipakai bila dokumen kurang atau tidak terbaca: recruiter memperbaiki lalu mengajukan ulang.
+     * Catatan wajib diisi untuk revisi dan penolakan.
      *
      * Method  : PATCH
      * Endpoint: /api/admin/verifications/{id}
-     * Body    : { "decision": "approve" | "reject", "admin_notes": "..." }
+     * Body    : { "decision": "approve" | "revision" | "reject", "admin_notes": "..." }
      */
     public function review(Request $request, int $id): JsonResponse
     {
         $admin = $request->attributes->get('auth_user') ?? $request->user();
 
         $validator = Validator::make($request->all(), [
-            'decision' => 'required|string|in:approve,reject',
-            'admin_notes' => 'nullable|string|max:1000|required_if:decision,reject',
+            'decision' => 'required|string|in:approve,revision,reject',
+            'admin_notes' => 'nullable|string|max:1000|required_if:decision,reject|required_if:decision,revision',
         ], [
-            'decision.in' => 'Keputusan harus approve atau reject.',
-            'admin_notes.required_if' => 'Catatan alasan penolakan wajib diisi agar recruiter tahu apa yang perlu diperbaiki.',
+            'decision.in' => 'Keputusan harus approve, revision, atau reject.',
+            'admin_notes.required_if' => 'Catatan wajib diisi agar recruiter tahu apa yang perlu diperbaiki.',
         ]);
 
         if ($validator->fails()) {
@@ -87,27 +89,30 @@ class AdminVerificationController extends Controller
             return $this->errorResponse('Pengajuan ini sudah diperiksa sebelumnya.', 409, null, 'ALREADY_REVIEWED');
         }
 
-        $approved = $request->decision === 'approve';
+        $decision = $request->decision;
+        $approved = $decision === 'approve';
+        [$submissionStatus, $companyStatus, $message] = match ($decision) {
+            'approve' => ['approved', 'verified', 'Perusahaan berhasil diverifikasi.'],
+            'revision' => ['revision_required', 'revision_required', 'Recruiter diminta memperbaiki pengajuan.'],
+            default => ['rejected', 'rejected', 'Pengajuan verifikasi ditolak.'],
+        };
 
-        DB::transaction(function () use ($submission, $approved, $request, $admin) {
+        DB::transaction(function () use ($submission, $approved, $submissionStatus, $companyStatus, $request, $admin) {
             $submission->update([
-                'status' => $approved ? 'approved' : 'rejected',
+                'status' => $submissionStatus,
                 'admin_notes' => $request->admin_notes,
                 'reviewed_by' => $admin->id,
                 'reviewed_at' => now(),
             ]);
 
             $submission->company->update([
-                'verification_status' => $approved ? 'verified' : 'rejected',
+                'verification_status' => $companyStatus,
                 'verification_note' => $approved ? null : $request->admin_notes,
                 'verified_at' => $approved ? now() : null,
             ]);
         });
 
-        return $this->successResponse(
-            $submission->fresh(['reviewer'])->toApiArray(),
-            $approved ? 'Perusahaan berhasil diverifikasi.' : 'Pengajuan verifikasi ditolak.'
-        );
+        return $this->successResponse($submission->fresh(['reviewer'])->toApiArray(), $message);
     }
 
     /**

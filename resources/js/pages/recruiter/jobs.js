@@ -1,6 +1,6 @@
 import { jobs as jobsApi, toast, confirm } from '../../api.js';
 import { util } from '../../api.js';
-import { bootShell, setReviewCount, canPublish } from '../../recruiter/shell.js';
+import { bootShell, setNavCounts, canPublish } from '../../recruiter/shell.js';
 import { data, appsOfJob, averageScore } from '../../recruiter/data.js';
 import { initMenus, menu, debounce } from '../../recruiter/components.js';
 import { initJobForm, openJobForm, skillSuggestions } from '../../recruiter/job-form.js';
@@ -62,7 +62,7 @@ function actionsFor(job) {
     const publishOk = canPublish(state.ctx);
     const tip = publishOk ? '' : 'Perusahaan harus terverifikasi terlebih dahulu';
     const items = [{ label: 'Lihat detail', icon: icon('eye'), attrs: `data-act="view" data-id="${job.id}"` }];
-    if (job.status === 'open') items.push({ label: 'Lihat kandidat', icon: icon('kanban'), attrs: `data-act="pipeline" data-id="${job.id}"` });
+    items.push({ label: 'Buka kandidat', icon: icon('users'), attrs: `data-act="pipeline" data-id="${job.id}"` });
     if (job.status !== 'archived') items.push({ label: 'Edit', icon: icon('pencil'), attrs: `data-act="edit" data-id="${job.id}"` });
     items.push('-');
     if (job.status === 'draft' || job.status === 'closed') {
@@ -209,7 +209,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!job) return;
         const a = act.dataset.act;
         if (a === 'view') window.location.href = `/recruiter/jobs/${job.id}`;
-        if (a === 'pipeline') window.location.href = `/recruiter/pipeline?job=${job.id}`;
+        if (a === 'pipeline') window.location.href = `/recruiter/jobs/${job.id}`;
         if (a === 'edit') openJobForm(job, skillSuggestions(state.jobs, state.apps));
         if (a === 'publish') changeStatus(job, 'open');
         if (a === 'close') changeStatus(job, 'closed', { confirmOpts: { title: 'Tutup lowongan ini?', message: `"${job.title}" berhenti menerima lamaran baru. Kandidat yang sudah melamar tetap bisa diproses.`, confirmText: 'Tutup lowongan', cancelText: 'Batal', danger: true } });
@@ -219,7 +219,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     try {
         [state.jobs, state.apps] = await Promise.all([data.jobs(), data.applications()]);
-        setReviewCount(state.apps.filter((a) => stageOf(a) === 'screening').length);
+        setNavCounts(state.apps);
         render();
         if (params.get('new') === '1') {
             openJobForm(null, skillSuggestions(state.jobs, state.apps));

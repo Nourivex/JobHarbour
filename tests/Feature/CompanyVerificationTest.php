@@ -314,4 +314,41 @@ class CompanyVerificationTest extends TestCase
             'role' => 'admin',
         ])->assertStatus(422)->assertJsonStructure(['errors' => ['role']]);
     }
+
+    public function test_admin_requests_revision_then_recruiter_resubmits(): void
+    {
+        $headers = $this->auth('recruiter@test.com');
+        $this->withHeaders($headers)->putJson('/api/company', $this->completeProfile());
+        $this->submitVerification($headers)->assertStatus(201);
+        $first = Company::first()->verifications()->first()->id;
+        $admin = $this->auth('admin@test.com');
+
+        // Revisi wajib disertai catatan
+        $this->withHeaders($admin)->patchJson("/api/admin/verifications/{$first}", ['decision' => 'revision'])
+            ->assertStatus(422)
+            ->assertJsonStructure(['errors' => ['admin_notes']]);
+
+        $this->withHeaders($admin)->patchJson("/api/admin/verifications/{$first}", [
+            'decision' => 'revision',
+            'admin_notes' => 'Dokumen NIB buram, unggah ulang dengan resolusi lebih tinggi.',
+        ])->assertStatus(200)->assertJsonPath('data.status', 'revision_required');
+
+        $this->withHeaders($headers)->getJson('/api/company/verification')
+            ->assertJsonPath('data.status', 'revision_required')
+            ->assertJsonPath('data.note', 'Dokumen NIB buram, unggah ulang dengan resolusi lebih tinggi.')
+            ->assertJsonPath('data.can_submit', true);
+
+        // Selama perlu revisi, lowongan tetap tidak bisa dipublikasikan
+        $this->withHeaders($headers)->postJson('/api/jobs', $this->jobPayload())
+            ->assertStatus(403)
+            ->assertJsonPath('error_code', 'COMPANY_NOT_VERIFIED');
+
+        // Recruiter mengajukan ulang, admin menyetujui
+        $this->submitVerification($headers)->assertStatus(201)->assertJsonPath('data.status', 'pending');
+        $second = Company::first()->verifications()->first()->id;
+        $this->withHeaders($admin)->getJson('/api/admin/verifications?status=revision_required')->assertJsonCount(1, 'data');
+        $this->withHeaders($admin)->patchJson("/api/admin/verifications/{$second}", ['decision' => 'approve'])->assertStatus(200);
+
+        $this->withHeaders($headers)->getJson('/api/company')->assertJsonPath('data.verification_status', 'verified');
+    }
 }

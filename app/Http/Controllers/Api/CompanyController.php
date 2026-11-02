@@ -327,7 +327,7 @@ class CompanyController extends Controller
             'status' => $company->verification_status,
             'note' => $company->verification_note,
             'verified_at' => $company->verified_at?->toIso8601String(),
-            'can_submit' => in_array($company->verification_status, ['unverified', 'rejected'], true) && ! $missing,
+            'can_submit' => in_array($company->verification_status, ['unverified', 'revision_required', 'rejected'], true) && ! $missing,
             'missing_profile_fields' => $missing,
             'submissions' => $company->verifications->map->toApiArray()->values()->all(),
         ];

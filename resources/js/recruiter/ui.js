@@ -10,6 +10,8 @@ import {
     Kanban, LayoutDashboard, Link, ListFilter, Lock, LogOut, Mail, MapPin, Menu, Moon, PartyPopper, Pencil, Phone, Plus,
     RefreshCw, RotateCcw, Search, Send, Settings, ShieldAlert, ShieldCheck, ShieldX, Sparkles, Sun, Target, Trash2,
     TrendingUp, Upload, UserRound, Users, X, Archive, Megaphone, KeyRound, Palette,
+    ChevronsLeft, ChartColumn, StickyNote, Video, Table2, LayoutList, CalendarCheck, UserCheck, Timer, ListChecks,
+    FilePenLine, MessageSquareText,
 } from 'lucide';
 import { util } from '../api.js';
 
@@ -22,6 +24,8 @@ const ICONS = {
     Kanban, LayoutDashboard, Link, ListFilter, Lock, LogOut, Mail, MapPin, Menu, Moon, PartyPopper, Pencil, Phone, Plus,
     RefreshCw, RotateCcw, Search, Send, Settings, ShieldAlert, ShieldCheck, ShieldX, Sparkles, Sun, Target, Trash2,
     TrendingUp, Upload, UserRound, Users, X, Archive, Megaphone, KeyRound, Palette,
+    ChevronsLeft, ChartColumn, StickyNote, Video, Table2, LayoutList, CalendarCheck, UserCheck, Timer, ListChecks,
+    FilePenLine, MessageSquareText,
 };
 
 const toPascal = (name) => name.replace(/(^|-)([a-z0-9])/g, (_, __, c) => c.toUpperCase());
@@ -111,6 +115,7 @@ export function jobStatusBadge(status) {
 export const VERIFY = {
     unverified: { label: 'Belum diverifikasi', tone: 'neutral', icon: 'circle-dashed', text: 'Ajukan verifikasi agar lowongan bisa dipublikasikan.' },
     pending: { label: 'Sedang diperiksa', tone: 'info', icon: 'hourglass', text: 'Admin sedang memeriksa dokumen perusahaanmu.' },
+    revision_required: { label: 'Perlu revisi', tone: 'warning', icon: 'file-pen-line', text: 'Admin meminta perbaikan. Baca catatannya, perbaiki, lalu ajukan ulang.' },
     verified: { label: 'Terverifikasi', tone: 'success', icon: 'shield-check', text: 'Perusahaan terverifikasi dan bisa mempublikasikan lowongan.' },
     rejected: { label: 'Ditolak', tone: 'danger', icon: 'shield-x', text: 'Pengajuan ditolak. Perbaiki sesuai catatan admin lalu ajukan ulang.' },
     suspended: { label: 'Ditangguhkan', tone: 'danger', icon: 'shield-alert', text: 'Perusahaan ditangguhkan admin. Lowongan tidak bisa dipublikasikan.' },
