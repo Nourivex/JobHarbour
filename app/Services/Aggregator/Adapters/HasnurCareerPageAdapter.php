@@ -10,7 +10,12 @@ class HasnurCareerPageAdapter implements JobSourceAdapterInterface
 {
     public function fetch(JobSource $source): array
     {
-        $response = Http::timeout(15)
+        $timeout = (int) config('services.aggregator.timeout', 15);
+        $retries = (int) config('services.aggregator.retry_attempts', 2);
+        $retryDelay = (int) config('services.aggregator.retry_delay_ms', 500);
+
+        $response = Http::timeout($timeout)
+            ->retry($retries, $retryDelay)
             ->withHeaders(['User-Agent' => 'JobHarbour-Aggregator/1.0 (+https://jobharbour.ddev.site)'])
             ->get($source->base_url);
 

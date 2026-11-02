@@ -5,7 +5,9 @@ namespace App\Services\Aggregator;
 use App\Models\JobSource;
 use App\Models\JobSyncLog;
 use App\Models\JobVacancy;
+use App\Models\User;
 use App\Services\Aggregator\Contracts\JobSourceAdapterInterface;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 class JobAggregationService
@@ -28,6 +30,9 @@ class JobAggregationService
     public function syncSource(JobSource $source): JobSyncLog
     {
         $startTime = microtime(true);
+        $cacheKey = "job_source_feed:{$source->id}";
+        $cacheTtlHours = (int) config('services.aggregator.cache_ttl_hours', 6);
+
         $log = new JobSyncLog([
             'job_source_id' => $source->id,
             'status' => 'running',
@@ -48,6 +53,11 @@ class JobAggregationService
             /** @var JobSourceAdapterInterface $adapter */
             $adapter = app($adapterClass);
             $rawVacancies = $adapter->fetch($source);
+
+            // Simpan cache feed untuk fail-open fallback
+            if (!empty($rawVacancies)) {
+                Cache::put($cacheKey, $rawVacancies, now()->addHours($cacheTtlHours));
+            }
 
             $createdCount = 0;
             $updatedCount = 0;
@@ -114,7 +124,7 @@ class JobAggregationService
                         'job_source_type' => $v['job_source_type'] ?? 'official_career_page',
                         'location_verification_status' => $v['location_verification_status'] ?? 'approximate_city',
                         'location_data_source' => $v['location_data_source'] ?? $source->name,
-                        'posted_by' => 1,
+                        'posted_by' => $v['posted_by'] ?? User::where('role', 'admin')->value('id') ?? User::where('email', 'admin@jobharbour.id')->value('id'),
                     ]);
                     $createdCount++;
                 }
@@ -144,16 +154,18 @@ class JobAggregationService
             $duration = round(microtime(true) - $startTime, 2);
             Log::error("JobAggregationService Error [Source: {$source->name}]: " . $e->getMessage());
 
+            $fallbackNote = Cache::has($cacheKey) ? ' (Tersedia cadangan cache feed)' : '';
+
             $log->update([
                 'status' => 'failed',
-                'error_details' => $e->getMessage(),
+                'error_details' => $e->getMessage() . $fallbackNote,
                 'duration_seconds' => $duration,
                 'finished_at' => now(),
             ]);
 
             $source->update([
                 'last_error_at' => now(),
-                'last_error_message' => substr($e->getMessage(), 0, 500),
+                'last_error_message' => substr($e->getMessage() . $fallbackNote, 0, 500),
             ]);
 
             return $log;

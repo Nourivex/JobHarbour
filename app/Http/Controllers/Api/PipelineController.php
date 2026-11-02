@@ -110,9 +110,42 @@ class PipelineController extends Controller
         $notes = $request->input('notes');
         $interviewSchedule = $request->input('interview_schedule');
 
+        // 6. Validasi Aturan Transisi Tahapan Seleksi (Forward-only & No Rollback)
+        // Aturan: Tahapan hanya boleh bergerak maju atau beralih ke 'rejected'.
+        // Pelamar yang sudah di status 'rejected' tidak dapat dialihkan kembali ke tahapan lain.
+        $stageRanks = [
+            'screening' => 1,
+            'assessment' => 2,
+            'interview' => 3,
+            'offering' => 4,
+        ];
+
+        if ($pipeline->current_stage === 'rejected' && $newStage !== 'rejected') {
+            return $this->errorResponse(
+                'Tahapan seleksi pelamar sudah berada pada status ditolak (rejected) dan tidak dapat dialihkan ke tahapan lain.',
+                422,
+                ['stage' => ['Kandidat telah ditolak dan tidak dapat dipindahkan kembali ke tahapan proses seleksi.']],
+                'INVALID_STAGE_TRANSITION'
+            );
+        }
+
+        if ($newStage !== 'rejected' && $newStage !== $pipeline->current_stage) {
+            $currentRank = $stageRanks[$pipeline->current_stage] ?? 0;
+            $newRank = $stageRanks[$newStage] ?? 0;
+
+            if ($newRank < $currentRank) {
+                return $this->errorResponse(
+                    "Perpindahan tahapan seleksi tidak valid. Tahapan hanya dapat bergerak maju (Screening -> Assessment -> Interview -> Offering) atau beralih ke ditolak (rejected), tanpa rollback.",
+                    422,
+                    ['stage' => ["Tidak dapat memindahkan tahapan mundur dari '{$pipeline->current_stage}' ke '{$newStage}'."]],
+                    'INVALID_STAGE_TRANSITION'
+                );
+            }
+        }
+
         $stages = $pipeline->stages ?? [];
 
-        // 6. Jika berpindah ke tahapan baru, selesaikan (tutup waktu) tahap sebelumnya
+        // 7. Jika berpindah ke tahapan baru, selesaikan (tutup waktu) tahap sebelumnya
         if ($pipeline->current_stage !== $newStage) {
             foreach ($stages as &$stg) {
                 if ($stg['stage'] === $pipeline->current_stage && empty($stg['completed_at'])) {

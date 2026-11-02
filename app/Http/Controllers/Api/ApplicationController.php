@@ -193,6 +193,9 @@ class ApplicationController extends Controller
 
         // 7. Simpan lamaran dan buat linimasa pipeline secara atomic di dalam Database Transaction
         return DB::transaction(function () use ($currentUser, $job, $request, $matchResult, $candidateSkills, $cvFilePath) {
+            // Pessimistic lock pada baris lowongan untuk mencegah race condition kuota
+            JobVacancy::where('id', $job->id)->lockForUpdate()->first();
+
             // A. Simpan data lamaran kerja
             $application = Application::create([
                 'user_id' => $currentUser->id,

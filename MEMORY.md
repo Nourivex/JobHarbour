@@ -59,6 +59,12 @@ Dokumen ini berfungsi sebagai memori jangka panjang (*long-term memory*) untuk m
 - Perbaikan tata letak kartu lowongan katalog agar adaptif, responsif, dan bebas terhimpit.
 - Lencana transparansi asal lowongan: **Sumber Karier Resmi**, **Mitra Terverifikasi**, dan **Data Demo**.
 
+### Audit API & Penyelesaian Isu GitHub (#9, #10, #11):
+- **Isu #9:** Menutup celah akses rute `/api/aggregator/sync` dan `/api/aggregator/summary` dengan middleware `jwt.auth:admin`, mencegah pemicuan request HTTP eksternal tanpa otentikasi.
+- **Isu #10:** Menghapus penulisan hardcoded `posted_by = 1` pada `JobAggregationService`. Menggunakan ID akun admin dinamis atau `null` (sesuai skema database `posted_by` nullable).
+- **Isu #11:** Menegakkan aturan transisi status pipeline pada `PipelineController`. Memblokir transisi mundur (rollback) dari tahapan yang lebih tinggi ke tahapan sebelumnya dengan HTTP 422 (`INVALID_STAGE_TRANSITION`) dan mengunci status pelamar yang telah ditolak (`rejected`).
+- **Pengujian:** Suite pengujian otomatis bertambah menjadi 22 tests (147 assertions) berstatus 100% hijau.
+
 ---
 
 ## 3. Catatan Teknis Penting (Gotchas & Caveats)

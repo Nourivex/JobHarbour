@@ -453,4 +453,145 @@ class JobHarbourApiTest extends TestCase
             ->assertJsonPath('status', 'error')
             ->assertJsonStructure(['status', 'message', 'error_code']);
     }
+
+    public function test_validation_error_returns_422_with_field_errors(): void
+    {
+        // Login tanpa email dan dengan format email salah
+        $this->postJson('/api/auth/login', ['password' => 'secret123'])
+            ->assertStatus(422)
+            ->assertJsonPath('status', 'error')
+            ->assertJsonPath('error_code', 'VALIDATION_ERROR')
+            ->assertJsonStructure(['status', 'message', 'data', 'meta', 'errors' => ['email']]);
+
+        // Recruiter membuat lowongan tanpa kolom wajib.
+        // Nama perusahaan diisi otomatis dari profil perusahaan recruiter, jadi tidak ikut gagal.
+        $token = $this->postJson('/api/auth/login', [
+            'email' => 'recruiter@test.com',
+            'password' => 'secret123',
+        ])->json('data.token');
+
+        $this->withHeaders(['Authorization' => "Bearer {$token}"])
+            ->postJson('/api/jobs', ['title' => 'Tanpa syarat skill'])
+            ->assertStatus(422)
+            ->assertJsonPath('error_code', 'VALIDATION_ERROR')
+            ->assertJsonStructure(['errors' => ['description', 'location', 'requirements']]);
+    }
+
+    public function test_missing_resource_returns_404(): void
+    {
+        $this->getJson('/api/jobs/999999')
+            ->assertStatus(404)
+            ->assertJsonPath('status', 'error')
+            ->assertJsonPath('error_code', 'RESOURCE_NOT_FOUND');
+
+        $token = $this->postJson('/api/auth/login', [
+            'email' => 'applicant@test.com',
+            'password' => 'secret123',
+        ])->json('data.token');
+
+        $this->withHeaders(['Authorization' => "Bearer {$token}"])
+            ->getJson('/api/applications/999999')
+            ->assertStatus(404)
+            ->assertJsonPath('error_code', 'RESOURCE_NOT_FOUND');
+    }
+
+    public function test_create_job_returns_201_with_location_header(): void
+    {
+        $token = $this->postJson('/api/auth/login', [
+            'email' => 'recruiter@test.com',
+            'password' => 'secret123',
+        ])->json('data.token');
+
+        $response = $this->withHeaders(['Authorization' => "Bearer {$token}"])
+            ->postJson('/api/jobs', [
+                'title' => 'QA Engineer',
+                'company' => 'PT Uji Mutu',
+                'description' => 'Menguji API',
+                'location' => 'Tegal',
+                'requirements' => [['skill' => 'PHPUnit', 'level' => 'required']],
+            ]);
+
+        $id = $response->json('data.id');
+        $response->assertStatus(201)
+            ->assertHeader('Location', url("/api/jobs/{$id}"));
+
+        // URL di header Location benar-benar menunjuk resource yang baru dibuat
+        $this->getJson("/api/jobs/{$id}")
+            ->assertStatus(200)
+            ->assertJsonPath('data.title', 'QA Engineer');
+    }
+
+    /**
+     * Test aturan transisi pipeline: tahapan hanya boleh maju atau ke rejected, tolak rollback (Issue #11).
+     */
+    public function test_pipeline_rejects_backward_stage_transitions(): void
+    {
+        $job = JobVacancy::create([
+            'title' => 'DevOps Engineer',
+            'company' => 'PT Awan Nusantara',
+            'description' => 'CI/CD & Cloud',
+            'posted_by' => $this->recruiter->id,
+            'status' => 'open',
+        ]);
+
+        $applicantToken = $this->postJson('/api/auth/login', [
+            'email' => 'applicant@test.com',
+            'password' => 'secret123',
+        ])->json('data.token');
+
+        $recruiterToken = $this->postJson('/api/auth/login', [
+            'email' => 'recruiter@test.com',
+            'password' => 'secret123',
+        ])->json('data.token');
+
+        $appRes = $this->withHeaders(['Authorization' => "Bearer {$applicantToken}"])
+            ->postJson('/api/applications', ['job_id' => $job->id]);
+        $appId = $appRes->json('data.application_id');
+
+        // 1. Maju ke tahap interview (sah)
+        $this->withHeaders(['Authorization' => "Bearer {$recruiterToken}"])
+            ->patchJson("/api/pipelines/{$appId}/status", [
+                'stage' => 'interview',
+                'status' => 'in_progress',
+            ])
+            ->assertStatus(200)
+            ->assertJsonPath('data.current_stage', 'interview');
+
+        // 2. Coba rollback mundur ke screening -> Ditolak 422
+        $rollbackToScreening = $this->withHeaders(['Authorization' => "Bearer {$recruiterToken}"])
+            ->patchJson("/api/pipelines/{$appId}/status", [
+                'stage' => 'screening',
+                'status' => 'in_progress',
+            ]);
+        $rollbackToScreening->assertStatus(422)
+            ->assertJsonPath('error_code', 'INVALID_STAGE_TRANSITION');
+
+        // 3. Coba rollback mundur ke assessment -> Ditolak 422
+        $rollbackToAssessment = $this->withHeaders(['Authorization' => "Bearer {$recruiterToken}"])
+            ->patchJson("/api/pipelines/{$appId}/status", [
+                'stage' => 'assessment',
+                'status' => 'in_progress',
+            ]);
+        $rollbackToAssessment->assertStatus(422)
+            ->assertJsonPath('error_code', 'INVALID_STAGE_TRANSITION');
+
+        // 4. Beralih ke rejected (sah dari tahap mana pun)
+        $this->withHeaders(['Authorization' => "Bearer {$recruiterToken}"])
+            ->patchJson("/api/pipelines/{$appId}/status", [
+                'stage' => 'rejected',
+                'status' => 'rejected',
+                'notes' => 'Kandidat belum memenuhi kualifikasi interview.',
+            ])
+            ->assertStatus(200)
+            ->assertJsonPath('data.current_stage', 'rejected');
+
+        // 5. Coba ubah dari rejected kembali ke interview -> Ditolak 422 (status final terkunci)
+        $reactivateRejected = $this->withHeaders(['Authorization' => "Bearer {$recruiterToken}"])
+            ->patchJson("/api/pipelines/{$appId}/status", [
+                'stage' => 'interview',
+                'status' => 'in_progress',
+            ]);
+        $reactivateRejected->assertStatus(422)
+            ->assertJsonPath('error_code', 'INVALID_STAGE_TRANSITION');
+    }
 }

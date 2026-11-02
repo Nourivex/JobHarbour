@@ -1,5 +1,5 @@
 import { jobs, matchmaking, session, util } from '../api.js';
-import { companyTile, icon, rupiah, salaryRange, savedJobs, jobSourceBadge, EMPLOYMENT_SHORT, jobCode } from '../job-ui.js';
+import { companyTile, icon, rupiah, salaryRange, savedJobs, jobSourceBadge, EMPLOYMENT_SHORT, jobCode, scoreCategory } from '../job-ui.js';
 
 const esc = util.escapeHtml;
 

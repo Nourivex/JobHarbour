@@ -194,7 +194,7 @@ Route::get('/geo/villages', [\App\Http\Controllers\Api\GeospatialAtlasController
 // =========================================================================
 // 7. Mesin Agregasi & Pemantauan Kesehatan Sumber (Admin Monitoring)
 // =========================================================================
-Route::prefix('aggregator')->group(function () {
+Route::prefix('aggregator')->middleware('jwt.auth:admin')->group(function () {
     Route::get('/summary', [\App\Http\Controllers\Api\JobSourceMonitoringController::class, 'getMonitoringSummary']);
     Route::post('/sync', [\App\Http\Controllers\Api\JobSourceMonitoringController::class, 'triggerSync']);
 });
