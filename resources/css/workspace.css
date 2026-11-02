@@ -2,41 +2,44 @@
 /* Portal Recruiter: workspace dengan sidebar                            */
 /* Token warna di sini hanya berlaku di dalam .ws-body, jadi halaman      */
 /* publik tidak terpengaruh. Mode malam memetakan ulang token yang sama.  */
+/* Nilai warna terang disamakan dengan @theme di app.css (navy,           */
+/* orange-harbour, text-*, border-*) agar portal dan halaman publik satu  */
+/* palet. Ubah keduanya bersamaan.                                        */
 /* ==================================================================== */
 .ws-body {
-    --ws-bg: #F7F8FA;
+    --ws-bg: #F4F6F8;
     --ws-surface: #FFFFFF;
     --ws-surface-2: #F2F4F7;
-    --ws-border: #E4E7EC;
-    --ws-border-strong: #CBD2DB;
-    --ws-text: #101C2C;
-    --ws-text-2: #344054;
-    --ws-muted: #5D6B7E;
-    --ws-navy: #0D2338;
-    --ws-navy-2: #15304B;
+    --ws-border: #E2E7ED;
+    --ws-border-strong: #C5CFDA;
+    --ws-text: #0B1B2B;
+    --ws-text-2: #3D4B5C;
+    --ws-muted: #627080;
+    --ws-navy: #0C2238;
+    --ws-navy-2: #133150;
     /* Navy untuk aksi utama, oranye hanya untuk aksen penting (penanda aktif, highlight, fokus) */
-    --ws-primary: #0D2338;
-    --ws-primary-hover: #1E3A5C;
+    --ws-primary: #0C2238;
+    --ws-primary-hover: #133150;
     --ws-primary-soft: #E9EEF5;
     --ws-on-primary: #FFFFFF;
-    --ws-accent: #F45B0B;
+    --ws-accent: #F26A1B;
     --ws-accent-text: #C8460B;
-    --ws-accent-soft: #FFF1E8;
+    --ws-accent-soft: #FFF3EA;
     --ws-r-sm: 0.5rem;
     --ws-r-md: 0.7rem;
     --ws-r-lg: 1rem;
     --ws-r-xl: 1.1rem;
-    --ws-shadow-card: 0 1px 2px rgba(13, 35, 56, 0.04);
-    --ws-success: #15803D;
-    --ws-success-soft: #E8F5EC;
+    --ws-shadow-card: 0 1px 2px rgba(12, 34, 56, 0.04);
+    --ws-success: #157F3B;
+    --ws-success-soft: #E7F5EC;
     --ws-info: #1B65A6;
-    --ws-info-soft: #EAF2FB;
+    --ws-info-soft: #EBF3FB;
     --ws-warning: #B45309;
     --ws-warning-soft: #FEF3E2;
     --ws-danger: #B42318;
-    --ws-danger-soft: #FDECEA;
-    --ws-focus: 0 0 0 3px rgba(244, 91, 11, 0.28);
-    --ws-shadow-pop: 0 18px 40px -16px rgba(13, 35, 56, 0.35);
+    --ws-danger-soft: #FDEEEC;
+    --ws-focus: 0 0 0 3px rgba(242, 106, 27, 0.28);
+    --ws-shadow-pop: 0 18px 40px -16px rgba(12, 34, 56, 0.35);
     --ws-ease: cubic-bezier(0.23, 1, 0.32, 1);
     --ws-sidebar-w: 264px;
 
@@ -113,7 +116,7 @@ html.dark .ws-body {
     .ws-sidebar { transform: translateX(-100%); box-shadow: var(--ws-shadow-pop); }
     .ws-nav-animate .ws-sidebar { transition: transform 260ms var(--ws-ease); }
     .ws-nav-open .ws-sidebar { transform: none; }
-    .ws-backdrop { position: fixed; inset: 0; z-index: 40; background: rgba(13, 35, 56, 0.5); opacity: 0; pointer-events: none; transition: opacity 220ms ease; }
+    .ws-backdrop { position: fixed; inset: 0; z-index: 40; background: rgba(12, 34, 56, 0.5); opacity: 0; pointer-events: none; transition: opacity 220ms ease; }
     .ws-nav-open .ws-backdrop { opacity: 1; pointer-events: auto; }
     .ws-nav-open { overflow: hidden; }
 }
@@ -161,7 +164,7 @@ html.dark .ws-body {
 .ws-nav-link:hover { background: rgba(255, 255, 255, 0.07); color: #FFFFFF; }
 .ws-nav-link:hover svg { color: #FFFFFF; }
 .ws-nav-link:focus-visible { outline: none; box-shadow: var(--ws-focus); }
-.ws-nav-link[aria-current="page"] { background: rgba(244, 91, 11, 0.14); color: #FFFFFF; font-weight: 600; }
+.ws-nav-link[aria-current="page"] { background: rgba(242, 106, 27, 0.14); color: #FFFFFF; font-weight: 600; }
 .ws-nav-link[aria-current="page"] svg { color: var(--ws-accent); }
 .ws-nav-link[aria-current="page"]::before { content: ""; position: absolute; left: -0.75rem; top: 0.55rem; bottom: 0.55rem; width: 3px; border-radius: 0 3px 3px 0; background: var(--ws-accent); }
 
@@ -440,7 +443,7 @@ select.ws-input { appearance: none; padding-right: 2.25rem; cursor: pointer; bac
 }
 
 .ws-dialog[open] { display: flex; flex-direction: column; animation: ws-dialog-in 220ms var(--ws-ease); }
-.ws-dialog::backdrop { background: rgba(13, 35, 56, 0.5); animation: ws-fade 200ms ease; }
+.ws-dialog::backdrop { background: rgba(12, 34, 56, 0.5); animation: ws-fade 200ms ease; }
 .ws-dialog-lg { width: min(820px, calc(100% - 2rem)); }
 .ws-dialog-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; padding: 1.25rem 1.5rem 1rem; border-bottom: 1px solid var(--ws-border); }
 .ws-dialog-body { flex: 1; overflow-y: auto; padding: 1.25rem 1.5rem; }
@@ -462,7 +465,7 @@ select.ws-input { appearance: none; padding-right: 2.25rem; cursor: pointer; bac
 }
 
 .ws-drawer[open] { display: flex; flex-direction: column; animation: ws-drawer-in 280ms var(--ws-ease); }
-.ws-drawer::backdrop { background: rgba(13, 35, 56, 0.45); animation: ws-fade 200ms ease; }
+.ws-drawer::backdrop { background: rgba(12, 34, 56, 0.45); animation: ws-fade 200ms ease; }
 @keyframes ws-drawer-in { from { transform: translateX(100%); } to { transform: none; } }
 
 /* ------------------------------------------------------------------ keadaan kosong & skeleton */
@@ -486,7 +489,7 @@ select.ws-input { appearance: none; padding-right: 2.25rem; cursor: pointer; bac
 .ws-step.is-done .ws-step-mark { background: var(--ws-success); border-color: var(--ws-success); color: #FFFFFF; }
 html.dark .ws-step.is-done .ws-step-mark { color: #0B111C; }
 .ws-step.is-done::before { background: var(--ws-success); }
-.ws-step.is-current .ws-step-mark { border-color: var(--ws-accent); color: var(--ws-accent); box-shadow: 0 0 0 4px rgba(244, 91, 11, 0.15); }
+.ws-step.is-current .ws-step-mark { border-color: var(--ws-accent); color: var(--ws-accent); box-shadow: 0 0 0 4px rgba(242, 106, 27, 0.15); }
 .ws-step.is-failed .ws-step-mark { background: var(--ws-danger); border-color: var(--ws-danger); color: #FFFFFF; }
 .ws-step-title { font-size: 14px; font-weight: 600; color: var(--ws-text); }
 .ws-step-text { margin-top: 0.15rem; font-size: 12.5px; color: var(--ws-muted); }
@@ -556,12 +559,12 @@ html.dark .ws-seg button[aria-pressed="true"] { background: #E8EDF4; color: #0B1
 .ws-col.is-drop-no { opacity: 0.4; }
 
 .ws-kcard { padding: 0.85rem; border-radius: 0.85rem; background: var(--ws-surface); border: 1px solid var(--ws-border); cursor: pointer; transition: border-color 150ms ease, box-shadow 150ms ease, transform 150ms var(--ws-ease), opacity 150ms ease; }
-.ws-kcard:hover { border-color: var(--ws-border-strong); box-shadow: 0 10px 22px -18px rgba(13, 35, 56, 0.55); }
+.ws-kcard:hover { border-color: var(--ws-border-strong); box-shadow: 0 10px 22px -18px rgba(12, 34, 56, 0.55); }
 .ws-kcard:focus-visible { outline: none; box-shadow: var(--ws-focus); }
 .ws-kcard[draggable="true"] { cursor: grab; }
 .ws-kcard.is-dragging { opacity: 0.5; transform: rotate(1.5deg) scale(0.98); }
 .ws-kcard.is-arrived { animation: ws-arrive 600ms var(--ws-ease); }
-@keyframes ws-arrive { 0% { transform: translateY(-6px); box-shadow: 0 0 0 3px rgba(244, 91, 11, 0.35); } 100% { transform: none; box-shadow: 0 0 0 0 rgba(244, 91, 11, 0); } }
+@keyframes ws-arrive { 0% { transform: translateY(-6px); box-shadow: 0 0 0 3px rgba(242, 106, 27, 0.35); } 100% { transform: none; box-shadow: 0 0 0 0 rgba(242, 106, 27, 0); } }
 .ws-kcard-next { display: inline-flex; align-items: center; gap: 0.3rem; height: 1.9rem; padding: 0 0.6rem; border-radius: 0.55rem; background: var(--ws-primary-soft); color: var(--ws-primary); font-size: 12px; font-weight: 600; cursor: pointer; transition: background-color 150ms ease, color 150ms ease; }
 .ws-kcard-next:hover { background: var(--ws-primary); color: var(--ws-on-primary); }
 .ws-kcard-next:focus-visible { outline: none; box-shadow: var(--ws-focus); }
@@ -579,7 +582,7 @@ html.dark .ws-seg button[aria-pressed="true"] { background: #E8EDF4; color: #0B1
     max-width: 16rem;
     padding: 0.45rem 0.6rem;
     border-radius: 0.5rem;
-    background: #0D2338;
+    background: #0C2238;
     color: #FFFFFF;
     font-size: 12px;
     font-weight: 500;
@@ -772,7 +775,7 @@ html.dark .ws-skill-pick button[aria-pressed="true"] { background: #E8EDF4; bord
 
 /* Kanban v2: kartu ringkas, tombol maju muncul saat diarahkan */
 .ws-kcard2 { padding: 0.75rem 0.8rem; border-radius: var(--ws-r-md); background: var(--ws-surface); border: 1px solid var(--ws-border); cursor: pointer; transition: border-color 150ms ease, box-shadow 150ms ease, opacity 150ms ease, transform 150ms var(--ws-ease); }
-.ws-kcard2:hover { border-color: var(--ws-border-strong); box-shadow: 0 8px 20px -16px rgba(13, 35, 56, 0.5); }
+.ws-kcard2:hover { border-color: var(--ws-border-strong); box-shadow: 0 8px 20px -16px rgba(12, 34, 56, 0.5); }
 .ws-kcard2:focus-visible { outline: none; box-shadow: var(--ws-focus); }
 .ws-kcard2[draggable="true"] { cursor: grab; }
 .ws-kcard2.is-dragging { opacity: 0.5; transform: rotate(1.5deg) scale(0.98); }
