@@ -5,11 +5,14 @@
 import { jobs, toast } from '../api.js';
 import { util } from '../api.js';
 import { bindDialog, openDialog, setBusy } from './components.js';
-import { LEVEL, esc, icon, hydrateIcons, showFieldErrors, clearFieldErrors, errorMessage } from './ui.js';
+import { LEVEL, esc, icon, hydrateIcons, jobStatusBadge, showFieldErrors, clearFieldErrors, errorMessage } from './ui.js';
 
 let ctxRef = null;
 let onSaved = () => {};
 let editing = null;
+let lastSkills = [];
+
+const TYPE_LABEL = { 'full-time': 'Full-time', 'part-time': 'Part-time', contract: 'Kontrak', internship: 'Magang' };
 
 const $ = (id) => document.getElementById(id);
 
@@ -132,10 +135,15 @@ export function initJobForm(ctx, { onSave } = {}) {
         try {
             const res = editing ? await jobs.update(editing.id, payload) : await jobs.create(payload);
             setBusy(submitter, false);
-            dialog.close();
-            const published = (res.data?.status || payload.status) === 'open';
-            toast(editing ? 'Perubahan lowongan disimpan.' : (published ? 'Lowongan dipublikasikan.' : 'Draft lowongan disimpan.'), 'success');
+            const saved = { ...payload, ...(res.data || {}) };
             onSaved(res.data);
+            if (editing) {
+                dialog.close();
+                toast('Perubahan lowongan disimpan.', 'success');
+            } else {
+                // Lowongan baru: tampilkan konfirmasi di dialog yang sama, bukan sekadar toast
+                showSuccess(saved);
+            }
         } catch (err) {
             setBusy(submitter, false);
             if (!showFieldErrors(form, err)) {
@@ -146,9 +154,85 @@ export function initJobForm(ctx, { onSave } = {}) {
     });
 }
 
+/** Panel konfirmasi: centang beranimasi, ringkasan lowongan, dan langkah berikutnya. */
+function showSuccess(job) {
+    const published = job.status === 'open';
+    const verified = ctxRef?.isAdmin || ctxRef?.company?.verification_status === 'verified';
+    const reqs = job.requirements || [];
+    const totalWeight = reqs.reduce((s, r) => s + (LEVEL[r.level]?.weight || 0), 0);
+    const meta = [job.company, job.location, TYPE_LABEL[job.employment_type] || job.employment_type].filter(Boolean).map(esc).join(' · ');
+    const note = published
+        ? 'Lowongan sudah tampil di katalog. Setiap pelamar yang melamar langsung mendapat skor kecocokan.'
+        : verified
+            ? 'Belum tampil di katalog. Publikasikan kapan saja dari halaman lowongan.'
+            : 'Belum tampil di katalog. Lowongan bisa dipublikasikan setelah perusahaan terverifikasi.';
+    const facts = [
+        [icon('list-checks'), `${reqs.length} skill, total bobot ${totalWeight}`],
+        [icon('users'), `Kuota ${Number(job.quota) || 1} orang`],
+        job.expires_at ? [icon('calendar-clock'), `Ditutup ${util.formatDate(job.expires_at)}`] : null,
+    ].filter(Boolean);
+
+    const panel = $('job-success');
+    panel.innerHTML = `
+        <div class="ws-success-body">
+            <svg class="ws-success-check" viewBox="0 0 52 52" aria-hidden="true">
+                <circle class="ws-success-ring" cx="26" cy="26" r="24" fill="none"/>
+                <path class="ws-success-tick" fill="none" d="M15 27l7 7 15-16"/>
+            </svg>
+            <div role="status">
+                <h2 id="job-success-title" class="text-xl font-bold">${published ? 'Lowongan dipublikasikan' : 'Draft lowongan disimpan'}</h2>
+                <p class="ws-meta mt-1 max-w-[26rem] mx-auto">${note}</p>
+            </div>
+            <div class="ws-success-card">
+                <div class="flex items-start justify-between gap-3">
+                    <div class="min-w-0">
+                        <p class="font-semibold line-clamp-2">${esc(job.title)}</p>
+                        <p class="ws-meta truncate">${meta}</p>
+                    </div>
+                    <span class="shrink-0">${jobStatusBadge(job.status)}</span>
+                </div>
+                <ul class="mt-3 flex flex-wrap gap-x-4 gap-y-1.5 ws-meta">${facts.map(([ic, t]) => `<li class="inline-flex items-center gap-1.5">${ic}${esc(t)}</li>`).join('')}</ul>
+            </div>
+        </div>
+        <div class="ws-dialog-foot">
+            ${published ? `<button type="button" class="ws-btn ws-btn-ghost" data-success-copy>${icon('link')}<span>Salin tautan</span></button>` : '<span></span>'}
+            <button type="button" class="ws-btn ws-btn-secondary" data-success-again>${icon('plus')}Buat lowongan lain</button>
+            ${job.id ? `<a href="/recruiter/jobs/${encodeURIComponent(job.id)}" class="ws-btn ws-btn-primary" data-success-open>Buka lowongan${icon('arrow-right')}</a>` : ''}
+        </div>`;
+
+    $('job-form').hidden = true;
+    $('job-dialog').setAttribute('aria-labelledby', 'job-success-title');
+    $('job-dialog').classList.add('is-success');
+    panel.hidden = false;
+
+    panel.querySelector('[data-success-again]').addEventListener('click', () => openJobForm(null, lastSkills));
+    panel.querySelector('[data-success-copy]')?.addEventListener('click', async (e) => {
+        const btn = e.currentTarget;
+        const url = `${location.origin}/jobs/${job.id}`;
+        try {
+            await navigator.clipboard.writeText(url);
+            btn.innerHTML = `${icon('check')}<span>Tautan disalin</span>`;
+        } catch (err) {
+            // Clipboard ditolak browser: tampilkan alamatnya agar bisa disalin manual
+            btn.innerHTML = `${icon('link')}<span class="truncate max-w-[14rem]">${esc(url)}</span>`;
+        }
+    });
+    (panel.querySelector('[data-success-open]') || panel.querySelector('[data-success-again]')).focus();
+}
+
+function resetSuccess() {
+    $('job-success').hidden = true;
+    $('job-success').innerHTML = '';
+    $('job-form').hidden = false;
+    $('job-dialog').classList.remove('is-success');
+    $('job-dialog').setAttribute('aria-labelledby', 'job-dialog-title');
+}
+
 /** Buka dialog. job = null untuk lowongan baru. skills = daftar saran nama skill. */
 export function openJobForm(job = null, skills = []) {
     editing = job;
+    lastSkills = skills;
+    resetSuccess();
     const form = $('job-form');
     form.reset();
     clearFieldErrors(form);

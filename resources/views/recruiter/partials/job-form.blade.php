@@ -100,4 +100,7 @@
             </span>
         </div>
     </form>
+
+    {{-- Konfirmasi setelah lowongan baru tersimpan; diisi oleh job-form.js --}}
+    <div id="job-success" class="ws-success" hidden></div>
 </dialog>
