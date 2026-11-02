@@ -96,7 +96,10 @@ function renderCompany(user, company) {
     logoEl.outerHTML = companyLogo(company, 'ws-company-logo');
 }
 
-/** Banner di atas konten bila perusahaan belum bisa mempublikasikan lowongan. */
+/**
+ * Banner di atas konten bila perusahaan belum bisa mempublikasikan lowongan.
+ * Di layar kecil hanya judul singkat dan tombol yang tampil; penjelasan lengkap ada di halaman tujuan.
+ */
 function renderBanner(user, company) {
     const banner = document.getElementById('ws-banner');
     const dot = document.getElementById('ws-nav-verify');
@@ -108,20 +111,23 @@ function renderBanner(user, company) {
     if (document.body.dataset.page === 'verification') return;
 
     const copy = {
-        none: ['Lengkapi profil perusahaan untuk mulai merekrut.', 'Sebelum diverifikasi, lowongan hanya bisa disimpan sebagai draft.', '/recruiter/company', 'Lengkapi profil', 'info'],
-        unverified: ['Perusahaanmu belum terverifikasi.', 'Lowongan bisa disimpan sebagai draft, tetapi baru bisa dipublikasikan setelah verifikasi disetujui.', '/recruiter/verification', 'Ajukan verifikasi', 'info'],
-        pending: ['Pengajuan verifikasi sedang diperiksa admin.', 'Siapkan lowonganmu sebagai draft. Publikasikan setelah disetujui.', '/recruiter/verification', 'Lihat status', 'info'],
-        revision_required: ['Admin meminta perbaikan verifikasi.', esc(company?.verification_note || 'Lihat catatan admin lalu ajukan ulang.'), '/recruiter/verification', 'Perbaiki pengajuan', 'warning'],
-        rejected: ['Pengajuan verifikasi ditolak.', esc(company?.verification_note || 'Lihat catatan admin lalu ajukan ulang.'), '/recruiter/verification', 'Perbaiki dan ajukan ulang', 'danger'],
-        suspended: ['Perusahaan sedang ditangguhkan.', esc(company?.verification_note || 'Hubungi admin JobHarbour untuk informasi lebih lanjut.'), '/recruiter/verification', 'Lihat detail', 'danger'],
+        none: ['Lengkapi profil perusahaan untuk mulai merekrut.', 'Sebelum diverifikasi, lowongan hanya bisa disimpan sebagai draft.', '/recruiter/company', 'Lengkapi profil', 'info', 'Profil perusahaan belum lengkap'],
+        unverified: ['Perusahaanmu belum terverifikasi.', 'Lowongan bisa disimpan sebagai draft, tetapi baru bisa dipublikasikan setelah verifikasi disetujui.', '/recruiter/verification', 'Ajukan verifikasi', 'info', 'Perusahaan belum terverifikasi'],
+        pending: ['Pengajuan verifikasi sedang diperiksa admin.', 'Siapkan lowonganmu sebagai draft. Publikasikan setelah disetujui.', '/recruiter/verification', 'Lihat status', 'info', 'Verifikasi sedang diperiksa'],
+        revision_required: ['Admin meminta perbaikan verifikasi.', esc(company?.verification_note || 'Lihat catatan admin lalu ajukan ulang.'), '/recruiter/verification', 'Perbaiki pengajuan', 'warning', 'Verifikasi perlu perbaikan'],
+        rejected: ['Pengajuan verifikasi ditolak.', esc(company?.verification_note || 'Lihat catatan admin lalu ajukan ulang.'), '/recruiter/verification', 'Perbaiki dan ajukan ulang', 'danger', 'Verifikasi ditolak'],
+        suspended: ['Perusahaan sedang ditangguhkan.', esc(company?.verification_note || 'Hubungi admin JobHarbour untuk informasi lebih lanjut.'), '/recruiter/verification', 'Lihat detail', 'danger', 'Perusahaan ditangguhkan'],
     }[status];
 
     banner.className = `ws-banner ws-banner-${copy[4]}`;
     banner.innerHTML = `
         <div class="ws-banner-inner">
             ${icon({ danger: 'shield-alert', warning: 'file-pen-line' }[copy[4]] || 'info', 'w-5 h-5')}
-            <p class="flex-1 min-w-0"><strong>${copy[0]}</strong> <span>${copy[1]}</span></p>
-            <a href="${copy[2]}" class="ws-btn ws-btn-sm ws-btn-secondary whitespace-nowrap">${copy[3]}${icon('arrow-right', 'w-4 h-4')}</a>
+            <p class="flex-1 min-w-0">
+                <strong class="hidden sm:inline">${copy[0]}</strong> <span class="hidden sm:inline">${copy[1]}</span>
+                <strong class="sm:hidden">${copy[5]}</strong>
+            </p>
+            <a href="${copy[2]}" class="ws-btn ws-btn-sm ws-btn-secondary whitespace-nowrap" aria-label="${copy[3]}"><span class="hidden sm:inline">${copy[3]}</span><span class="sm:hidden">Buka</span>${icon('arrow-right', 'w-4 h-4')}</a>
         </div>`;
 }
 

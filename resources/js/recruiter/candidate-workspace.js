@@ -91,8 +91,8 @@ export function mountCandidateWorkspace({ root, jobs, apps, jobId = null, navApp
             <label for="cw-sort" class="sr-only">Urutkan</label>
             <select id="cw-sort" class="ws-input w-auto">${Object.entries(SORTS).map(([k, [label]]) => `<option value="${k}">${label}</option>`).join('')}</select>
             <div class="ws-seg sm:ml-auto" role="group" aria-label="Tampilan">
-                <button type="button" data-view="table" aria-pressed="false">${icon('table-2', 'w-4 h-4')}Tabel</button>
-                <button type="button" data-view="board" aria-pressed="false">${icon('kanban', 'w-4 h-4')}Kanban</button>
+                <button type="button" data-view="table" aria-pressed="false" aria-label="Tampilan tabel" title="Tabel">${icon('table-2', 'w-4 h-4')}<span class="hidden sm:inline">Tabel</span></button>
+                <button type="button" data-view="board" aria-pressed="false" aria-label="Tampilan kanban" title="Kanban">${icon('kanban', 'w-4 h-4')}<span class="hidden sm:inline">Kanban</span></button>
             </div>
         </div>
         <div id="cw-chips" class="ws-fchips mb-3"></div>
@@ -174,9 +174,19 @@ export function mountCandidateWorkspace({ root, jobs, apps, jobId = null, navApp
                 <span class="ws-stage-label">${color ? `<span class="ws-dot" style="--c:${color}"></span>` : ''}${label}</span>
                 <span class="ws-stage-num">${n}</span>
             </button>`).join('');
+        stripFade();
         $('#cw-prop').innerHTML = list.length
             ? STAGES.filter((s) => counts[s]).map((s) => `<span style="flex-grow:${counts[s]};background:${STAGE[s].color}" title="${STAGE[s].label}: ${counts[s]}"></span>`).join('')
             : '';
+    }
+
+    // Tanda bisa digeser: tepi strip memudar di sisi yang masih punya tahap tersembunyi (layar sempit)
+    function stripFade() {
+        const el = $('#cw-strip');
+        const max = el.scrollWidth - el.clientWidth;
+        const left = el.scrollLeft > 4;
+        const right = max - el.scrollLeft > 4;
+        el.dataset.fade = left && right ? 'both' : left ? 'left' : right ? 'right' : 'none';
     }
 
     // ------------------------------------------------------------------ filter
@@ -835,7 +845,11 @@ export function mountCandidateWorkspace({ root, jobs, apps, jobId = null, navApp
         });
     }
 
+    $('#cw-strip').addEventListener('scroll', stripFade, { passive: true });
+    window.addEventListener('resize', stripFade, { passive: true });
+
     render();
+    $('#cw-strip [aria-pressed="true"]')?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
     const focus = params.get('candidate');
     if (focus) openDrawer(findApp(focus));
 
