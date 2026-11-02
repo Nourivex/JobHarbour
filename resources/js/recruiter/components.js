@@ -65,10 +65,43 @@ export function menu(triggerLabel, items, { icon = '', triggerClass = 'ws-icon-b
         </div>`;
 }
 
+const nativeClose = HTMLDialogElement.prototype.close;
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+/**
+ * Tutup <dialog> dengan animasi keluar (.is-closing di CSS), baru kemudian ditutup sungguhan.
+ * Batas waktu memastikan dialog tetap tertutup walau animationend tidak terpicu (mis. tab di latar).
+ */
+function animatedClose(dialog, value) {
+    if (!dialog.open || dialog.classList.contains('is-closing')) return;
+    if (reduceMotion.matches) {
+        nativeClose.call(dialog, value);
+        return;
+    }
+    const finish = () => {
+        clearTimeout(dialog._closeTimer);
+        dialog.removeEventListener('animationend', onEnd);
+        if (!dialog.classList.contains('is-closing')) return;
+        dialog.classList.remove('is-closing');
+        nativeClose.call(dialog, value);
+    };
+    const onEnd = (e) => { if (e.target === dialog) finish(); };
+    dialog.addEventListener('animationend', onEnd);
+    dialog._closeTimer = setTimeout(finish, 320);
+    dialog.classList.add('is-closing');
+}
+
 /** <dialog> dengan penutupan lewat tombol [data-dialog-close] dan klik latar. */
 export function bindDialog(dialog) {
     if (!dialog || dialog.dataset.bound) return dialog;
     dialog.dataset.bound = '1';
+    // Semua pemanggil dialog.close() ikut mendapat animasi keluar
+    dialog.close = (value) => animatedClose(dialog, value);
+    dialog.addEventListener('cancel', (e) => {
+        // Tombol Escape: tahan penutupan bawaan agar animasi keluar sempat berjalan
+        e.preventDefault();
+        dialog.close();
+    });
     dialog.addEventListener('click', (e) => {
         if (e.target.closest('[data-dialog-close]')) dialog.close();
         else if (e.target === dialog) {
@@ -83,6 +116,11 @@ export function bindDialog(dialog) {
 
 export function openDialog(dialog) {
     bindDialog(dialog);
+    if (dialog.classList.contains('is-closing')) {
+        // Dibuka lagi saat animasi keluar berjalan: batalkan penutupan
+        clearTimeout(dialog._closeTimer);
+        dialog.classList.remove('is-closing');
+    }
     if (!dialog.open) dialog.showModal();
     document.body.classList.add('overflow-hidden');
     dialog.addEventListener('close', () => document.body.classList.remove('overflow-hidden'), { once: true });

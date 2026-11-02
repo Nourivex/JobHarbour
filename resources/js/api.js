@@ -473,7 +473,10 @@ export const util = {
     },
 };
 
-export function toast(message, type = 'success', timeout = 3800) {
+/**
+ * Notifikasi singkat. opts opsional: detail (kalimat kedua) dan action ({ label, onClick }) untuk satu tombol lanjutan.
+ */
+export function toast(message, type = 'success', timeout = 3800, opts = {}) {
     let wrap = document.getElementById('jh-toast-wrap');
     if (!wrap) {
         wrap = document.createElement('div');
@@ -502,8 +505,12 @@ export function toast(message, type = 'success', timeout = 3800) {
     el.className = `p-4 rounded-xl shadow-lg border text-sm flex items-start gap-3 pointer-events-auto transition-all duration-200 transform translate-y-4 opacity-0 ${bgs[type] || bgs.info}`;
     el.innerHTML = `
         ${icons[type] || icons.info}
-        <div class="flex-1 font-medium leading-relaxed">${util.escapeHtml(message)}</div>
-        <button type="button" aria-label="Tutup notifikasi" class="text-[#627080] hover:text-[#0B1B2B] text-xs ml-1 shrink-0 cursor-pointer">
+        <div class="flex-1 leading-relaxed">
+            <p class="font-medium">${util.escapeHtml(message)}</p>
+            ${opts.detail ? `<p class="mt-0.5 text-[13px] text-[#627080]">${util.escapeHtml(opts.detail)}</p>` : ''}
+            ${opts.action ? `<button type="button" data-toast-action class="mt-2 inline-flex items-center h-8 px-3 rounded-lg text-[13px] font-semibold bg-[#0C2238] text-white hover:bg-[#133150] cursor-pointer">${util.escapeHtml(opts.action.label)}</button>` : ''}
+        </div>
+        <button type="button" data-toast-close aria-label="Tutup notifikasi" class="text-[#627080] hover:text-[#0B1B2B] text-xs ml-1 shrink-0 cursor-pointer">
             <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
     `;
@@ -527,7 +534,11 @@ export function toast(message, type = 'success', timeout = 3800) {
 
     el.addEventListener('mouseenter', stopTimer);
     el.addEventListener('mouseleave', startTimer);
-    el.querySelector('button').addEventListener('click', dismiss);
+    el.querySelector('[data-toast-close]').addEventListener('click', dismiss);
+    el.querySelector('[data-toast-action]')?.addEventListener('click', () => {
+        dismiss();
+        opts.action.onClick?.();
+    });
 
     startTimer();
 }

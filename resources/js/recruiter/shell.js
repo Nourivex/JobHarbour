@@ -29,10 +29,32 @@ function initSidebar() {
         collapseBtn?.setAttribute('title', on ? 'Lebarkan sidebar' : 'Ringkas sidebar');
     };
     syncCollapse();
+    // Dua fase supaya teks menu tidak hilang mendadak: teks memudar dulu, baru lebar sidebar berubah.
+    // Saat melebar, lebar berubah dulu lalu teks muncul kembali.
+    const root = document.documentElement;
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let phase = null;
     collapseBtn?.addEventListener('click', () => {
-        const on = document.documentElement.classList.toggle('ws-collapsed');
+        clearTimeout(phase);
+        const on = !root.classList.contains('ws-collapsed');
         try { localStorage.setItem('jh_ws_collapsed', on ? '1' : '0'); } catch (e) { /* abaikan */ }
-        syncCollapse();
+        if (reduceMotion.matches) {
+            root.classList.toggle('ws-collapsed', on);
+            syncCollapse();
+            return;
+        }
+        root.classList.add('ws-labels-hidden');
+        if (on) {
+            phase = setTimeout(() => {
+                root.classList.add('ws-collapsed');
+                root.classList.remove('ws-labels-hidden');
+                syncCollapse();
+            }, 110);
+        } else {
+            root.classList.remove('ws-collapsed');
+            syncCollapse();
+            phase = setTimeout(() => root.classList.remove('ws-labels-hidden'), 200);
+        }
     });
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && document.body.classList.contains('ws-nav-open')) setOpen(false);

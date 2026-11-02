@@ -517,6 +517,12 @@ export function mountCandidateWorkspace({ root, jobs, apps, jobId = null, navApp
     }
 
     // ------------------------------------------------------------------ perpindahan satu kandidat
+    // Petunjuk langkah berikutnya setelah kandidat dimajukan lewat kanban atau menu baris
+    const NEXT_STEP = {
+        assessment: 'Berikutnya: kirim tugas atau tes, lalu catat hasilnya di tab Catatan.',
+        offering: 'Berikutnya: sampaikan penawaran, lalu tandai Diterima bila kandidat setuju.',
+    };
+
     async function quickMove(app, target) {
         if (target === 'interview' || target === 'hired' || target === 'rejected') {
             openDrawer(app, { mode: target === 'rejected' ? 'reject' : 'advance' });
@@ -529,11 +535,20 @@ export function mountCandidateWorkspace({ root, jobs, apps, jobId = null, navApp
             cancelText: 'Batal',
         });
         if (!ok) return;
+        // Tanda "menyimpan" di kartu/baris selama menunggu server, supaya tidak terasa diam
+        const row = $(`#cw-view [data-app="${app.id}"]`);
+        row?.classList.add('is-saving');
+        row?.setAttribute('aria-busy', 'true');
         try {
             await moveCandidate(app, target);
-            toast(`${app.applicant?.name || 'Kandidat'} maju ke ${STAGE[target].label}.`, 'success');
             afterMove(app, target);
+            toast(`${app.applicant?.name || 'Kandidat'} maju ke ${STAGE[target].label}.`, 'success', 6000, {
+                detail: NEXT_STEP[target],
+                action: { label: 'Buka kandidat', onClick: () => openDrawer(findApp(app.id)) },
+            });
         } catch (err) {
+            row?.classList.remove('is-saving');
+            row?.removeAttribute('aria-busy');
             toast(errorMessage(err, 'Tahap kandidat gagal diperbarui.'), 'error', 5000);
         }
     }
@@ -545,6 +560,8 @@ export function mountCandidateWorkspace({ root, jobs, apps, jobId = null, navApp
         onChange();
         const moved = $(`#cw-view [data-app="${app.id}"]`);
         if (moved?.classList.contains('ws-kcard2')) moved.classList.add('is-arrived');
+        // Angka di kepala kolom tujuan berdenyut sekali agar perubahan jumlah terlihat
+        $(`#cw-view .ws-col[data-stage="${target}"] .ws-count`)?.classList.add('is-bumped');
         moved?.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
     }
 
@@ -569,8 +586,9 @@ export function mountCandidateWorkspace({ root, jobs, apps, jobId = null, navApp
         body.scrollTop = 0;
     }
 
-    function openDrawer(app, { mode = null, tab = 'summary' } = {}) {
+    function openDrawer(app, { mode = null, tab = 'summary', dir = null } = {}) {
         if (!app) return;
+        const wasOpen = drawer.open;
         state.drawerId = String(app.id);
         state.drawerTab = tab;
         const list = visibleList();
@@ -596,13 +614,25 @@ export function mountCandidateWorkspace({ root, jobs, apps, jobId = null, navApp
         hydrateIcons(drawer);
         openDialog(drawer);
         syncUrl();
+        if (dir && wasOpen) slideIn(dir);
+    }
+
+    // J/K: isi laci bergeser sedikit ke arah perpindahan agar terasa berpindah, bukan berkedip.
+    // Hanya opacity dan transform (ringan), dan animasi baru langsung menggantikan yang lama saat tombol ditekan cepat.
+    function slideIn(dir) {
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        const dx = dir === 'next' ? 14 : -14;
+        drawer.querySelectorAll('[data-d-identity], [data-d-body]').forEach((el) => el.animate(
+            [{ opacity: 0, transform: `translateX(${dx}px)` }, { opacity: 1, transform: 'none' }],
+            { duration: 180, easing: 'cubic-bezier(0.23, 1, 0.32, 1)' },
+        ));
     }
 
     function stepDrawer(delta) {
         const list = visibleList();
         const idx = list.findIndex((a) => String(a.id) === state.drawerId);
         const next = list[idx + delta];
-        if (next) openDrawer(next, { tab: state.drawerTab });
+        if (next) openDrawer(next, { tab: state.drawerTab, dir: delta > 0 ? 'next' : 'prev' });
     }
 
     drawer.onclick = (e) => {
@@ -833,7 +863,7 @@ function ensureDrawer() {
                     <button type="button" class="ws-icon-btn" data-dialog-close aria-label="Tutup">${icon('x', 'w-5 h-5')}</button>
                 </span>
             </div>
-            <div class="flex items-start gap-3">
+            <div class="flex items-start gap-3" data-d-identity>
                 <span class="ws-ava w-11 h-11 text-[15px]" data-d-avatar aria-hidden="true">?</span>
                 <div class="min-w-0 flex-1">
                     <h2 id="cw-d-name" class="text-[20px] leading-tight font-bold truncate" data-d-name>Kandidat</h2>
