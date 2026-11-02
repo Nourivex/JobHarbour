@@ -863,7 +863,7 @@ html.dark .ws-skill-pick button[aria-pressed="true"] { background: #E8EDF4; bord
 /* ------------------------------------------------------------------ wawancara lewat jadwal */
 .ws-callout-warning { background: var(--ws-warning-soft); }
 .ws-callout-warning svg { color: var(--ws-warning); }
-.ws-overdue { display: flex; align-items: center; gap: 0.3rem; margin-top: 0.15rem; font-size: 12px; font-weight: 600; color: var(--ws-warning); }
+.ws-overdue { display: flex; align-items: center; gap: 0.3rem; margin-top: 0.15rem; font-size: 12px; font-weight: 600; color: var(--ws-warning); white-space: nowrap; }
 
 /* ------------------------------------------------------------------ pilihan cepat alasan penolakan */
 .ws-tpl { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.1rem 0 0.5rem; }

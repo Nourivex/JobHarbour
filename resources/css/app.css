@@ -912,6 +912,9 @@ html.dark [class~="bg-white"], .dark [class~="bg-white"] { background-color: #12
 .dark [class~="bg-[#dbeaf8]"] { background-color: #183350; }
 .dark [class~="bg-[#FDEEEC]"] { background-color: #321715; }
 .dark [class~="bg-[#0C2238]"] { background-color: #16263D; }
+/* Tombol aksi di notifikasi (toast): latar notifikasi ikut gelap, jadi tombolnya dibalik menjadi terang */
+.dark [data-toast-action] { background-color: #E8EDF4; color: #0B111C; }
+.dark [data-toast-action]:hover { background-color: #FFFFFF; }
 .dark [class~="bg-[#133150]"] { background-color: #1C3350; }
 .dark [class~="hover:bg-white"]:hover { background-color: #1E2A3D; }
 .dark [class~="hover:bg-[#F4F6F8]"]:hover { background-color: #1E2A3D; }
