@@ -42,6 +42,7 @@ function renderSide() {
     ].map(([k, v]) => `<div class="flex items-center justify-between gap-3"><dt class="ws-meta">${k}</dt><dd class="text-right">${v}</dd></div>`).join('');
 
     renderActions($('cd-actions'), app, {
+        job: state.job,
         onMoved: () => {
             data.invalidate('apps');
             renderSide();

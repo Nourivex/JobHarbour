@@ -64,6 +64,7 @@ function actionsFor(job) {
     const items = [{ label: 'Lihat detail', icon: icon('eye'), attrs: `data-act="view" data-id="${job.id}"` }];
     items.push({ label: 'Buka kandidat', icon: icon('users'), attrs: `data-act="pipeline" data-id="${job.id}"` });
     if (job.status !== 'archived') items.push({ label: 'Edit', icon: icon('pencil'), attrs: `data-act="edit" data-id="${job.id}"` });
+    items.push({ label: 'Duplikat', icon: icon('copy'), attrs: `data-act="duplicate" data-id="${job.id}"` });
     items.push('-');
     if (job.status === 'draft' || job.status === 'closed') {
         items.push({ label: job.status === 'draft' ? 'Publikasikan' : 'Buka lagi', icon: icon('send'), attrs: `data-act="publish" data-id="${job.id}"`, disabled: !publishOk, tip });
@@ -211,6 +212,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (a === 'view') window.location.href = `/recruiter/jobs/${job.id}`;
         if (a === 'pipeline') window.location.href = `/recruiter/jobs/${job.id}`;
         if (a === 'edit') openJobForm(job, skillSuggestions(state.jobs, state.apps));
+        if (a === 'duplicate') openJobForm(null, skillSuggestions(state.jobs, state.apps), { template: job });
         if (a === 'publish') changeStatus(job, 'open');
         if (a === 'close') changeStatus(job, 'closed', { confirmOpts: { title: 'Tutup lowongan ini?', message: `"${job.title}" berhenti menerima lamaran baru. Kandidat yang sudah melamar tetap bisa diproses.`, confirmText: 'Tutup lowongan', cancelText: 'Batal', danger: true } });
         if (a === 'archive') changeStatus(job, 'archived', { confirmOpts: { title: 'Arsipkan lowongan?', message: 'Lowongan disembunyikan dari daftar utama. Kamu bisa memulihkannya kapan saja.', confirmText: 'Arsipkan', cancelText: 'Batal' } });

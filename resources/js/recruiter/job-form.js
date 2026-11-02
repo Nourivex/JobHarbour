@@ -228,8 +228,11 @@ function resetSuccess() {
     $('job-dialog').setAttribute('aria-labelledby', 'job-dialog-title');
 }
 
-/** Buka dialog. job = null untuk lowongan baru. skills = daftar saran nama skill. */
-export function openJobForm(job = null, skills = []) {
+/**
+ * Buka dialog. job = null untuk lowongan baru. skills = daftar saran nama skill.
+ * template: lowongan yang disalin menjadi lowongan baru (duplikat), disimpan sebagai lowongan terpisah.
+ */
+export function openJobForm(job = null, skills = [], { template = null } = {}) {
     editing = job;
     lastSkills = skills;
     resetSuccess();
@@ -238,28 +241,32 @@ export function openJobForm(job = null, skills = []) {
     clearFieldErrors(form);
     $('job-form-alert').className = 'hidden';
 
-    $('job-dialog-title').textContent = job ? 'Edit lowongan' : 'Lowongan baru';
+    $('job-dialog-title').textContent = job ? 'Edit lowongan' : template ? 'Duplikat lowongan' : 'Lowongan baru';
     $('job-dialog-sub').textContent = job
         ? 'Perubahan syarat skill memengaruhi skor kecocokan pelamar baru.'
-        : 'Isi detail posisi. Simpan sebagai draft bila belum siap dipublikasikan.';
+        : template
+            ? `Disalin dari "${template.title}". Periksa lagi isinya, lalu simpan sebagai lowongan baru.`
+            : 'Isi detail posisi. Simpan sebagai draft bila belum siap dipublikasikan.';
+    // Sumber isian: lowongan yang diedit, atau lowongan yang diduplikat (batas lamaran lama tidak ikut disalin)
+    const src = job || template;
 
     const companyName = ctxRef?.company?.name || '';
-    $('jf-title').value = job?.title || '';
-    $('jf-company').value = job?.company || companyName;
+    $('jf-title').value = src?.title || '';
+    $('jf-company').value = src?.company || companyName;
     $('jf-company').readOnly = !ctxRef?.isAdmin && Boolean(companyName);
     $('jf-company-help').classList.toggle('hidden', !$('jf-company').readOnly);
-    $('jf-location').value = job?.location || ctxRef?.company?.city || '';
-    $('jf-type').value = job?.employment_type || 'full-time';
-    $('jf-quota').value = job?.quota || 1;
-    $('jf-salary-min').value = job?.salary_min || '';
-    $('jf-salary-max').value = job?.salary_max || '';
-    $('jf-description').value = job?.description || '';
+    $('jf-location').value = src?.location || ctxRef?.company?.city || '';
+    $('jf-type').value = src?.employment_type || 'full-time';
+    $('jf-quota').value = src?.quota || 1;
+    $('jf-salary-min').value = src?.salary_min || '';
+    $('jf-salary-max').value = src?.salary_max || '';
+    $('jf-description').value = src?.description || '';
     $('jf-expires').value = job?.expires_at ? String(job.expires_at).slice(0, 10) : '';
     $('jf-expires').min = job ? '' : new Date(Date.now() + 86400000).toISOString().slice(0, 10);
 
     $('jf-skill-list').innerHTML = [...new Set(skills)].filter(Boolean).sort((a, b) => a.localeCompare(b, 'id'))
         .map((s) => `<option value="${esc(s)}"></option>`).join('');
-    const reqs = job?.requirements?.length ? job.requirements : [{ skill: '', level: 'required' }, { skill: '', level: 'important' }];
+    const reqs = src?.requirements?.length ? src.requirements : [{ skill: '', level: 'required' }, { skill: '', level: 'important' }];
     $('jf-reqs').innerHTML = reqs.map(reqRow).join('');
     updateWeights();
     setPublishState();

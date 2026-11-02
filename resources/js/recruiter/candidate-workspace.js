@@ -16,7 +16,7 @@ import { setNavCounts } from './shell.js';
 import { openDialog, setBusy, debounce, menu } from './components.js';
 import {
     matchSection, otherSkillsSection, profileSection, documentsSection, historySection, timelineSection, notesSection,
-    renderActions, bindCvDownload, bindNotes,
+    renderActions, bindCvDownload, bindNotes, rejectTemplates, templateChips, bindTemplates,
 } from './candidate-view.js';
 import {
     esc, icon, hydrateIcons, STAGES, STAGE, stageOf, nextStageOf, stageEnteredAt, interviewOf, interviewOverdue, scoreInfo,
@@ -24,6 +24,8 @@ import {
 } from './ui.js';
 
 const VIEW_KEY = 'jh_ws_view';
+// Penolakan massal: alasan yang berlaku untuk banyak kandidat sekaligus (tanpa skill per orang)
+const BULK_REJECT = rejectTemplates();
 const PAGE_SIZE = 25;
 const desktop = window.matchMedia('(min-width: 1024px)');
 const SORTS = {
@@ -94,6 +96,7 @@ export function mountCandidateWorkspace({ root, jobs, apps, jobId = null, navApp
                 <button type="button" data-view="table" aria-pressed="false" aria-label="Tampilan tabel" title="Tabel">${icon('table-2', 'w-4 h-4')}<span class="hidden sm:inline">Tabel</span></button>
                 <button type="button" data-view="board" aria-pressed="false" aria-label="Tampilan kanban" title="Kanban">${icon('kanban', 'w-4 h-4')}<span class="hidden sm:inline">Kanban</span></button>
             </div>
+            <button type="button" id="cw-export" class="ws-btn ws-btn-secondary" title="Unduh daftar kandidat yang sedang tampil sebagai CSV" aria-label="Ekspor CSV">${icon('download')}<span class="hidden sm:inline">Ekspor</span></button>
         </div>
         <div id="cw-chips" class="ws-fchips mb-3"></div>
         <div id="cw-view" aria-live="polite"></div>
@@ -187,6 +190,48 @@ export function mountCandidateWorkspace({ root, jobs, apps, jobId = null, navApp
         const left = el.scrollLeft > 4;
         const right = max - el.scrollLeft > 4;
         el.dataset.fade = left && right ? 'both' : left ? 'left' : right ? 'right' : 'none';
+    }
+
+    // ------------------------------------------------------------------ ekspor CSV
+    // Mengikuti filter, pencarian, dan tahap yang sedang aktif. Pemisah titik koma agar langsung
+    // terbaca per kolom di Excel berbahasa Indonesia; BOM menjaga huruf non-ASCII tetap benar.
+    // Tanggal lokal (bukan UTC) untuk nama file, supaya sesuai hari di zona waktu recruiter
+    const localDate = () => {
+        const d = new Date();
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    };
+
+    function exportCsv() {
+        const list = visibleList();
+        if (!list.length) {
+            toast('Tidak ada kandidat untuk diekspor dengan filter saat ini.', 'warning');
+            return;
+        }
+        const cell = (v) => {
+            let s = v === null || v === undefined ? '' : String(v);
+            if (/^[=+\-@]/.test(s)) s = `'${s}`; // cegah isian pengguna terbaca sebagai rumus spreadsheet
+            return `"${s.replace(/"/g, '""')}"`;
+        };
+        const header = ['Nama', 'Email', 'Telepon', 'Lokasi', 'Lowongan', 'Tahap', 'Skor (%)', 'Skill wajib terpenuhi', 'Skill wajib kurang', 'Tanggal melamar', 'Jadwal wawancara'];
+        const rows = list.map((app) => {
+            const a = app.applicant || {};
+            const req = requiredInfo(app);
+            const schedule = stageOf(app) === 'interview' ? interviewOf(app) : null;
+            return [
+                a.name, a.email, a.phone, a.location, app.job_vacancy?.title || jobOf(app)?.title,
+                STAGE[stageOf(app)].label, scoreInfo(app.match_score).score,
+                req ? `${req.ok}/${req.total}` : '', req ? req.missing.join(', ') : '',
+                formatDate(app.created_at), schedule ? formatDateTime(schedule.datetime) : '',
+            ];
+        });
+        const csv = '\uFEFF' + [header, ...rows].map((r) => r.map(cell).join(';')).join('\r\n');
+        const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+        const link = Object.assign(document.createElement('a'), { href: url, download: `kandidat-jobharbour-${localDate()}.csv` });
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        toast(`${list.length} kandidat diekspor ke CSV.`, 'success');
     }
 
     // ------------------------------------------------------------------ filter
@@ -507,6 +552,7 @@ export function mountCandidateWorkspace({ root, jobs, apps, jobId = null, navApp
         if (!list.length) return;
         const form = rejectDialog.querySelector('form');
         form.reset();
+        form.querySelectorAll('[data-tpl]').forEach((c) => c.setAttribute('aria-pressed', 'false'));
         form.querySelector('[data-error-for="notes"]').textContent = '';
         rejectDialog.querySelector('[data-reject-count]').textContent = `${list.length} kandidat akan ditandai tidak dilanjutkan.`;
         openDialog(rejectDialog);
@@ -616,6 +662,7 @@ export function mountCandidateWorkspace({ root, jobs, apps, jobId = null, navApp
         paintDrawerTab(app);
         renderActions(drawer.querySelector('[data-d-actions]'), app, {
             mode,
+            job: jobOf(app),
             onMoved: (moved, target) => {
                 afterMove(moved, target);
                 // Tetap di laci supaya recruiter bisa lanjut ke kandidat berikutnya
@@ -846,6 +893,7 @@ export function mountCandidateWorkspace({ root, jobs, apps, jobId = null, navApp
         });
     }
 
+    $('#cw-export').addEventListener('click', exportCsv);
     $('#cw-strip').addEventListener('scroll', stripFade, { passive: true });
     window.addEventListener('resize', stripFade, { passive: true });
 
@@ -912,6 +960,7 @@ function ensureRejectDialog() {
             </div>
             <div class="ws-dialog-body">
                 <label for="cw-reject-notes" class="ws-label">Alasan penolakan</label>
+                ${templateChips(BULK_REJECT)}
                 <textarea id="cw-reject-notes" name="notes" rows="3" maxlength="1000" class="ws-input" placeholder="contoh: Posisi sudah terisi oleh kandidat lain."></textarea>
                 <p class="ws-error" data-error-for="notes"></p>
                 <p class="ws-help">Alasan yang sama dicatat di linimasa setiap kandidat. Keputusan tidak dapat dibatalkan.</p>
@@ -922,5 +971,6 @@ function ensureRejectDialog() {
             </div>
         </form>`;
     document.body.appendChild(d);
+    bindTemplates(d, BULK_REJECT, d.querySelector('#cw-reject-notes'));
     return d;
 }

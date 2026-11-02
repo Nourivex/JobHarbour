@@ -264,7 +264,36 @@ export function timelineSection(app) {
  * Panel aksi tahap. mode: null (tombol), 'advance', atau 'reject'.
  * onMoved(app) dipanggil setelah tahap berhasil diubah.
  */
-export function renderActions(container, app, { mode = null, onMoved = () => {} } = {}) {
+/**
+ * Alasan penolakan siap pakai. Skill wajib yang kurang disebut bila lowongannya diketahui,
+ * dan pilihan hasil tahap hanya muncul pada tahap yang relevan.
+ */
+export function rejectTemplates({ missing = [], stage = null } = {}) {
+    return [
+        missing.length ? { label: 'Skill wajib kurang', text: `Belum memenuhi skill wajib untuk posisi ini: ${missing.join(', ')}.` } : null,
+        { label: 'Pengalaman belum sesuai', text: 'Pengalaman kerja belum sesuai dengan kebutuhan posisi ini.' },
+        stage === 'assessment' ? { label: 'Hasil assessment', text: 'Hasil assessment belum memenuhi standar yang dibutuhkan.' } : null,
+        stage === 'interview' ? { label: 'Hasil wawancara', text: 'Hasil wawancara belum sesuai dengan kebutuhan tim.' } : null,
+        { label: 'Posisi sudah terisi', text: 'Posisi sudah terisi oleh kandidat lain.' },
+    ].filter(Boolean);
+}
+
+/** Tombol pilihan cepat di atas kolom alasan. Klik mengisi kolom; teks tetap bisa diubah. */
+export function templateChips(list) {
+    return `<div class="ws-tpl" role="group" aria-label="Pilih alasan cepat">${list.map((t, i) => `<button type="button" class="ws-tpl-chip" data-tpl="${i}" title="${esc(t.text)}">${esc(t.label)}</button>`).join('')}</div>`;
+}
+
+export function bindTemplates(scope, list, textarea) {
+    scope.querySelectorAll('[data-tpl]').forEach((chip) => chip.addEventListener('click', () => {
+        textarea.value = list[Number(chip.dataset.tpl)].text;
+        textarea.dispatchEvent(new Event('input', { bubbles: true }));
+        scope.querySelectorAll('[data-tpl]').forEach((c) => c.setAttribute('aria-pressed', String(c === chip)));
+        textarea.focus();
+        textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+    }));
+}
+
+export function renderActions(container, app, { mode = null, job = null, onMoved = () => {} } = {}) {
     const stage = stageOf(app);
     const next = nextStageOf(stage);
 
@@ -277,7 +306,7 @@ export function renderActions(container, app, { mode = null, onMoved = () => {} 
         return;
     }
 
-    const rerender = (m) => renderActions(container, app, { mode: m, onMoved });
+    const rerender = (m) => renderActions(container, app, { mode: m, job, onMoved });
 
     if (!mode) {
         const overdue = interviewOverdue(app);
@@ -299,6 +328,9 @@ export function renderActions(container, app, { mode = null, onMoved = () => {} 
     const isReject = mode === 'reject';
     const target = isReject ? 'rejected' : next;
     const needsSchedule = target === 'interview';
+    const templates = isReject
+        ? rejectTemplates({ missing: matchBreakdown(app, job).rows.filter((r) => r.level === 'required' && !r.ok).map((r) => r.name), stage })
+        : [];
     container.innerHTML = `
         <form class="space-y-3" novalidate>
             <p class="font-semibold">${isReject ? 'Tolak kandidat' : target === 'hired' ? 'Tandai kandidat sebagai Hired' : `Majukan ke ${STAGE[target].label}`}</p>
@@ -312,6 +344,7 @@ export function renderActions(container, app, { mode = null, onMoved = () => {} 
                 </div>` : ''}
             <div>
                 <label class="ws-label" for="cv-note-${app.id}">${isReject ? 'Alasan penolakan' : 'Catatan'} ${isReject ? '' : '<span class="opt">(opsional)</span>'}</label>
+                ${templates.length ? templateChips(templates) : ''}
                 <textarea id="cv-note-${app.id}" name="notes" rows="2" maxlength="1000" class="ws-input" placeholder="${isReject ? 'contoh: Belum menguasai Redis yang wajib untuk posisi ini.' : 'Catatan untuk tim atau tahap berikutnya'}"></textarea>
                 <p class="ws-error" data-error-for="notes"></p>
             </div>
@@ -323,6 +356,7 @@ export function renderActions(container, app, { mode = null, onMoved = () => {} 
 
     const form = container.querySelector('form');
     form.querySelector('[data-cancel]').addEventListener('click', () => rerender(null));
+    if (templates.length) bindTemplates(form, templates, form.notes);
     form.querySelector(needsSchedule ? 'input' : 'textarea').focus();
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
