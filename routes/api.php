@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\Api\AdminJobController;
+use App\Http\Controllers\Api\AdminOverviewController;
+use App\Http\Controllers\Api\AdminUserController;
 use App\Http\Controllers\Api\AdminVerificationController;
 use App\Http\Controllers\Api\ApplicationController;
 use App\Http\Controllers\Api\ApplicationNoteController;
@@ -117,6 +120,17 @@ Route::middleware('jwt.auth:admin')->prefix('admin')->group(function () {
     Route::get('/verifications', [AdminVerificationController::class, 'index']);
     Route::patch('/verifications/{id}', [AdminVerificationController::class, 'review'])->whereNumber('id');
     Route::patch('/companies/{id}/status', [AdminVerificationController::class, 'setCompanyStatus'])->whereNumber('id');
+
+    // Admin Portal: ringkasan, pengguna, perusahaan, moderasi lowongan, dan log audit
+    Route::get('/overview', [AdminOverviewController::class, 'overview']);
+    Route::get('/audit-logs', [AdminOverviewController::class, 'auditLogs']);
+    Route::get('/users', [AdminUserController::class, 'index']);
+    Route::get('/users/{id}', [AdminUserController::class, 'show'])->whereNumber('id');
+    Route::patch('/users/{id}/status', [AdminUserController::class, 'updateStatus'])->whereNumber('id');
+    Route::get('/companies', [AdminVerificationController::class, 'companies']);
+    Route::get('/companies/{id}', [AdminVerificationController::class, 'company'])->whereNumber('id');
+    Route::get('/jobs', [AdminJobController::class, 'index']);
+    Route::patch('/jobs/{id}/moderation', [AdminJobController::class, 'moderate'])->whereNumber('id');
 });
 
 Route::middleware('jwt.auth')->group(function () {
@@ -204,5 +218,5 @@ Route::get('/geo/villages', [\App\Http\Controllers\Api\GeospatialAtlasController
 // =========================================================================
 Route::prefix('aggregator')->middleware('jwt.auth:admin')->group(function () {
     Route::get('/summary', [\App\Http\Controllers\Api\JobSourceMonitoringController::class, 'getMonitoringSummary']);
-    Route::post('/sync', [\App\Http\Controllers\Api\JobSourceMonitoringController::class, 'triggerSync']);
+    Route::post('/sync', [\App\Http\Controllers\Api\JobSourceMonitoringController::class, 'triggerSync'])->middleware('throttle:6,1');
 });

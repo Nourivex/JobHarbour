@@ -152,7 +152,7 @@ class ApplicationController extends Controller
         // 3. Pastikan lowongan berstatus buka ('open')
         $job = JobVacancy::find($jobVacancyId);
 
-        if (! $job || $job->status !== 'open') {
+        if (! $job || $job->status !== 'open' || $job->moderation_status === 'removed') {
             return $this->errorResponse('Lowongan ini telah ditutup dan tidak lagi menerima berkas lamaran baru.', 400);
         }
 

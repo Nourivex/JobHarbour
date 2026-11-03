@@ -62,6 +62,7 @@ class JobVacancy extends Model
     protected function casts(): array
     {
         return [
+            'moderated_at' => 'datetime',
             'requirements' => 'array', // Otomatis mengubah JSON requirements menjadi array PHP
             'expires_at' => 'datetime',
             'salary_min' => 'integer',

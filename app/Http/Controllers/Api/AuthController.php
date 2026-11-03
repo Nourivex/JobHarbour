@@ -69,6 +69,14 @@ class AuthController extends Controller
             return $this->errorResponse('Kredensial tidak valid. Alamat email atau kata sandi salah.', 401);
         }
 
+        // Akun yang ditangguhkan admin tidak mendapat token baru
+        if ($user->status === 'suspended') {
+            return $this->forbiddenResponse(
+                'Akun Anda sedang ditangguhkan oleh admin JobHarbour. Hubungi admin untuk informasi lebih lanjut.',
+                'ACCOUNT_SUSPENDED'
+            );
+        }
+
         // 4. Buat token akses JWT menggunakan JwtService
         $token = $this->jwtService->generateToken($user);
 

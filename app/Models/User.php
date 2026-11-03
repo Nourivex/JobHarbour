@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -55,6 +56,7 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
+            'status_changed_at' => 'datetime',
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'skills' => 'array', // Otomatis mengubah data JSON database menjadi PHP array
@@ -83,5 +85,13 @@ class User extends Authenticatable
     public function company(): HasOne
     {
         return $this->hasOne(Company::class, 'owner_id');
+    }
+
+    /**
+     * Relasi: admin yang terakhir mengubah status akun ini (penangguhan / pengaktifan kembali).
+     */
+    public function statusChanger(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'status_changed_by');
     }
 }

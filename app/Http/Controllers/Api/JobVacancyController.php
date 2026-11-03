@@ -50,7 +50,8 @@ class JobVacancyController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $query = JobVacancy::query();
+        // Lowongan yang diturunkan admin (moderasi) tidak pernah tampil di katalog publik
+        $query = JobVacancy::query()->where('moderation_status', '!=', 'removed');
 
         // 1. Filter Status Lowongan: secara default hanya menampilkan lowongan yang masih dibuka ('open').
         //    Draft dan arsip tidak pernah tampil di katalog publik.
@@ -152,7 +153,7 @@ class JobVacancyController extends Controller
         $job = JobVacancy::with('recruiter:id,name,email')->find($id);
 
         // Draft dan arsip diperlakukan tidak ada bagi publik; pemiliknya melihatnya lewat /api/jobs/my
-        if (! $job || ! in_array($job->status, self::PUBLIC_STATUSES, true)) {
+        if (! $job || ! in_array($job->status, self::PUBLIC_STATUSES, true) || $job->moderation_status === 'removed') {
             return $this->notFoundResponse('Lowongan pekerjaan yang dicari tidak ditemukan.');
         }
 
@@ -404,6 +405,14 @@ class JobVacancyController extends Controller
 
         if ($validator->fails()) {
             return $this->validationErrorResponse($validator->errors(), 'Gagal memperbarui lowongan karena data tidak valid.');
+        }
+
+        // Lowongan yang diturunkan admin tidak bisa dibuka kembali oleh recruiter
+        if ($request->input('status') === 'open' && $job->moderation_status === 'removed' && $currentUser->role !== 'admin') {
+            return $this->forbiddenResponse(
+                'Lowongan ini diturunkan oleh admin JobHarbour: '.($job->moderation_reason ?: 'tanpa keterangan').' Perbaiki isinya lalu hubungi admin untuk dipulihkan.',
+                'JOB_REMOVED_BY_ADMIN'
+            );
         }
 
         // Membuka (mempublikasikan) lowongan yang belum terbuka tunduk pada aturan verifikasi perusahaan

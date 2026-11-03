@@ -74,6 +74,15 @@ class JwtAuth
             );
         }
 
+        // 3b. Akun yang ditangguhkan admin langsung ditolak. Karena user dibaca ulang dari database di
+        //     setiap request, penangguhan berlaku seketika walaupun token lama belum kedaluwarsa.
+        if ($user->status === 'suspended') {
+            return $this->forbiddenResponse(
+                'Akun Anda sedang ditangguhkan oleh admin JobHarbour. Hubungi admin untuk informasi lebih lanjut.',
+                'ACCOUNT_SUSPENDED'
+            );
+        }
+
         // 4. Pengecekan Otorisasi Peran (Role Check) jika ditentukan di route
         if ($requiredRole !== null && $user->role !== $requiredRole && $user->role !== 'admin') {
             return $this->forbiddenResponse(
