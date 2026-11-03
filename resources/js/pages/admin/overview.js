@@ -55,10 +55,11 @@ function renderHealth(d, healthy) {
 function renderQueue(q) {
     const oldest = q.oldest_pending_at ? `tertua ${relativeTime(q.oldest_pending_at)}` : 'tidak ada yang menunggu';
     const suspended = q.users_suspended + q.companies_suspended;
+    const reports = q.reports_open + q.appeals_open;
     $('ov-queue').innerHTML = [
+        tile({ n: reports, label: 'Laporan dan banding', sub: reports ? `${plural(q.reports_open, 'laporan')}, ${plural(q.appeals_open, 'banding')}` : 'tidak ada yang menunggu', href: '/admin/reports', tone: q.reports_open ? 'is-bad' : (q.appeals_open ? 'is-warn' : '') }),
         tile({ n: q.verifications_pending, label: 'Verifikasi menunggu', sub: oldest, href: '/admin/verifications', tone: q.verifications_pending ? 'is-warn' : '' }),
         tile({ n: q.sources_degraded, label: 'Sumber bermasalah', sub: q.sources_degraded ? 'pengambilan terakhir gagal' : 'semua sehat', href: '/admin/sources', tone: q.sources_degraded ? 'is-bad' : '' }),
-        tile({ n: q.companies_revision, label: 'Diminta revisi', sub: 'menunggu recruiter', href: '/admin/companies?status=revision_required' }),
         tile({ n: q.jobs_removed, label: 'Lowongan diturunkan', sub: 'tidak tampil di katalog', href: '/admin/jobs?moderation=removed' }),
         tile({ n: suspended, label: 'Ditangguhkan', sub: `${plural(q.users_suspended, 'akun')}, ${plural(q.companies_suspended, 'perusahaan')}`, href: '/admin/users?status=suspended' }),
     ].join('');

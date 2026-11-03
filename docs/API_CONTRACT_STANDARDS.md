@@ -736,6 +736,13 @@ Semua endpoint di bawah memakai `Authorization: Bearer <token_admin>` dan dilind
 | PATCH | `/api/admin/jobs/{id}/moderation` | Body `{ "action": "remove" \| "restore", "reason": "..." }`. Alasan wajib (min. 10 karakter) saat menurunkan. |
 | GET | `/api/admin/audit-logs?action=&target_type=&actor_id=` | Log audit (baca saja). `meta.actions` berisi label setiap jenis tindakan. |
 
+| GET | `/api/admin/reports?status=&kind=` | Laporan pengguna dan banding recruiter. `status`: active (open + in_review, bawaan), open, in_review, resolved, dismissed. `kind`: report, appeal. Diurutkan dari yang paling lama menunggu. |
+| PATCH | `/api/admin/reports/{id}` | Body `{ "status": "in_review" \| "resolved" \| "dismissed", "resolution": "..." }`. Hasil pemeriksaan wajib (min. 10 karakter) saat menyelesaikan atau menolak. Laporan yang sudah ditutup: `409 ALREADY_CLOSED`. |
+
+**Laporan dan banding (pengguna):**
+- `POST /api/reports` (semua pengguna yang masuk, dibatasi 10 per jam): body `{ "target_type": "job" | "company", "target_id", "category": "scam" | "misleading" | "discrimination" | "spam" | "other", "description" (min. 20) }`. 201 + `Location`. Laporan ganda yang masih aktif: `409 DUPLICATE_REPORT`. Melaporkan milik sendiri: `403 SELF_REPORT_FORBIDDEN`.
+- `POST /api/jobs/{id}/appeal` (recruiter pemilik, dibatasi 10 per jam): body `{ "description" (min. 20) }` untuk lowongan yang diturunkan admin. Lowongan tidak sedang diturunkan: `409 NOT_REMOVED`; banding aktif sudah ada: `409 DUPLICATE_APPEAL`. `GET /api/jobs/my` menyertakan `has_open_appeal`.
+
 **Akun ditangguhkan:** login dan semua endpoint terproteksi mengembalikan `403` dengan `error_code: ACCOUNT_SUSPENDED`, termasuk token yang dibuat sebelum penangguhan.
 
 **Lowongan diturunkan admin:** tidak tampil di `GET /api/jobs`, `GET /api/jobs/{id}` mengembalikan `404`, dan lamaran baru ditolak `400`. Pemilik tetap melihatnya di `GET /api/jobs/my` beserta `moderation_status` dan `moderation_reason`, tetapi tidak bisa membukanya lagi (`403 JOB_REMOVED_BY_ADMIN`) sampai admin memulihkannya.

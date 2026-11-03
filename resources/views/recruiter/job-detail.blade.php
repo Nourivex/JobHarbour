@@ -49,6 +49,32 @@
 
     @push('modals')
         @include('recruiter.partials.job-form')
+
+        {{-- Banding atas lowongan yang diturunkan admin --}}
+        <dialog id="jd-appeal" class="ws-dialog" aria-labelledby="jd-appeal-title">
+            <form novalidate>
+                <div class="ws-dialog-head">
+                    <div>
+                        <h2 id="jd-appeal-title" class="text-lg font-bold">Ajukan pemulihan lowongan</h2>
+                        <p class="ws-meta mt-0.5">Admin meninjau pengajuan ini lalu memutuskan apakah lowongan dipulihkan.</p>
+                    </div>
+                    <button type="button" class="ws-icon-btn -mr-2" data-dialog-close aria-label="Tutup"><i data-lucide="x"></i></button>
+                </div>
+                <div class="ws-dialog-body space-y-3">
+                    <div class="ws-callout ws-callout-warning"><i data-lucide="info"></i><p>Alasan diturunkan: <b id="jd-appeal-reason"></b></p></div>
+                    <div>
+                        <label for="jd-appeal-text" class="ws-label">Apa yang sudah diperbaiki</label>
+                        <textarea id="jd-appeal-text" name="description" rows="4" maxlength="2000" class="ws-input" placeholder="contoh: Rentang gaji sudah kami sesuaikan dengan kontrak resmi dan informasi biaya pendaftaran sudah dihapus."></textarea>
+                        <p class="ws-error" data-error-for="description"></p>
+                        <p class="ws-help">Perbaiki isi lowongan lewat tombol Edit sebelum mengajukan.</p>
+                    </div>
+                </div>
+                <div class="ws-dialog-foot">
+                    <button type="button" class="ws-btn ws-btn-ghost" data-dialog-close>Batal</button>
+                    <button type="submit" class="ws-btn ws-btn-primary">Kirim pengajuan</button>
+                </div>
+            </form>
+        </dialog>
     @endpush
     @push('scripts')
         @vite('resources/js/pages/recruiter/job-detail.js')

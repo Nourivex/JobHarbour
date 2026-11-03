@@ -15,6 +15,7 @@ const TARGET_LINK = {
     user: (id) => `/admin/users?open=${id}`,
     jobvacancy: (id) => `/admin/jobs?id=${id}`,
     jobsource: () => '/admin/sources',
+    report: () => '/admin/reports?status=resolved',
 };
 
 function syncUrl() {

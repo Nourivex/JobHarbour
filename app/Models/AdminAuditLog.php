@@ -37,6 +37,9 @@ class AdminAuditLog extends Model
         'job.removed' => 'Menurunkan lowongan',
         'job.restored' => 'Memulihkan lowongan',
         'source.synced' => 'Menjalankan sinkronisasi sumber lowongan',
+        'report.in_review' => 'Meninjau laporan',
+        'report.resolved' => 'Menyelesaikan laporan',
+        'report.dismissed' => 'Menolak laporan',
     ];
 
     public function actor(): BelongsTo

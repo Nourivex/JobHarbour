@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AdminJobController;
 use App\Http\Controllers\Api\AdminOverviewController;
+use App\Http\Controllers\Api\AdminReportController;
 use App\Http\Controllers\Api\AdminUserController;
 use App\Http\Controllers\Api\AdminVerificationController;
 use App\Http\Controllers\Api\ApplicationController;
@@ -11,6 +12,7 @@ use App\Http\Controllers\Api\CompanyController;
 use App\Http\Controllers\Api\JobVacancyController;
 use App\Http\Controllers\Api\PipelineController;
 use App\Http\Controllers\Api\ProfileSkillController;
+use App\Http\Controllers\Api\ReportController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -131,7 +133,13 @@ Route::middleware('jwt.auth:admin')->prefix('admin')->group(function () {
     Route::get('/companies/{id}', [AdminVerificationController::class, 'company'])->whereNumber('id');
     Route::get('/jobs', [AdminJobController::class, 'index']);
     Route::patch('/jobs/{id}/moderation', [AdminJobController::class, 'moderate'])->whereNumber('id');
+    Route::get('/reports', [AdminReportController::class, 'index']);
+    Route::patch('/reports/{id}', [AdminReportController::class, 'update'])->whereNumber('id');
 });
+
+// Laporan pengguna dan banding recruiter (dibatasi agar tidak dipakai untuk spam)
+Route::middleware(['jwt.auth', 'throttle:10,60'])->post('/reports', [ReportController::class, 'store']);
+Route::middleware(['jwt.auth:recruiter', 'throttle:10,60'])->post('/jobs/{id}/appeal', [ReportController::class, 'appeal'])->whereNumber('id');
 
 Route::middleware('jwt.auth')->group(function () {
     // Method PUT/PATCH: Memperbarui biodata profil & keahlian pengguna

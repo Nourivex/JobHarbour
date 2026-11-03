@@ -352,6 +352,8 @@ class JobVacancyController extends Controller
         $jobs = JobVacancy::query()
             ->when($currentUser->role !== 'admin', fn ($query) => $query->where('posted_by', $currentUser->id))
             ->withCount('applications')
+            // Penanda banding yang masih ditinjau admin untuk lowongan yang diturunkan
+            ->withExists(['appeals as has_open_appeal' => fn ($q) => $q->whereIn('status', \App\Models\Report::ACTIVE)])
             ->latest()
             ->get();
 

@@ -155,6 +155,12 @@ export const jobs = {
     create: (payload) => api.post('/jobs', payload),
     update: (id, payload) => api.patch('/jobs/' + id, payload),
     close: (id) => api.del('/jobs/' + id),
+    appeal: (id, payload) => api.post('/jobs/' + id + '/appeal', payload),
+};
+
+/** Laporan pengguna atas lowongan atau perusahaan. */
+export const reports = {
+    create: (payload) => api.post('/reports', payload),
 };
 
 export const applications = {
@@ -269,6 +275,8 @@ export const admin = {
     sources: () => api.get('/aggregator/summary'),
     syncSources: (slug) => api.post('/aggregator/sync', slug ? { source_slug: slug } : {}),
     health: () => api.get('/health'),
+    reports: (query) => api.get('/admin/reports', query),
+    updateReport: (id, payload) => api.patch('/admin/reports/' + id, payload),
 };
 
 export const matchmaking = {

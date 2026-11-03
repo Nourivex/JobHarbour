@@ -4,6 +4,7 @@
             ['key' => 'overview', 'href' => '/admin', 'icon' => 'layout-dashboard', 'label' => 'Ringkasan'],
         ]],
         ['label' => 'Kepercayaan', 'items' => [
+            ['key' => 'reports', 'href' => '/admin/reports', 'icon' => 'flag', 'label' => 'Laporan', 'count' => 'adm-nav-reports'],
             ['key' => 'verifications', 'href' => '/admin/verifications', 'icon' => 'badge-check', 'label' => 'Verifikasi', 'count' => 'adm-nav-verifications'],
             ['key' => 'companies', 'href' => '/admin/companies', 'icon' => 'building-2', 'label' => 'Perusahaan'],
             ['key' => 'users', 'href' => '/admin/users', 'icon' => 'users', 'label' => 'Pengguna'],

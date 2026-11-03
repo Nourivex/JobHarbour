@@ -92,4 +92,12 @@ class JobVacancy extends Model
     {
         return $this->hasMany(Application::class, 'job_vacancy_id');
     }
+
+    /**
+     * Relasi: banding recruiter atas lowongan ini (laporan dengan kind = appeal).
+     */
+    public function appeals(): HasMany
+    {
+        return $this->hasMany(Report::class, 'target_id')->where('target_type', 'job')->where('kind', 'appeal');
+    }
 }

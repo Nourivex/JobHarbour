@@ -49,6 +49,13 @@
                     <div class="h-64 rounded-2xl animate-skeleton bg-[#F4F6F8]"></div>
                 </div>
                 <div id="panel-process" role="tabpanel" aria-labelledby="tab-process" class="hidden p-5 sm:p-7"></div>
+
+                <!-- Laporan: jalur bagi pelamar bila lowongan mencurigakan -->
+                <div class="px-5 sm:px-7 py-4 border-t border-[#E2E7ED] flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-[#3D4B5C]">
+                    <svg class="w-4 h-4 text-[#627080]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 22V4a1 1 0 0 1 1-1h12l-2 4 2 4H5"/></svg>
+                    <span>Ada yang janggal dengan lowongan ini, misalnya diminta membayar biaya?</span>
+                    <button type="button" id="detail-report" class="font-semibold text-[#B42318] hover:underline cursor-pointer">Laporkan ke admin</button>
+                </div>
             </div>
 
             <!-- ====================================================== -->
@@ -76,6 +83,47 @@
             </aside>
         </div>
     </div>
+
+    <!-- Dialog laporan lowongan -->
+    <dialog id="report-dialog" class="report-dialog m-auto w-[min(520px,calc(100%-2rem))] rounded-2xl border border-[#E2E7ED] bg-white p-0 text-[#0B1B2B]" aria-labelledby="report-title">
+        <form id="report-form" class="p-5 sm:p-6 space-y-4" novalidate>
+            <div class="flex items-start justify-between gap-3">
+                <div>
+                    <h2 id="report-title" class="text-lg font-extrabold">Laporkan lowongan</h2>
+                    <p class="text-sm text-[#3D4B5C] mt-0.5">Laporan dikirim ke admin JobHarbour dan tidak terlihat oleh perusahaan.</p>
+                </div>
+                <button type="button" data-report-close class="w-9 h-9 -mr-2 rounded-lg flex items-center justify-center text-[#3D4B5C] hover:bg-[#F4F6F8] cursor-pointer" aria-label="Tutup">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <fieldset>
+                <legend class="text-sm font-semibold mb-2">Jenis masalah</legend>
+                <div class="grid sm:grid-cols-2 gap-2" id="report-categories">
+                    @foreach (['scam' => 'Penipuan atau meminta biaya', 'misleading' => 'Informasi menyesatkan', 'discrimination' => 'Diskriminatif', 'spam' => 'Spam atau duplikat', 'other' => 'Lainnya'] as $value => $label)
+                        <label class="report-option flex items-center gap-2.5 rounded-xl border border-[#E2E7ED] px-3 py-2.5 text-sm cursor-pointer hover:border-[#C5CFDA]">
+                            <input type="radio" name="category" value="{{ $value }}" class="accent-[#C8460B]" @if ($loop->first) checked @endif>
+                            {{ $label }}
+                        </label>
+                    @endforeach
+                </div>
+            </fieldset>
+            <div>
+                <label for="report-description" class="text-sm font-semibold">Ceritakan yang janggal</label>
+                <textarea id="report-description" name="description" rows="4" maxlength="2000" class="mt-1.5 w-full rounded-xl border border-[#E2E7ED] bg-white px-3 py-2.5 text-[15px] text-[#0B1B2B] focus:outline-none focus:ring-2 focus:ring-[#C8460B]/30 focus:border-[#C8460B]" placeholder="contoh: Saat dihubungi, recruiter meminta biaya pelatihan Rp500.000 sebelum wawancara."></textarea>
+                <p id="report-error" class="mt-1 text-sm text-[#B42318] min-h-5" role="alert"></p>
+            </div>
+            <div class="flex justify-end gap-2">
+                <button type="button" data-report-close class="h-11 px-4 rounded-xl font-semibold text-[#3D4B5C] hover:bg-[#F4F6F8] cursor-pointer">Batal</button>
+                <button type="submit" id="report-submit" class="btn-press h-11 px-5 rounded-xl font-semibold text-white bg-[#B42318] hover:bg-[#912018] cursor-pointer disabled:opacity-60">Kirim laporan</button>
+            </div>
+        </form>
+        <div id="report-done" class="hidden p-6 text-center" role="status">
+            <svg class="report-check mx-auto w-14 h-14 text-[#157F3B]" viewBox="0 0 52 52" aria-hidden="true"><circle cx="26" cy="26" r="24" fill="none" stroke="currentColor" stroke-width="2.5"/><path fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" d="M15 27l7 7 15-16"/></svg>
+            <p class="mt-3 text-lg font-extrabold">Laporan terkirim</p>
+            <p class="mt-1 text-sm text-[#3D4B5C]">Terima kasih. Admin JobHarbour akan memeriksa lowongan ini.</p>
+            <button type="button" data-report-close class="btn-press mt-5 h-11 px-5 rounded-xl font-semibold bg-[#0C2238] text-white cursor-pointer">Tutup</button>
+        </div>
+    </dialog>
 
     @push('scripts')
         @vite('resources/js/pages/job-detail.js')

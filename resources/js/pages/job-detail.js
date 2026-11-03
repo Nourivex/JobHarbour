@@ -1,4 +1,4 @@
-import { jobs, applications, matchmaking, session, util } from '../api.js';
+import { jobs, applications, matchmaking, reports, session, util } from '../api.js';
 import { EMPLOYMENT_SHORT, companyTile, jobCode, salaryRange, remainingQuota, scoreCategory, savedJobs, icon } from '../job-ui.js';
 
 const esc = util.escapeHtml;
@@ -392,7 +392,68 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     renderMatch(job, applied);
     renderStickyApply(job, applied);
+    initReport(job);
 });
+
+/**
+ * Laporan lowongan oleh pengguna yang sudah masuk. Tamu diarahkan ke halaman masuk lalu kembali ke sini.
+ * Error dari server (mis. sudah pernah melapor) ditampilkan di dialog tanpa menutupnya.
+ */
+function initReport(job) {
+    const trigger = document.getElementById('detail-report');
+    const dialog = document.getElementById('report-dialog');
+    const form = document.getElementById('report-form');
+    const done = document.getElementById('report-done');
+    const error = document.getElementById('report-error');
+    const submit = document.getElementById('report-submit');
+    if (!trigger || !dialog) return;
+
+    if (loggedIn && (user.role === 'recruiter' || user.role === 'admin')) {
+        // Recruiter tidak melaporkan lowongannya sendiri; admin langsung memoderasi dari Admin Portal
+        trigger.parentElement.classList.add('hidden');
+        return;
+    }
+
+    const close = () => dialog.close();
+    dialog.querySelectorAll('[data-report-close]').forEach((b) => b.addEventListener('click', close));
+    dialog.addEventListener('click', (e) => { if (e.target === dialog) close(); });
+
+    trigger.addEventListener('click', () => {
+        if (!loggedIn) {
+            window.location.href = '/login?next=' + encodeURIComponent(window.location.pathname);
+            return;
+        }
+        form.reset();
+        form.classList.remove('hidden');
+        done.classList.add('hidden');
+        error.textContent = '';
+        dialog.showModal();
+        setTimeout(() => form.elements.description.focus(), 30);
+    });
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const description = form.elements.description.value.trim();
+        if (description.length < 20) {
+            error.textContent = 'Ceritakan minimal 20 karakter agar admin bisa memeriksanya.';
+            form.elements.description.focus();
+            return;
+        }
+        submit.disabled = true;
+        submit.textContent = 'Mengirim...';
+        try {
+            await reports.create({ target_type: 'job', target_id: job.id, category: form.elements.category.value, description });
+            form.classList.add('hidden');
+            done.classList.remove('hidden');
+            done.querySelector('[data-report-close]').focus();
+        } catch (err) {
+            error.textContent = err?.fullMessage?.() || err?.message || 'Laporan gagal dikirim. Coba lagi.';
+        } finally {
+            submit.disabled = false;
+            submit.textContent = 'Kirim laporan';
+        }
+    });
+}
 
 /**
  * Bar lamar yang menempel di bawah layar (ponsel dan tablet saja). Di layar kecil panel skor dan tombol

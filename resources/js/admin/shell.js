@@ -11,11 +11,17 @@ import { hydrateIcons } from '../recruiter/ui.js';
 export function renderNavCounts(queue) {
     if (!queue) return;
     const v = document.getElementById('adm-nav-verifications');
-    if (v) {
+    if (v && ('verifications_pending' in queue)) {
         v.textContent = queue.verifications_pending || 0;
         v.classList.toggle('hidden', !queue.verifications_pending);
     }
-    document.getElementById('adm-nav-sources')?.classList.toggle('hidden', !queue.sources_degraded);
+    const r = document.getElementById('adm-nav-reports');
+    const reportsOpen = (queue.reports_open || 0) + (queue.appeals_open || 0);
+    if (r && ('reports_open' in queue)) {
+        r.textContent = reportsOpen;
+        r.classList.toggle('hidden', !reportsOpen);
+    }
+    if ('sources_degraded' in queue) document.getElementById('adm-nav-sources')?.classList.toggle('hidden', !queue.sources_degraded);
 }
 
 /**

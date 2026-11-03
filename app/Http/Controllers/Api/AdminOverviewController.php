@@ -9,6 +9,7 @@ use App\Models\Company;
 use App\Models\CompanyVerification;
 use App\Models\JobSource;
 use App\Models\JobVacancy;
+use App\Models\Report;
 use App\Models\User;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
@@ -54,6 +55,9 @@ class AdminOverviewController extends Controller
                 'users_suspended' => User::where('status', 'suspended')->count(),
                 'companies_suspended' => Company::where('verification_status', 'suspended')->count(),
                 'sources_degraded' => $degraded->count(),
+                'reports_open' => Report::where('kind', 'report')->whereIn('status', Report::ACTIVE)->count(),
+                'appeals_open' => Report::where('kind', 'appeal')->whereIn('status', Report::ACTIVE)->count(),
+                'oldest_report_at' => Report::whereIn('status', Report::ACTIVE)->oldest('created_at')->value('created_at')?->toIso8601String(),
             ],
             'users' => [
                 'by_role' => User::query()->select('role', DB::raw('count(*) as total'))->groupBy('role')->pluck('total', 'role'),
@@ -186,7 +190,7 @@ class AdminOverviewController extends Controller
 
         $page = AdminAuditLog::with('actor:id,name')
             ->when(array_key_exists((string) $request->input('action'), AdminAuditLog::ACTIONS), fn ($q) => $q->where('action', $request->input('action')))
-            ->when(in_array($request->input('target_type'), ['user', 'company', 'jobvacancy', 'jobsource', 'companyverification'], true), fn ($q) => $q->where('target_type', $request->input('target_type')))
+            ->when(in_array($request->input('target_type'), ['user', 'company', 'jobvacancy', 'jobsource', 'companyverification', 'report'], true), fn ($q) => $q->where('target_type', $request->input('target_type')))
             ->when($request->filled('actor_id'), fn ($q) => $q->where('actor_id', (int) $request->input('actor_id')))
             ->latest('id')
             ->paginate($perPage);
