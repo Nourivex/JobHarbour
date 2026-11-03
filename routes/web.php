@@ -64,7 +64,9 @@ Route::get('/api/documentation', function () {
     return view('swagger');
 })->name('swagger.docs.alias');
 
-// API Studio & Interactive Demo Console (kembaran modern Swagger UI untuk demonstrasi UTS)
+// Halaman Postman API Client & Workspace Interaktif (untuk tim & demonstrasi dosen)
+Route::view('/postman', 'api-studio')->name('postman');
+Route::view('/api-client', 'api-studio')->name('api.client');
 Route::view('/api-studio', 'api-studio')->name('api.studio');
 Route::view('/docs/studio', 'api-studio')->name('api.studio.docs');
 
