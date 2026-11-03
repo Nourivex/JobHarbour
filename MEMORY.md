@@ -65,6 +65,23 @@ Dokumen ini berfungsi sebagai memori jangka panjang (*long-term memory*) untuk m
 - **Isu #11:** Menegakkan aturan transisi status pipeline pada `PipelineController`. Memblokir transisi mundur (rollback) dari tahapan yang lebih tinggi ke tahapan sebelumnya dengan HTTP 422 (`INVALID_STAGE_TRANSITION`) dan mengunci status pelamar yang telah ditolak (`rejected`).
 - **Pengujian:** Suite pengujian otomatis bertambah menjadi 22 tests (147 assertions) berstatus 100% hijau.
 
+### Penggabungan PR #13 & PR #14 dan Model Verifikasi Perusahaan Mas Affif:
+- Penggabungan PR #13 (perbaikan mobile & validasi sandi min 8 karakter) dan PR #14 (portal recruiter v2, catatan evaluator internal, profil perusahaan).
+- Penyelesaian merge conflict pada `AuthController.php`.
+- Implementasi Tiered Trust & Search Priority Boost (ide Mas Affif):
+  - Recruiter baru/belum verif: boleh coba buka 1 lowongan trial (`regular_standard`), lowongan ke-2 dicegat wajib verifikasi (`403 COMPANY_NOT_VERIFIED`).
+  - Perusahaan terverifikasi resmi: dapat lencana centang biru (`verified_official`), posting tanpa batas, dan otomatis mendapatkan Search Priority Boost di urutan teratas katalog pelamar.
+- Testing: 38 automated tests (288 assertions) 100% passed.
+
+### Halaman Postman API Client & Workspace Interaktif (/postman):
+- Dibuat halaman mandiri mirip Postman Web (`/postman`, alias `/api-client`, `/api-studio`) yang bersih dan terpisah dari Swagger UI asli (`/docs`).
+- Fitur workspace Postman:
+  - Koleksi folder untuk 4 microservices + Aggregator (18 endpoint siap uji).
+  - 1-Click Role Auth Switcher (Pelamar, Recruiter Resmi, Recruiter Trial, Admin) tanpa perlu copy-paste token manual.
+  - Request builder lengkap (Params, Authorization Bearer, Headers, Raw JSON Body dengan beautify).
+  - Response viewer warna Postman dengan status code, response time (ms), response size, copy response, dan copy cURL.
+  - Tab "Panduan Rubrik UTS" menjelaskan poin kriteria penilaian dosen untuk setiap endpoint.
+
 ---
 
 ## 3. Catatan Teknis Penting (Gotchas & Caveats)
