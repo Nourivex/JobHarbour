@@ -35,6 +35,7 @@ export default defineConfig({
                 'resources/js/pages/admin/audit.js',
                 'resources/js/pages/admin/reports.js',
                 'resources/js/pages/admin/announcements.js',
+                'resources/js/pages/admin/platform.js',
             ],
             refresh: true,
         }),

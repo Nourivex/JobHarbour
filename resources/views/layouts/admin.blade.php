@@ -15,8 +15,9 @@
             ['key' => 'announcements', 'href' => '/admin/announcements', 'icon' => 'megaphone', 'label' => 'Pengumuman'],
             ['key' => 'audit', 'href' => '/admin/audit', 'icon' => 'scroll-text', 'label' => 'Log Audit'],
         ]],
-        ['label' => 'Akun', 'items' => [
-            ['key' => 'settings', 'href' => '/admin/settings', 'icon' => 'settings', 'label' => 'Pengaturan'],
+        ['label' => 'Pengaturan', 'items' => [
+            ['key' => 'platform', 'href' => '/admin/platform', 'icon' => 'sliders-horizontal', 'label' => 'Platform'],
+            ['key' => 'settings', 'href' => '/admin/settings', 'icon' => 'user-round-cog', 'label' => 'Akun saya'],
         ]],
     ];
 @endphp

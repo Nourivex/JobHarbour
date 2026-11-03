@@ -1,4 +1,4 @@
-<x-layouts.admin title="Pengaturan - Admin Portal JobHarbour" active="settings" crumb="Pengaturan">
+<x-layouts.admin title="Akun saya - Admin Portal JobHarbour" active="settings" crumb="Akun saya">
     @include('partials.account-settings')
 
     @push('scripts')

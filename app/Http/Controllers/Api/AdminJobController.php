@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\AdminAuditLog;
 use App\Models\JobVacancy;
+use App\Models\Report;
 use App\Models\UserNotification;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
@@ -74,6 +75,64 @@ class AdminJobController extends Controller
                 'removed' => JobVacancy::where('moderation_status', 'removed')->count(),
             ],
         ]);
+    }
+
+    /**
+     * Detail lowongan untuk pemeriksaan moderasi: isi, syarat skill, laporan pengguna, dan riwayat tindakan admin.
+     *
+     * Method  : GET
+     * Endpoint: /api/admin/jobs/{id}
+     */
+    public function show(int $id): JsonResponse
+    {
+        $j = JobVacancy::with(['recruiter:id,name,email', 'recruiter.company:id,owner_id,name,verification_status'])
+            ->withCount('applications')
+            ->find($id);
+
+        if (! $j) {
+            return $this->notFoundResponse('Lowongan tidak ditemukan.');
+        }
+
+        return $this->successResponse([
+            'id' => $j->id,
+            'title' => $j->title,
+            'company' => $j->company,
+            'location' => $j->location,
+            'employment_type' => $j->employment_type,
+            'salary_min' => $j->salary_min,
+            'salary_max' => $j->salary_max,
+            'description' => $j->description,
+            'requirements' => $j->requirements ?? [],
+            'status' => $j->status,
+            'moderation_status' => $j->moderation_status,
+            'moderation_reason' => $j->moderation_reason,
+            'moderated_at' => $j->moderated_at?->toIso8601String(),
+            'source_type' => $j->source_type,
+            'source_url' => $j->source_url,
+            'verification_status' => $j->verification_status,
+            'is_demo' => $j->isDemoData(),
+            'applications_count' => $j->applications_count,
+            'expires_at' => $j->expires_at?->toIso8601String(),
+            'recruiter' => $j->recruiter?->only(['id', 'name', 'email']),
+            'company_record' => $j->recruiter?->company?->only(['id', 'name', 'verification_status']),
+            'created_at' => $j->created_at?->toIso8601String(),
+            'reports' => Report::with(['reporter:id,name', 'handler:id,name'])
+                ->where('target_type', 'job')->where('target_id', $j->id)
+                ->latest('id')->limit(10)->get()
+                ->map(fn (Report $r) => [
+                    'id' => $r->id,
+                    'kind' => $r->kind,
+                    'category' => $r->category,
+                    'category_label' => Report::CATEGORIES[$r->category] ?? $r->category,
+                    'description' => $r->description,
+                    'status' => $r->status,
+                    'resolution' => $r->resolution,
+                    'reporter' => $r->reporter?->only(['id', 'name']),
+                    'created_at' => $r->created_at?->toIso8601String(),
+                ])->values(),
+            'history' => AdminAuditLog::with('actor:id,name')->where('target_type', 'jobvacancy')->where('target_id', $j->id)
+                ->latest('id')->limit(10)->get()->map->toApiArray(),
+        ], 'Detail lowongan berhasil dimuat.');
     }
 
     /**

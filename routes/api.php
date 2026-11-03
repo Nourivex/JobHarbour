@@ -136,6 +136,7 @@ Route::middleware('jwt.auth:admin')->prefix('admin')->group(function () {
     Route::get('/companies', [AdminVerificationController::class, 'companies']);
     Route::get('/companies/{id}', [AdminVerificationController::class, 'company'])->whereNumber('id');
     Route::get('/jobs', [AdminJobController::class, 'index']);
+    Route::get('/jobs/{id}', [AdminJobController::class, 'show'])->whereNumber('id');
     Route::patch('/jobs/{id}/moderation', [AdminJobController::class, 'moderate'])->whereNumber('id');
     Route::get('/reports', [AdminReportController::class, 'index']);
     Route::patch('/reports/{id}', [AdminReportController::class, 'update'])->whereNumber('id');

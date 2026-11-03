@@ -1,7 +1,8 @@
 /**
  * Admin Portal: Ringkasan sebagai pusat kendali. Urutan menurut prioritas kerja admin:
- * keputusan yang menunggu, kesehatan pasar kerja, pertumbuhan dan neraca skill, lalu isi platform.
- * Semua angka dari GET /api/admin/overview. Nilai null ditampilkan "belum cukup data", bukan nol.
+ * kondisi platform (pita navy), keputusan yang menunggu, kesehatan pasar kerja, pertumbuhan dan neraca skill,
+ * lalu tindakan admin terbaru. Semua angka dari GET /api/admin/overview.
+ * Nilai null ditampilkan "belum cukup data" beserta alasannya, bukan nol. Data demo selalu diberi penanda.
  * Animasi hanya transform/opacity dan mengikuti setelan kurangi gerakan.
  */
 import { admin } from '../../api.js';
@@ -12,6 +13,7 @@ const $ = (id) => document.getElementById(id);
 const sum = (obj) => Object.values(obj || {}).reduce((s, n) => s + Number(n || 0), 0);
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 const fmt = (n, digits = 0) => Number(n).toLocaleString('id-ID', { maximumFractionDigits: digits, minimumFractionDigits: digits });
+const counter = (n, digits = 0) => `<span data-count-to="${n}" data-digits="${digits}">${fmt(n, digits)}</span>`;
 
 /** Angka naik dari nol saat pertama tampil (450 ms). Elemen: [data-count-to] dan opsional [data-digits]. */
 function countUp(root) {
@@ -29,49 +31,93 @@ function countUp(root) {
     });
 }
 
-function tile({ n, label, sub, href = null, tone = '', na = false, digits = 0, unit = '' }) {
-    const clear = !na && !n && !tone;
-    const tag = href ? 'a' : 'div';
-    const value = na
-        ? '<span class="adm-tile-na">Belum cukup data</span>'
-        : `<span class="adm-tile-num"><span data-count-to="${n}" data-digits="${digits}">${fmt(n, digits)}</span>${unit}</span>`;
-    return `<${tag} ${href ? `href="${href}"` : ''} class="adm-tile ${clear ? 'is-clear' : tone}">
-        ${value}
-        <span class="adm-tile-label">${label}</span>
-        <span class="adm-tile-sub">${sub}</span>
-    </${tag}>`;
+function stat(label, n, sub) {
+    return `<div class="adm-stat"><span class="adm-stat-label">${label}</span><span class="adm-stat-num">${counter(n)}</span><span class="adm-stat-sub">${sub}</span></div>`;
 }
 
-function renderHealth(d, healthy) {
+/** Pita navy: status layanan di atas, isi platform di bawah. */
+function renderCommand(d, healthy, windowDays) {
     const degraded = d.sources.degraded || [];
-    $('ov-health').innerHTML = `
-        <div class="adm-health">
-            <span class="${healthy ? '' : 'is-bad'}"><span class="ws-status-dot"></span>API ${healthy ? 'berjalan normal' : 'tidak merespons'}</span>
-            <span class="${degraded.length ? 'is-bad' : ''}"><span class="ws-status-dot"></span>${d.sources.total ? `${d.sources.enabled} dari ${d.sources.total} sumber lowongan aktif${degraded.length ? `, ${degraded.length} bermasalah` : ', semuanya sehat'}` : 'Belum ada sumber lowongan otomatis'}</span>
-            ${degraded.length ? `<a href="/admin/sources" class="ws-btn ws-btn-ghost ws-btn-sm ml-auto">Periksa sumber${icon('arrow-right')}</a>` : ''}
+    const roles = d.users.by_role || {};
+    const companies = d.companies.by_status || {};
+    const j = d.jobs;
+    const newSub = (n) => (n ? ` · <b>+${n}</b> dalam ${windowDays} hari` : '');
+    const demoNote = j.open_demo
+        ? `<span class="adm-demo-tag" title="Lowongan contoh dari seeder, bukan lowongan nyata">DEMO</span> ${j.open_real} nyata, ${j.open_demo} data demo`
+        : 'semuanya lowongan nyata';
+    $('ov-command').innerHTML = `
+        <div class="adm-command-status">
+            <span><span class="adm-dot ${healthy ? '' : 'is-bad'}"></span>API ${healthy ? 'berjalan normal' : 'tidak merespons'}</span>
+            <span><span class="adm-dot ${!d.sources.total ? 'is-idle' : (degraded.length ? 'is-bad' : '')}"></span>${d.sources.total
+                ? `${d.sources.enabled} dari ${d.sources.total} sumber lowongan aktif${degraded.length ? `, ${degraded.length} bermasalah · <a href="/admin/sources">Periksa</a>` : ''}`
+                : 'Belum ada sumber lowongan otomatis'}</span>
+            ${j.open_demo ? `<span><span class="adm-dot is-idle"></span>Data demo ${j.demo_hidden ? 'disembunyikan dari' : 'tampil di'} katalog publik</span>` : ''}
+        </div>
+        <div class="adm-command-stats">
+            ${stat('Pengguna', sum(roles), `${roles.applicant || 0} pelamar, ${roles.recruiter || 0} recruiter${newSub(d.users.new_30d)}`)}
+            ${stat('Perusahaan', sum(companies), `${companies.verified || 0} terverifikasi${newSub(d.companies.new_30d)}`)}
+            ${stat('Lowongan terbuka', j.open_real + j.open_demo, demoNote)}
+            ${stat('Lamaran', d.applications.total, d.applications.total ? `total sejak awal${newSub(d.applications.new_30d)}` : 'belum ada lamaran masuk')}
         </div>`;
 }
 
+/** Antrean keputusan sebagai daftar: yang berisi dan paling mendesak di atas. */
 function renderQueue(q) {
-    const oldest = q.oldest_pending_at ? `tertua ${relativeTime(q.oldest_pending_at)}` : 'tidak ada yang menunggu';
     const suspended = q.users_suspended + q.companies_suspended;
     const reports = q.reports_open + q.appeals_open;
-    $('ov-queue').innerHTML = [
-        tile({ n: reports, label: 'Laporan dan banding', sub: reports ? `${plural(q.reports_open, 'laporan')}, ${plural(q.appeals_open, 'banding')}` : 'tidak ada yang menunggu', href: '/admin/reports', tone: q.reports_open ? 'is-bad' : (q.appeals_open ? 'is-warn' : '') }),
-        tile({ n: q.verifications_pending, label: 'Verifikasi menunggu', sub: oldest, href: '/admin/verifications', tone: q.verifications_pending ? 'is-warn' : '' }),
-        tile({ n: q.sources_degraded, label: 'Sumber bermasalah', sub: q.sources_degraded ? 'pengambilan terakhir gagal' : 'semua sehat', href: '/admin/sources', tone: q.sources_degraded ? 'is-bad' : '' }),
-        tile({ n: q.jobs_removed, label: 'Lowongan diturunkan', sub: 'tidak tampil di katalog', href: '/admin/jobs?moderation=removed' }),
-        tile({ n: suspended, label: 'Ditangguhkan', sub: `${plural(q.users_suspended, 'akun')}, ${plural(q.companies_suspended, 'perusahaan')}`, href: '/admin/users?status=suspended' }),
-    ].join('');
+    const items = [
+        { n: reports, icon: 'flag', label: 'Laporan dan banding', href: '/admin/reports', level: q.reports_open ? 3 : (q.appeals_open ? 2 : 0),
+          sub: reports ? `${plural(q.reports_open, 'laporan')}, ${plural(q.appeals_open, 'banding')}${q.oldest_report_at ? `, tertua ${relativeTime(q.oldest_report_at)}` : ''}` : 'Tidak ada yang menunggu' },
+        { n: q.verifications_pending, icon: 'badge-check', label: 'Verifikasi perusahaan', href: '/admin/verifications', level: q.verifications_pending ? 2 : 0,
+          sub: q.oldest_pending_at ? `Tertua diajukan ${relativeTime(q.oldest_pending_at)}` : 'Tidak ada pengajuan menunggu' },
+        { n: q.sources_degraded, icon: 'globe', label: 'Sumber lowongan bermasalah', href: '/admin/sources', level: q.sources_degraded ? 3 : 0,
+          sub: q.sources_degraded ? 'Pengambilan terakhir gagal' : 'Semua sumber sehat' },
+        { n: q.jobs_removed, icon: 'eye-off', label: 'Lowongan diturunkan', href: '/admin/jobs?moderation=removed', level: 0,
+          sub: 'Tidak tampil di katalog sampai dipulihkan' },
+        { n: suspended, icon: 'user-x', label: 'Akun dan perusahaan ditangguhkan', href: '/admin/users?status=suspended', level: 0,
+          sub: `${plural(q.users_suspended, 'akun')}, ${plural(q.companies_suspended, 'perusahaan')}` },
+    ].sort((a, b) => (b.level - a.level) || (Number(Boolean(b.n)) - Number(Boolean(a.n))));
+    const pending = items.some((it) => it.level > 0);
+
+    $('ov-queue').innerHTML = `
+        ${pending ? '' : `<p class="adm-allclear mb-2">${icon('circle-check')}Tidak ada keputusan yang menunggu. Antrean bersih.</p>`}
+        ${items.map((it) => `
+            <a href="${it.href}" class="adm-queue-item ${it.level === 3 ? 'is-bad' : (it.level === 2 ? 'is-hot' : '')} ${it.n ? '' : 'is-clear'}">
+                <span class="adm-queue-icon">${icon(it.icon)}</span>
+                <span class="adm-queue-text"><span class="adm-queue-label">${it.label}</span><span class="adm-queue-sub">${it.sub}</span></span>
+                <span class="adm-queue-num">${counter(it.n)}</span>
+                ${icon('chevron-right', 'adm-queue-go')}
+            </a>`).join('')}`;
 }
 
-function renderMarket(m) {
-    $('ov-market-sub').textContent = m.open_jobs ? `${plural(m.open_jobs, 'lowongan terbuka')} yang tidak diturunkan` : 'Belum ada lowongan terbuka';
+function metric({ label, def, n, na, naText = 'Belum cukup data', digits = 0, unit = '', warn = false }) {
+    return `<div class="adm-metric">
+        <span class="adm-metric-label">${label}</span>
+        ${na ? `<span class="adm-metric-na">${naText}</span>` : `<span class="adm-metric-num ${warn ? 'is-warn' : ''}">${counter(n, digits)}${unit}</span>`}
+        <span class="adm-metric-def">${def}</span>
+    </div>`;
+}
+
+function renderMarket(m, jobs) {
+    $('ov-market-sub').textContent = m.open_jobs
+        ? `Dihitung dari ${plural(m.open_jobs, 'lowongan terbuka')} yang tidak diturunkan.`
+        : 'Belum ada lowongan terbuka untuk dihitung.';
+    // Metrik pasar ikut menghitung data demo, jadi penandanya harus jelas
+    const demoShare = jobs.open_demo && !jobs.open_real
+        ? 'Semua lowongan terbuka saat ini adalah data demo. Angka di bawah belum mencerminkan pasar nyata.'
+        : (jobs.open_demo ? `Termasuk ${plural(jobs.open_demo, 'lowongan')} data demo dari ${jobs.open_real + jobs.open_demo} lowongan terbuka.` : '');
+    $('ov-market-note').innerHTML = demoShare
+        ? `<div class="ws-callout ws-callout-warning mb-3">${icon('info', 'w-4 h-4')}<p><span class="adm-demo-tag mr-1">DEMO</span>${demoShare}</p></div>`
+        : '';
     $('ov-market').innerHTML = [
-        tile({ n: m.applications_per_open_job ?? 0, na: m.applications_per_open_job === null, digits: 1, label: 'Lamaran per lowongan', sub: 'rata-rata lowongan terbuka' }),
-        tile({ n: m.open_without_applicants, na: !m.open_jobs, label: 'Lowongan tanpa pelamar', sub: 'perlu dipromosikan atau dicek', tone: m.open_without_applicants ? 'is-warn' : '' }),
-        tile({ n: m.avg_match_score ?? 0, na: m.avg_match_score === null, digits: 1, unit: '%', label: 'Rata-rata skor cocok', sub: 'semua lamaran' }),
-        tile({ n: m.verification_days ?? 0, na: m.verification_days === null, digits: 1, unit: ' hari', label: 'Waktu verifikasi', sub: m.verifications_reviewed ? `dari ${plural(m.verifications_reviewed, 'pengajuan')} diperiksa` : 'dari pengajuan sampai putusan' }),
+        metric({ label: 'Lamaran per lowongan', n: m.applications_per_open_job ?? 0, digits: 1, na: m.applications_per_open_job === null,
+            naText: 'Belum ada lowongan terbuka', def: 'Rata-rata lamaran yang diterima setiap lowongan terbuka.' }),
+        metric({ label: 'Lowongan tanpa pelamar', n: m.open_without_applicants, na: !m.open_jobs, naText: 'Belum ada lowongan terbuka',
+            warn: m.open_without_applicants > 0, def: 'Lowongan terbuka yang belum menerima satu lamaran pun.' }),
+        metric({ label: 'Rata-rata skor cocok', n: m.avg_match_score ?? 0, digits: 1, unit: '%', na: m.avg_match_score === null,
+            naText: 'Belum ada lamaran', def: 'Rata-rata skor pemadanan skill dari semua lamaran.' }),
+        metric({ label: 'Waktu verifikasi', n: m.verification_days ?? 0, digits: 1, unit: ' hari', na: m.verification_days === null,
+            naText: 'Belum ada pengajuan diputuskan', def: m.verifications_reviewed ? `Rata-rata dari pengajuan sampai putusan, ${plural(m.verifications_reviewed, 'pengajuan')}.` : 'Rata-rata dari pengajuan sampai putusan.' }),
     ].join('');
 }
 
@@ -80,7 +126,7 @@ function renderGrowth(g) {
     const n = g.week_starts.length;
     const total = sum(g.users) + sum(g.jobs) + sum(g.applications);
     if (!total) {
-        $('ov-growth').innerHTML = emptyState({ iconName: 'trending-up', title: 'Belum ada aktivitas 8 minggu terakhir' });
+        $('ov-growth').innerHTML = emptyState({ iconName: 'trending-up', title: 'Belum ada aktivitas 8 minggu terakhir', text: 'Grafik terisi setelah ada pengguna, lowongan, atau lamaran baru.' });
         hydrateIcons($('ov-growth'));
         return;
     }
@@ -103,8 +149,8 @@ function renderGrowth(g) {
             ${g.week_starts.map((w, i) => (i % 2 === n % 2 || i === n - 1 ? `<text class="axis" x="${x(i).toFixed(1)}" y="${H - 8}" text-anchor="middle">${label(w)}</text>` : '')).join('')}
         </svg>
         <div class="adm-legend mt-2">
-            <span><i style="background:var(--ws-accent)"></i>Pengguna baru (${sum(g.users)})</span>
-            <span><i style="background:var(--ws-warning)"></i>Lowongan baru (${sum(g.jobs)})</span>
+            <span><i style="background:var(--ws-chart-1)"></i>Pengguna baru (${sum(g.users)})</span>
+            <span><i style="background:var(--ws-chart-2)"></i>Lowongan baru (${sum(g.jobs)})</span>
             <span>Lamaran masuk: ${sum(g.applications)}</span>
         </div>`;
 }
@@ -118,6 +164,10 @@ function renderSkills(s) {
     $('ov-skills-sub').textContent = `Dari ${plural(s.open_jobs, 'lowongan terbuka')} dan ${plural(s.applicants, 'pelamar aktif')}.`;
     const pct = (v, total) => (total ? Math.round((v / total) * 100) : 0);
     $('ov-skills').innerHTML = `
+        <div class="adm-legend mb-2">
+            <span><i style="background:var(--ws-chart-2)"></i>Diminta lowongan</span>
+            <span><i style="background:var(--ws-chart-1)"></i>Dimiliki pelamar</span>
+        </div>
         <div>${s.items.map((it) => {
             const dj = pct(it.jobs, s.open_jobs);
             const da = pct(it.applicants, s.applicants);
@@ -125,39 +175,20 @@ function renderSkills(s) {
             <div class="adm-skill">
                 <span class="adm-skill-name" title="${esc(it.skill)}">${esc(it.skill)}</span>
                 <span class="adm-skill-bars">
-                    <span class="adm-skill-bar"><span class="adm-skill-track"><span style="width:${Math.max(dj, 2)}%;background:var(--ws-warning)"></span></span>${dj}% lowongan</span>
-                    <span class="adm-skill-bar"><span class="adm-skill-track"><span style="width:${Math.max(da, 2)}%;background:var(--ws-accent)"></span></span>${da}% pelamar</span>
+                    <span class="adm-skill-bar"><span class="adm-skill-track"><span style="width:${Math.max(dj, 2)}%;background:var(--ws-chart-2)"></span></span>${dj}% lowongan</span>
+                    <span class="adm-skill-bar"><span class="adm-skill-track"><span style="width:${Math.max(da, 2)}%;background:var(--ws-chart-1)"></span></span>${da}% pelamar</span>
                 </span>
             </div>`;
         }).join('')}</div>
         <p class="ws-meta mt-3">Skill yang banyak dicari tetapi jarang dimiliki pelamar menjelaskan kenapa skor kecocokan rendah.</p>`;
-    // Batang tumbuh dari kiri setelah tampil
     // Dua frame: elemen harus tergambar dulu dalam keadaan awal agar transisinya berjalan
     requestAnimationFrame(() => requestAnimationFrame(() => $('ov-skills').querySelectorAll('.adm-skill-track > span').forEach((b) => b.classList.add('is-in'))));
 }
 
-function row(label, value, sub = '') {
-    return `<div class="flex items-baseline justify-between gap-3 py-2.5 border-b border-[var(--ws-border)] last:border-0">
-        <span class="text-[var(--ws-text-2)]">${label}</span>
-        <span class="text-right"><b class="ws-num text-[var(--ws-text)]">${value}</b>${sub ? `<span class="block ws-meta">${sub}</span>` : ''}</span>
-    </div>`;
-}
-
-function renderData(d, windowDays) {
-    const roles = d.users.by_role || {};
-    const companies = d.companies.by_status || {};
-    $('ov-data-sub').textContent = `"Baru" berarti ${windowDays} hari terakhir.`;
-    $('ov-data').innerHTML = [
-        row('Pengguna', sum(roles), `${roles.applicant || 0} pelamar, ${roles.recruiter || 0} recruiter${d.users.new_30d ? ` · ${d.users.new_30d} baru` : ''}`),
-        row('Perusahaan', sum(companies), `${companies.verified || 0} terverifikasi`),
-        row('Lowongan terbuka', d.jobs.open_real + d.jobs.open_demo, d.jobs.open_demo ? `${d.jobs.open_real} nyata, ${d.jobs.open_demo} data demo` : 'semuanya data nyata'),
-        row('Lamaran', d.applications.total, d.applications.new_30d ? `${d.applications.new_30d} baru` : ''),
-    ].join('');
-}
-
 function renderAudit(list) {
     if (!list.length) {
-        $('ov-audit').innerHTML = `<div class="ws-card-body">${emptyState({ iconName: 'scroll-text', title: 'Belum ada tindakan admin', text: 'Keputusan verifikasi, penangguhan, dan moderasi tercatat di sini.' })}</div>`;
+        // Ringkas: kartu ini selebar halaman, empty state besar terlalu kosong
+        $('ov-audit').innerHTML = `<p class="ws-card-body flex items-center gap-2.5 text-sm text-[var(--ws-text-2)]">${icon('scroll-text', 'w-4 h-4 text-[var(--ws-muted)]')}Belum ada tindakan admin. Keputusan verifikasi, penangguhan, dan moderasi akan tercatat di sini.</p>`;
         return;
     }
     $('ov-audit').innerHTML = `<ul class="divide-y divide-[var(--ws-border)]">${list.map((a) => `
@@ -170,14 +201,17 @@ function renderAudit(list) {
         </li>`).join('')}</ul>`;
 }
 
-document.addEventListener('DOMContentLoaded', async () => {
-    const ctx = await bootAdmin({ page: 'admin-overview', loadNav: false });
-    if (!ctx) return;
-
-    $('ov-queue').innerHTML = Array.from({ length: 5 }, () => '<div class="ws-skel h-[5.5rem] rounded-xl"></div>').join('');
-    $('ov-market').innerHTML = Array.from({ length: 4 }, () => '<div class="ws-skel h-[5.5rem] rounded-xl"></div>').join('');
+function skeletons() {
+    $('ov-command').innerHTML = '<div class="h-[10.5rem] opacity-60"></div>';
+    $('ov-queue').innerHTML = `<div class="px-4 pb-4">${skeletonRows(4, 'h-12')}</div>`;
+    $('ov-market').innerHTML = Array.from({ length: 4 }, () => '<div class="adm-metric"><div class="ws-skel h-16 rounded-lg"></div></div>').join('');
     $('ov-growth').innerHTML = skeletonRows(1, 'h-40');
     $('ov-skills').innerHTML = skeletonRows(4, 'h-8');
+}
+
+async function load() {
+    const btn = $('ov-refresh');
+    btn.disabled = true;
     try {
         const [res, healthy] = await Promise.all([
             admin.overview(),
@@ -185,17 +219,30 @@ document.addEventListener('DOMContentLoaded', async () => {
         ]);
         const d = res.data;
         renderNavCounts(d.queue);
-        renderHealth(d, healthy);
+        renderCommand(d, healthy, res.meta?.window_days || 30);
         renderQueue(d.queue);
-        renderMarket(d.market);
+        renderMarket(d.market, d.jobs);
         renderGrowth(d.growth);
         renderSkills(d.skills);
-        renderData(d, res.meta?.window_days || 30);
         renderAudit(d.recent_actions || []);
-        countUp(document.getElementById('ws-main'));
+        hydrateIcons();
+        countUp($('ws-main'));
+        $('ov-updated').textContent = `Diperbarui ${new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}`;
     } catch (err) {
-        $('ov-queue').innerHTML = `<div class="col-span-full">${emptyState({ iconName: 'circle-alert', title: 'Ringkasan gagal dimuat', text: esc(errorMessage(err)), action: '<button type="button" class="ws-btn ws-btn-secondary" onclick="location.reload()">Muat ulang</button>' })}</div>`;
-        ['ov-market', 'ov-growth', 'ov-skills', 'ov-data'].forEach((id) => { $(id).innerHTML = ''; });
+        // Gagal memuat dibedakan dari nol: tidak ada angka yang ditampilkan sama sekali
+        $('ov-command').innerHTML = `<div class="adm-command-status"><span><span class="adm-dot is-bad"></span>Ringkasan gagal dimuat: ${esc(errorMessage(err))}</span></div>`;
+        $('ov-queue').innerHTML = `<div class="ws-card-body">${emptyState({ iconName: 'circle-alert', title: 'Data tidak bisa diambil', text: 'Angka tidak ditampilkan agar tidak tertukar dengan nol. Coba muat ulang.', action: '<button type="button" class="ws-btn ws-btn-secondary" data-retry>Muat ulang</button>' })}</div>`;
+        ['ov-market', 'ov-market-note', 'ov-growth', 'ov-skills', 'ov-audit'].forEach((id) => { $(id).innerHTML = ''; });
+        hydrateIcons();
     }
-    hydrateIcons();
+    btn.disabled = false;
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+    const ctx = await bootAdmin({ page: 'admin-overview', loadNav: false });
+    if (!ctx) return;
+    skeletons();
+    $('ov-refresh').addEventListener('click', load);
+    $('ov-queue').addEventListener('click', (e) => { if (e.target.closest('[data-retry]')) { skeletons(); load(); } });
+    await load();
 });

@@ -65,6 +65,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::view('/reports', 'admin.reports')->name('reports');
     Route::view('/announcements', 'admin.announcements')->name('announcements');
     Route::view('/settings', 'admin.settings')->name('settings');
+    Route::view('/platform', 'admin.platform')->name('platform');
 });
 
 // Dokumentasi Swagger / OpenAPI

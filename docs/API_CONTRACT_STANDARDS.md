@@ -733,6 +733,7 @@ Semua endpoint di bawah memakai `Authorization: Bearer <token_admin>` dan dilind
 | GET | `/api/admin/companies?q=&status=` | Daftar perusahaan, yang menunggu tindakan di atas. `meta.counts` per status verifikasi. |
 | GET | `/api/admin/companies/{id}` | Profil, pemilik, riwayat verifikasi, dan lowongan perusahaan. |
 | GET | `/api/admin/jobs?q=&status=&moderation=&source=&demo=` | Semua lowongan untuk moderasi. `moderation`: none, removed. |
+| GET | `/api/admin/jobs/{id}` | Detail untuk pemeriksaan moderasi: isi, syarat skill, gaji, recruiter, 10 laporan atau banding terbaru atas lowongan ini, dan riwayat tindakan admin. `404` bila tidak ada. |
 | PATCH | `/api/admin/jobs/{id}/moderation` | Body `{ "action": "remove" \| "restore", "reason": "..." }`. Alasan wajib (min. 10 karakter) saat menurunkan. |
 | GET | `/api/admin/audit-logs?action=&target_type=&actor_id=` | Log audit (baca saja). `meta.actions` berisi label setiap jenis tindakan. |
 | GET | `/api/admin/reports?status=&kind=` | Laporan pengguna dan banding recruiter. `status`: active (open + in_review, bawaan), open, in_review, resolved, dismissed. `kind`: report, appeal. Diurutkan dari yang paling lama menunggu. |

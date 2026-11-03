@@ -63,6 +63,20 @@
         <div id="jb-pager" class="px-4 pb-4"></div>
     </div>
 
+    @push('modals')
+        <dialog id="jb-drawer" class="ws-drawer" aria-labelledby="jb-d-title">
+            <header class="ws-dialog-head">
+                <div class="min-w-0">
+                    <h2 id="jb-d-title" class="text-lg font-bold">Lowongan</h2>
+                    <p id="jb-d-sub" class="ws-meta truncate"></p>
+                </div>
+                <button type="button" class="ws-icon-btn -mr-2" data-dialog-close aria-label="Tutup"><i data-lucide="x"></i></button>
+            </header>
+            <div id="jb-d-body" class="ws-dialog-body space-y-5"></div>
+            <div id="jb-d-foot" class="ws-dialog-foot"></div>
+        </dialog>
+    @endpush
+
     @push('scripts')
         @vite('resources/js/pages/admin/jobs.js')
     @endpush

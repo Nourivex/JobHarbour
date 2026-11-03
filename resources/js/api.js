@@ -294,6 +294,7 @@ export const admin = {
     companies: (query) => api.get('/admin/companies', query),
     company: (id) => api.get('/admin/companies/' + id),
     jobs: (query) => api.get('/admin/jobs', query),
+    job: (id) => api.get('/admin/jobs/' + id),
     moderateJob: (id, payload) => api.patch('/admin/jobs/' + id + '/moderation', payload),
     auditLogs: (query) => api.get('/admin/audit-logs', query),
     sources: () => api.get('/aggregator/summary'),

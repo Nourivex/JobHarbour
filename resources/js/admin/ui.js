@@ -4,6 +4,7 @@
  */
 import { openDialog, bindDialog, setBusy } from '../recruiter/components.js';
 import { esc, icon, hydrateIcons, errorMessage } from '../recruiter/ui.js';
+import { admin, toast } from '../api.js';
 
 export const ROLE = {
     applicant: { label: 'Pelamar', tone: 'info' },
@@ -105,4 +106,45 @@ export function confirmAction({ title, subtitle = '', impact, confirmText, tone 
 
     openDialog(dialog);
     setTimeout(() => (reason === 'none' ? submit : text).focus(), 30);
+}
+
+/**
+ * Pengaturan platform "sembunyikan data demo" (GET/PUT /api/admin/settings) dalam satu kotak.
+ * Dipakai di halaman Lowongan dan Pengaturan platform agar perilakunya sama persis.
+ */
+export function mountDemoSetting(box) {
+    const render = async () => {
+        try {
+            const hide = Boolean((await admin.settings()).data?.hide_demo_jobs);
+            box.innerHTML = `
+                <span class="min-w-0 flex-1">${hide
+                    ? '<b>Data demo disembunyikan</b> dari katalog publik. Pelamar hanya melihat lowongan nyata.'
+                    : '<b>Data demo masih tampil</b> di katalog publik, ditandai lencana "Data Demo".'}</span>
+                <button type="button" class="ws-btn ${hide ? 'ws-btn-secondary' : 'ws-btn-primary'} ws-btn-sm" data-demo-toggle="${hide ? '0' : '1'}">${hide ? 'Tampilkan lagi' : 'Sembunyikan data demo'}</button>`;
+        } catch (err) {
+            box.innerHTML = `<span class="ws-meta">Pengaturan data demo gagal dimuat: ${esc(errorMessage(err))}</span>`;
+        }
+    };
+    box.addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-demo-toggle]');
+        if (!btn) return;
+        const hide = btn.dataset.demoToggle === '1';
+        confirmAction({
+            title: hide ? 'Sembunyikan data demo?' : 'Tampilkan data demo lagi?',
+            subtitle: 'Pengaturan platform',
+            impact: hide
+                ? 'Lowongan bertanda data demo tidak tampil di katalog dan halaman detailnya tidak bisa dibuka publik. Data tidak dihapus dan tetap terlihat di Admin Portal.'
+                : 'Lowongan data demo kembali tampil di katalog dengan lencana "Data Demo".',
+            confirmText: hide ? 'Sembunyikan' : 'Tampilkan',
+            tone: 'primary',
+            reason: 'none',
+            onConfirm: async () => {
+                await admin.updateSettings({ hide_demo_jobs: hide });
+                toast(hide ? 'Data demo disembunyikan dari katalog publik.' : 'Data demo tampil lagi di katalog.', 'success');
+                await render();
+                flash(box);
+            },
+        });
+    });
+    return render();
 }

@@ -238,4 +238,27 @@ class AdminPortalTest extends TestCase
             ->assertJsonPath('data.0.actor.id', $this->admin->id)
             ->assertJsonPath('data.0.target_label', 'PT Pelabuhan Digital');
     }
+
+    public function test_admin_job_detail_includes_reports_and_history(): void
+    {
+        $recruiter = $this->recruiter;
+        $job = JobVacancy::create([
+            'title' => 'Lowongan Diperiksa', 'company' => 'PT Uji', 'description' => 'Deskripsi lengkap.', 'location' => 'Tegal',
+            'requirements' => [['skill' => 'PHP', 'level' => 'required']], 'status' => 'open', 'posted_by' => $recruiter->id,
+            'is_demo' => false, 'verification_status' => 'unverified',
+        ]);
+        $admin = $this->auth('admin@test.com');
+        $this->withHeaders($admin)->patchJson("/api/admin/jobs/{$job->id}/moderation", ['action' => 'remove', 'reason' => 'Isi lowongan menyesatkan pelamar.'])->assertStatus(200);
+
+        $this->withHeaders($admin)->getJson("/api/admin/jobs/{$job->id}")
+            ->assertStatus(200)
+            ->assertJsonPath('data.description', 'Deskripsi lengkap.')
+            ->assertJsonPath('data.requirements.0.skill', 'PHP')
+            ->assertJsonPath('data.moderation_status', 'removed')
+            ->assertJsonPath('data.history.0.action', 'job.removed')
+            ->assertJsonStructure(['data' => ['reports', 'recruiter', 'applications_count']]);
+
+        $this->withHeaders($admin)->getJson('/api/admin/jobs/999999')->assertStatus(404);
+        $this->flushHeaders()->withHeaders($this->auth('recruiter@test.com'))->getJson("/api/admin/jobs/{$job->id}")->assertStatus(403);
+    }
 }
