@@ -30,6 +30,7 @@ return new class extends Migration
                 'verified_official',   // Terverifikasi langsung dari portal karir resmi perusahaan
                 'verified_partner',    // Terverifikasi dari HRD mitra langsung JobHarbour
                 'unverified_external', // Kurasi luar belum diverifikasi penuh
+                'unverified',          // Lowongan reguler dari recruiter belum terverifikasi
                 'demo_sample'          // Sampel data untuk simulasi/demo
             ])->default('demo_sample')->after('last_checked_at')->index();
             $table->text('verification_notes')->nullable()->after('verification_status');

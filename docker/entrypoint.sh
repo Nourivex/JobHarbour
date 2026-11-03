@@ -64,6 +64,12 @@ if [ "$APP_ENV" = "production" ] || [ -z "$APP_ENV" ]; then
     php artisan view:cache || true
 fi
 
+# Pastikan kepemilikan dan hak akses penuh www-data untuk SQLite dan seluruh folder Laravel
+echo "[JobHarbour] Menetapkan hak akses www-data pada database dan storage..."
+chown -R www-data:www-data /var/www/html/database /var/www/html/storage /var/www/html/bootstrap/cache
+chmod -R 775 /var/www/html/database /var/www/html/storage /var/www/html/bootstrap/cache
+chmod 666 /var/www/html/database/database.sqlite* 2>/dev/null || true
+
 echo "[JobHarbour] Sistem siap! Menjalankan PHP-FPM dan Nginx..."
 php-fpm -D
 exec nginx -g "daemon off;"
