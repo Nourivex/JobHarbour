@@ -43,6 +43,15 @@ export function pager(p, noun) {
         </div>`;
 }
 
+/** Sorot sebentar elemen yang baru diubah (misalnya baris tabel) agar admin melihat hasil tindakannya. */
+export function flash(el) {
+    if (!el) return;
+    el.classList.remove('adm-flash');
+    void el.offsetWidth;
+    el.classList.add('adm-flash');
+    el.scrollIntoView({ block: 'nearest', behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+}
+
 /** Keterangan status pemuatan yang dibedakan: memuat, kosong, gagal. */
 export function tableMessage(cols, html) {
     return `<tr><td colspan="${cols}" class="!py-10">${html}</td></tr>`;

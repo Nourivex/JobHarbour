@@ -94,7 +94,17 @@ class AdminPortalTest extends TestCase
             ->assertJsonPath('data.jobs.open_real', 1)
             ->assertJsonPath('data.jobs.open_demo', 1)
             ->assertJsonPath('data.queue.users_suspended', 0)
-            ->assertJsonStructure(['data' => ['queue', 'users', 'companies', 'jobs', 'applications', 'sources', 'recent_actions'], 'meta' => ['window_days']]);
+            ->assertJsonStructure(['data' => ['queue', 'users', 'companies', 'jobs', 'applications', 'sources', 'market', 'growth', 'skills', 'recent_actions'], 'meta' => ['window_days']])
+            // Kesehatan pasar: 2 lowongan terbuka tanpa lamaran, skor rata-rata belum ada (null, bukan 0)
+            ->assertJsonPath('data.market.open_jobs', 2)
+            ->assertJsonPath('data.market.open_without_applicants', 2)
+            ->assertJsonPath('data.market.avg_match_score', null)
+            ->assertJsonCount(8, 'data.growth.week_starts')
+            ->assertJsonPath('data.growth.jobs.7', 2)
+            // Skill PHP diminta 1 lowongan; pelamar belum punya skill
+            ->assertJsonPath('data.skills.items.0.skill', 'PHP')
+            ->assertJsonPath('data.skills.items.0.jobs', 1)
+            ->assertJsonPath('data.skills.items.0.applicants', 0);
     }
 
     public function test_users_list_supports_search_filter_and_pagination(): void

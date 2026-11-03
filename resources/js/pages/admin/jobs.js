@@ -4,7 +4,7 @@
  */
 import { admin, toast } from '../../api.js';
 import { bootAdmin } from '../../admin/shell.js';
-import { confirmAction, pager, moderationBadge, tableMessage } from '../../admin/ui.js';
+import { confirmAction, pager, moderationBadge, tableMessage, flash } from '../../admin/ui.js';
 import { debounce } from '../../recruiter/components.js';
 import { esc, icon, hydrateIcons, jobStatusBadge, formatDate, emptyState, errorMessage } from '../../recruiter/ui.js';
 
@@ -42,7 +42,7 @@ async function load() {
         $('jb-rows').innerHTML = state.items.map((j) => {
             const removed = j.moderation_status === 'removed';
             return `
-            <tr>
+            <tr data-row="${j.id}">
                 <td>
                     <span class="block font-semibold text-[var(--ws-text)]">${esc(j.title)}</span>
                     <span class="block ws-meta">${esc([j.company, j.location].filter(Boolean).join(' · '))}${j.recruiter ? ` · oleh ${esc(j.recruiter.name)}` : ''}</span>
@@ -101,6 +101,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 await admin.moderateJob(job.id, { action: remove ? 'remove' : 'restore', reason });
                 toast(remove ? 'Lowongan diturunkan dan tercatat di Log Audit.' : 'Lowongan dipulihkan.', 'success');
                 await load();
+                flash(document.querySelector(`#jb-rows tr[data-row="${job.id}"]`));
             },
         });
     });

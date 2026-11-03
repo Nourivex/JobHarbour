@@ -877,8 +877,22 @@ html.dark .ws-skill-pick button[aria-pressed="true"] { background: #E8EDF4; bord
 /* Sidebar slate gelap (bukan navy brand) dan label "Admin Portal" agar  */
 /* admin selalu sadar sedang memegang kendali platform.                 */
 /* ==================================================================== */
-.ws-body.ws-admin { --ws-navy: #161D29; --ws-navy-2: #222B3A; }
-html.dark .ws-body.ws-admin { --ws-navy: #0B1018; --ws-navy-2: #151C28; }
+/* Aksen admin biru baja; oranye dan merah hanya untuk hal yang butuh perhatian */
+.ws-body.ws-admin {
+    --ws-navy: #161D29; --ws-navy-2: #222B3A;
+    --ws-accent: #4C7BB0; --ws-accent-text: #2F5F94; --ws-accent-soft: #E8F0F9;
+    --ws-focus: 0 0 0 3px rgba(76, 123, 176, 0.3);
+}
+html.dark .ws-body.ws-admin { --ws-navy: #0B1018; --ws-navy-2: #151C28; --ws-accent-text: #9CC3EC; --ws-accent-soft: #162638; }
+.ws-admin .ws-table td { padding: 0.7rem 1rem; }
+.ws-admin .ws-page-head { margin-bottom: 1.25rem; }
+.ws-admin .ws-h1 { font-size: 1.6rem; }
+
+/* Strip pengingat di bawah topbar: selalu terlihat, tidak mengganggu */
+.adm-modebar { display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem 1rem; font-size: 12.5px; color: var(--ws-text-2); background: color-mix(in srgb, var(--ws-accent) 7%, var(--ws-surface)); border-bottom: 1px solid var(--ws-border); }
+.adm-modebar svg { width: 0.95rem; height: 0.95rem; flex: none; color: var(--ws-accent-text); }
+@media (min-width: 640px) { .adm-modebar { padding: 0.4rem 1.5rem; } }
+@media (min-width: 1280px) { .adm-modebar { padding: 0.4rem 2.5rem; } }
 .ws-admin-tag { display: inline-flex; align-items: center; margin-top: 0.15rem; padding: 0.05rem 0.45rem; border-radius: 0.35rem; background: rgba(242, 106, 27, 0.16); color: #FFB48A; font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
 .ws-admin .ws-nav-link[aria-current="page"] { background: rgba(255, 255, 255, 0.08); }
 
@@ -890,7 +904,7 @@ html.dark .ws-body.ws-admin { --ws-navy: #0B1018; --ws-navy-2: #151C28; }
 .adm-queue-item:focus-visible { outline: none; box-shadow: inset var(--ws-focus); }
 .adm-queue-num { min-width: 2.5rem; font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; text-align: right; }
 .adm-queue-item.is-clear .adm-queue-num { color: var(--ws-muted); font-weight: 500; }
-.adm-queue-item.is-hot .adm-queue-num { color: var(--ws-accent-text); }
+.adm-queue-item.is-hot .adm-queue-num { color: var(--ws-warning); }
 .adm-health { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 1.25rem; padding: 0.7rem 1rem; border-radius: var(--ws-r-md); background: var(--ws-surface); border: 1px solid var(--ws-border); font-size: 13.5px; color: var(--ws-text-2); }
 .adm-health .ws-status-dot { width: 0.55rem; height: 0.55rem; border-radius: 9999px; display: inline-block; margin-right: 0.4rem; background: var(--ws-success); }
 .adm-health .is-bad .ws-status-dot { background: var(--ws-danger); }
@@ -917,3 +931,51 @@ html.dark .ws-body.ws-admin { --ws-navy: #0B1018; --ws-navy-2: #151C28; }
     .adm-stack td:empty { display: none; }
     .adm-stack td.adm-actions { justify-content: flex-end; padding-top: 0.5rem; }
 }
+
+
+/* ------------------------------------------------------------------ Ringkasan admin */
+.adm-section-title { display: flex; align-items: baseline; justify-content: space-between; gap: 0.75rem; margin: 1.5rem 0 0.6rem; }
+.adm-section-title h2 { font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ws-muted); }
+.adm-tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.6rem; }
+@media (min-width: 768px) { .adm-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 1280px) { .adm-tiles.is-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); } .adm-tiles.is-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.adm-tile { display: flex; flex-direction: column; gap: 0.15rem; min-width: 0; padding: 0.85rem 1rem; border-radius: var(--ws-r-md); background: var(--ws-surface); border: 1px solid var(--ws-border); color: var(--ws-text); transition: border-color 150ms ease, transform 150ms var(--ws-ease); }
+a.adm-tile:hover { border-color: var(--ws-border-strong); transform: translateY(-1px); }
+a.adm-tile:focus-visible { outline: none; box-shadow: var(--ws-focus); }
+.adm-tile-num { font-size: 1.6rem; font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.adm-tile-label { font-size: 13.5px; font-weight: 600; }
+.adm-tile-sub { font-size: 12.5px; color: var(--ws-muted); }
+.adm-tile.is-clear .adm-tile-num { color: var(--ws-muted); font-weight: 500; }
+.adm-tile.is-warn { border-color: color-mix(in srgb, var(--ws-warning) 35%, var(--ws-border)); }
+.adm-tile.is-warn .adm-tile-num { color: var(--ws-warning); }
+.adm-tile.is-bad { border-color: color-mix(in srgb, var(--ws-danger) 35%, var(--ws-border)); }
+.adm-tile.is-bad .adm-tile-num { color: var(--ws-danger); }
+.adm-tile-na { font-size: 13px; color: var(--ws-muted); font-weight: 500; }
+
+/* Grafik pertumbuhan (SVG) dan neraca skill: hanya transform/opacity agar ringan */
+.adm-chart { width: 100%; height: auto; overflow: visible; }
+.adm-chart .bar { fill: var(--ws-accent); transform-box: fill-box; transform-origin: bottom; animation: adm-grow 520ms var(--ws-ease) both; animation-delay: calc(var(--i, 0) * 45ms); }
+.adm-chart .line { fill: none; stroke: var(--ws-warning); stroke-width: 2.25; stroke-linejoin: round; stroke-linecap: round; animation: ws-fade 600ms ease both 250ms; }
+.adm-chart .dot { fill: var(--ws-surface); stroke: var(--ws-warning); stroke-width: 2; }
+.adm-chart .axis { fill: var(--ws-muted); font-size: 11px; }
+.adm-chart .grid { stroke: var(--ws-border); stroke-width: 1; }
+@keyframes adm-grow { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+.adm-legend { display: flex; flex-wrap: wrap; gap: 0.4rem 1rem; font-size: 12.5px; color: var(--ws-muted); }
+.adm-legend i { display: inline-block; width: 0.7rem; height: 0.7rem; border-radius: 0.2rem; margin-right: 0.35rem; vertical-align: -1px; }
+.adm-skill { display: grid; grid-template-columns: minmax(0, 7rem) minmax(0, 1fr); gap: 0.25rem 0.75rem; align-items: center; padding: 0.45rem 0; border-bottom: 1px solid var(--ws-border); }
+.adm-skill:last-child { border-bottom: 0; }
+.adm-skill-name { font-size: 13.5px; font-weight: 600; color: var(--ws-text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.adm-skill-bars { display: grid; gap: 3px; }
+.adm-skill-bar { display: grid; grid-template-columns: minmax(0, 1fr) 6.5rem; align-items: center; gap: 0.6rem; font-size: 12px; color: var(--ws-muted); font-variant-numeric: tabular-nums; }
+.adm-skill-track { height: 6px; border-radius: 9999px; background: var(--ws-surface-2); overflow: hidden; }
+.adm-skill-track > span { display: block; height: 100%; border-radius: inherit; transform-origin: left; transform: scaleX(0); transition: transform 600ms var(--ws-ease); }
+.adm-skill-track > span.is-in { transform: scaleX(1); }
+
+/* Sorotan singkat pada baris yang baru diubah admin */
+.adm-flash, .adm-flash > td { animation: adm-flash 1.4s ease-out; }
+@keyframes adm-flash { 0%, 25% { background-color: color-mix(in srgb, var(--ws-accent) 16%, transparent); } 100% { background-color: transparent; } }
+@media (prefers-reduced-motion: reduce) {
+    .adm-chart .bar, .adm-chart .line { animation: none; }
+    .adm-skill-track > span { transition: none; }
+}
+@media (max-width: 767px) { .adm-tiles > :last-child:nth-child(odd) { grid-column: span 2; } }

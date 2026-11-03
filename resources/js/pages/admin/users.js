@@ -4,7 +4,7 @@
  */
 import { admin, toast } from '../../api.js';
 import { bootAdmin } from '../../admin/shell.js';
-import { confirmAction, pager, roleBadge, userStatusBadge, tableMessage, ROLE } from '../../admin/ui.js';
+import { confirmAction, pager, roleBadge, userStatusBadge, tableMessage, flash, ROLE } from '../../admin/ui.js';
 import { debounce, openDialog, bindDialog } from '../../recruiter/components.js';
 import { esc, icon, hydrateIcons, initials, verifyBadge, jobStatusBadge, formatDate, relativeTime, emptyState, skeletonRows, errorMessage } from '../../recruiter/ui.js';
 
@@ -146,6 +146,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 await admin.setUserStatus(u.id, { status: suspend ? 'suspended' : 'active', reason });
                 toast(suspend ? 'Akun ditangguhkan dan tercatat di Log Audit.' : 'Akun diaktifkan kembali.', 'success');
                 await Promise.all([load(), admin.user(u.id).then((r) => renderDrawer(r.data))]);
+                flash(document.querySelector(`#us-rows tr[data-user="${u.id}"]`));
             },
         });
     });

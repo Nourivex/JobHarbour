@@ -119,6 +119,11 @@
                 </div>
             </header>
 
+            <div class="adm-modebar" role="note">
+                <i data-lucide="shield-check"></i>
+                <span><b>Mode admin</b><span class="hidden sm:inline"> · Tindakan di sini berlaku untuk seluruh platform dan tercatat di Log Audit.</span></span>
+            </div>
+
             <main id="ws-main" class="ws-main" tabindex="-1">
                 {{ $slot }}
             </main>
