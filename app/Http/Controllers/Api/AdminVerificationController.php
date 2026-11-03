@@ -110,6 +110,15 @@ class AdminVerificationController extends Controller
                 'verification_note' => $approved ? null : $request->admin_notes,
                 'verified_at' => $approved ? now() : null,
             ]);
+
+            if ($approved && $submission->company->owner_id) {
+                \App\Models\JobVacancy::where('posted_by', $submission->company->owner_id)
+                    ->where('status', 'open')
+                    ->update([
+                        'verification_status' => 'verified_official',
+                        'verification_notes' => 'Perusahaan terverifikasi resmi oleh JobHarbour.',
+                    ]);
+            }
         });
 
         return $this->successResponse($submission->fresh(['reviewer'])->toApiArray(), $message);

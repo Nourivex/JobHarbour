@@ -122,13 +122,19 @@ class CompanyVerificationTest extends TestCase
         $headers = $this->auth('recruiter@test.com');
         $this->withHeaders($headers)->putJson('/api/company', $this->completeProfile());
 
-        // Tanpa status berarti publikasi langsung: ditolak
-        $this->withHeaders($headers)->postJson('/api/jobs', $this->jobPayload())
+        // Lowongan ke-1 uji coba gratis diperbolehkan dengan status reguler unverified
+        $firstJob = $this->withHeaders($headers)->postJson('/api/jobs', $this->jobPayload())
+            ->assertStatus(201)
+            ->assertJsonPath('data.status', 'open')
+            ->assertJsonPath('data.verification_status', 'unverified');
+
+        // Lowongan ke-2 saat belum terverifikasi: kuota uji coba habis, ditolak 403 COMPANY_NOT_VERIFIED
+        $this->withHeaders($headers)->postJson('/api/jobs', $this->jobPayload(['title' => 'Posisi Kedua']))
             ->assertStatus(403)
             ->assertJsonPath('error_code', 'COMPANY_NOT_VERIFIED');
 
-        // Draft boleh, nama perusahaan diambil dari profil
-        $draft = $this->withHeaders($headers)->postJson('/api/jobs', $this->jobPayload(['status' => 'draft']))
+        // Draft ke-2 boleh, nama perusahaan diambil dari profil
+        $draft = $this->withHeaders($headers)->postJson('/api/jobs', $this->jobPayload(['title' => 'Posisi Draft', 'status' => 'draft']))
             ->assertStatus(201)
             ->assertJsonPath('data.status', 'draft')
             ->assertJsonPath('data.company', 'PT Pelabuhan Digital');
@@ -136,14 +142,13 @@ class CompanyVerificationTest extends TestCase
         $jobId = $draft->json('data.id');
 
         // Draft tidak tampil di katalog publik maupun detail publik
-        $this->getJson('/api/jobs')->assertJsonCount(0, 'data');
-        $this->getJson('/api/jobs?status=draft')->assertJsonCount(0, 'data');
+        $this->getJson('/api/jobs?search=Posisi+Draft')->assertJsonCount(0, 'data');
         $this->getJson("/api/jobs/{$jobId}")->assertStatus(404);
 
-        // Tetap terlihat oleh pemiliknya
-        $this->withHeaders($headers)->getJson('/api/jobs/my')->assertJsonCount(1, 'data');
+        // Tetap terlihat oleh pemiliknya (1 open + 1 draft)
+        $this->withHeaders($headers)->getJson('/api/jobs/my')->assertJsonCount(2, 'data');
 
-        // Membuka draft juga ditolak sebelum terverifikasi
+        // Membuka draft ke-2 juga ditolak sebelum terverifikasi
         $this->withHeaders($headers)->putJson("/api/jobs/{$jobId}", ['status' => 'open'])
             ->assertStatus(403)
             ->assertJsonPath('error_code', 'COMPANY_NOT_VERIFIED');
@@ -350,5 +355,49 @@ class CompanyVerificationTest extends TestCase
         $this->withHeaders($admin)->patchJson("/api/admin/verifications/{$second}", ['decision' => 'approve'])->assertStatus(200);
 
         $this->withHeaders($headers)->getJson('/api/company')->assertJsonPath('data.verification_status', 'verified');
+    }
+
+    /**
+     * Uji Algoritma Prioritas Ranking (Search Boost): Lowongan dari perusahaan terverifikasi
+     * otomatis berada di urutan paling atas mendahului lowongan reguler belum terverifikasi.
+     */
+    public function test_verified_company_jobs_ranked_first_in_catalog(): void
+    {
+        // 1. Buat lowongan reguler dari recruiter belum terverifikasi (dibuat lebih baru)
+        \App\Models\JobVacancy::create([
+            'title' => 'Reguler Job Baru',
+            'company' => 'CV Belum Verif',
+            'description' => 'Deskripsi lowongan reguler',
+            'location' => 'Tegal',
+            'status' => 'open',
+            'verification_status' => 'unverified',
+            'created_at' => now()->addMinutes(10),
+            'quota' => 1,
+            'requirements' => [['skill' => 'PHP', 'level' => 'required', 'weight' => 3]],
+        ]);
+
+        // 2. Buat lowongan terverifikasi resmi (dibuat lebih lama)
+        \App\Models\JobVacancy::create([
+            'title' => 'Verified Official Job',
+            'company' => 'PT Terverifikasi Maju',
+            'description' => 'Deskripsi lowongan terverifikasi',
+            'location' => 'Tegal',
+            'status' => 'open',
+            'verification_status' => 'verified_official',
+            'created_at' => now()->subHour(),
+            'quota' => 2,
+            'requirements' => [['skill' => 'Laravel', 'level' => 'required', 'weight' => 3]],
+        ]);
+
+        $response = $this->getJson('/api/jobs');
+        $response->assertStatus(200);
+
+        // Lowongan terverifikasi resmi WAJIB berada di urutan index 0 (paling atas)
+        $this->assertEquals('Verified Official Job', $response->json('data.0.title'));
+        $this->assertEquals('verified_official', $response->json('data.0.verification_status'));
+
+        // Lowongan reguler berada di urutan setelahnya
+        $this->assertEquals('Reguler Job Baru', $response->json('data.1.title'));
+        $this->assertEquals('unverified', $response->json('data.1.verification_status'));
     }
 }

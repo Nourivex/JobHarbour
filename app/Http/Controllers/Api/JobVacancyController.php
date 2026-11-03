@@ -108,7 +108,10 @@ class JobVacancyController extends Controller
             });
         }
 
-        // 6. Pengurutan Data (Sorting)
+        // 6. Pengurutan Data (Sorting):
+        // Prioritas Utama (Search Boost): Lowongan dari perusahaan yang terverifikasi resmi selalu di-boost di posisi teratas
+        $query->orderByRaw("CASE WHEN verification_status = 'verified_official' THEN 0 ELSE 1 END ASC");
+
         $sort = $request->input('sort', 'latest');
         match ($sort) {
             'oldest' => $query->oldest(),
@@ -232,6 +235,9 @@ class JobVacancyController extends Controller
         }, $request->input('requirements'));
 
         // 5. Simpan record lowongan baru ke database
+        $company = $currentUser->company;
+        $isCompanyVerified = $company && $company->canPublishJobs();
+
         $job = JobVacancy::create([
             'title' => $request->title,
             'company' => $request->company,
@@ -246,6 +252,11 @@ class JobVacancyController extends Controller
             'status' => $status,
             'posted_by' => $currentUser->id,
             'expires_at' => $request->expires_at,
+            'source_type' => 'direct',
+            'verification_status' => $isCompanyVerified ? 'verified_official' : 'unverified',
+            'verification_notes' => $isCompanyVerified
+                ? 'Perusahaan terverifikasi resmi oleh JobHarbour.'
+                : 'Lowongan reguler masa uji coba (perusahaan belum melengkapi verifikasi legalitas).',
         ]);
 
         // 6. Kembalikan response HTTP 201 Created beserta header Location menuju resource baru
@@ -259,6 +270,8 @@ class JobVacancyController extends Controller
             'requirements' => $job->requirements,
             'requirements_count' => count($job->requirements),
             'status' => $job->status,
+            'source_type' => $job->source_type,
+            'verification_status' => $job->verification_status,
             'posted_by' => [
                 'id' => $currentUser->id,
                 'name' => $currentUser->name,
@@ -270,10 +283,13 @@ class JobVacancyController extends Controller
     }
 
     /**
-     * Aturan publikasi: recruiter hanya boleh membuka lowongan bila perusahaannya terverifikasi.
-     * Admin tidak dibatasi. Mengembalikan response 403 bila diblokir, atau null bila boleh.
+     * Aturan publikasi:
+     * - Recruiter terverifikasi: Bebas mempublikasikan lowongan tanpa batas (unlimited).
+     * - Recruiter belum terverifikasi: Diizinkan maksimal 1 lowongan aktif sebagai masa uji coba gratis (Trial).
+     *   Jika mencoba membuka lowongan ke-2, sistem mewajibkan verifikasi perusahaan untuk membuka kuota tanpa batas.
+     * - Admin: Tidak dibatasi.
      */
-    private function publishBlocked($user): ?JsonResponse
+    private function publishBlocked($user, ?int $jobId = null): ?JsonResponse
     {
         if ($user->role === 'admin') {
             return null;
@@ -284,12 +300,32 @@ class JobVacancyController extends Controller
             return null;
         }
 
+        // Perusahaan dalam penangguhan atau diminta revisi dokumen diblokir langsung
+        if ($company && in_array($company->verification_status, ['suspended', 'revision_required', 'rejected'], true)) {
+            $msg = match ($company->verification_status) {
+                'suspended' => 'Perusahaan sedang ditangguhkan admin sehingga lowongan tidak dapat dipublikasikan.',
+                'revision_required' => 'Admin meminta perbaikan pengajuan verifikasi. Perbaiki pengajuan untuk mempublikasikan lowongan.',
+                'rejected' => 'Pengajuan verifikasi perusahaan ditolak. Perbaiki data verifikasi sebelum mempublikasikan lowongan.',
+                default => 'Perusahaan belum terverifikasi.',
+            };
+
+            return $this->forbiddenResponse($msg, 'COMPANY_NOT_VERIFIED');
+        }
+
+        // Hitung lowongan yang sedang dibuka aktif oleh recruiter ini
+        $activeJobCount = JobVacancy::where('posted_by', $user->id)
+            ->where('status', 'open')
+            ->when($jobId, fn ($q) => $q->where('id', '!=', $jobId))
+            ->count();
+
+        // Izinkan 1 lowongan aktif gratis untuk recruiter yang belum terverifikasi
+        if ($activeJobCount < 1) {
+            return null;
+        }
+
         $message = match ($company?->verification_status) {
-            null => 'Lengkapi profil perusahaan dan ajukan verifikasi sebelum mempublikasikan lowongan. Lowongan tetap bisa disimpan sebagai draft.',
-            'pending' => 'Verifikasi perusahaan masih diperiksa admin. Simpan lowongan sebagai draft dan publikasikan setelah disetujui.',
-            'revision_required' => 'Admin meminta perbaikan pengajuan verifikasi. Perbaiki lalu ajukan ulang; sementara itu lowongan bisa disimpan sebagai draft.',
-            'suspended' => 'Perusahaan sedang ditangguhkan admin sehingga lowongan tidak dapat dipublikasikan.',
-            default => 'Perusahaan belum terverifikasi. Ajukan verifikasi sebelum mempublikasikan lowongan. Lowongan tetap bisa disimpan sebagai draft.',
+            'pending' => 'Batas 1 lowongan gratis uji coba telah tercapai. Verifikasi perusahaan sedang diperiksa admin. Lowongan tambahan dapat disimpan sebagai draft.',
+            default => 'Batas 1 lowongan gratis uji coba telah tercapai. Lengkapi profil dan ajukan verifikasi perusahaan untuk mempublikasikan lowongan tanpa batas serta mendapatkan prioritas teratas di katalog.',
         };
 
         return $this->forbiddenResponse($message, 'COMPANY_NOT_VERIFIED');
@@ -371,7 +407,7 @@ class JobVacancyController extends Controller
         }
 
         // Membuka (mempublikasikan) lowongan yang belum terbuka tunduk pada aturan verifikasi perusahaan
-        if ($request->input('status') === 'open' && $job->status !== 'open' && ($blocked = $this->publishBlocked($currentUser))) {
+        if ($request->input('status') === 'open' && $job->status !== 'open' && ($blocked = $this->publishBlocked($currentUser, $job->id))) {
             return $blocked;
         }
 
