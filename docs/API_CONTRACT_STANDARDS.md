@@ -720,6 +720,30 @@ Pelamar hanya diperbolehkan membatalkan lamarannya jika proses seleksi masih ber
 
 ---
 
+### 4.5 Admin Portal (tata kelola platform)
+
+Semua endpoint di bawah memakai `Authorization: Bearer <token_admin>` dan dilindungi `jwt.auth:admin` (selain admin mendapat `403 INSUFFICIENT_ROLE`). Daftar memakai halaman di server: query `page` dan `per_page` (5 sampai 100), dengan `meta.pagination` berisi `current_page`, `per_page`, `total`, `last_page`. Password dan token tidak pernah dikirim. Setiap tindakan yang mengubah data dicatat di log audit oleh server.
+
+| Method | Endpoint | Keterangan |
+|---|---|---|
+| GET | `/api/admin/overview` | Antrean keputusan (verifikasi menunggu, sumber bermasalah, revisi, lowongan diturunkan, akun/perusahaan ditangguhkan), jumlah pengguna per peran, perusahaan per status, lowongan nyata vs demo, lamaran, dan 8 tindakan admin terakhir. `meta.window_days` = 30 untuk angka "baru". |
+| GET | `/api/admin/users?q=&role=&status=` | Daftar pengguna. `role`: applicant, recruiter, admin. `status`: active, suspended. |
+| GET | `/api/admin/users/{id}` | Detail akun, lamaran/lowongan terbaru, dan riwayat tindakan admin terhadap akun ini. |
+| PATCH | `/api/admin/users/{id}/status` | Body `{ "status": "suspended" \| "active", "reason": "..." }`. Alasan wajib (min. 10 karakter) saat menangguhkan. Tidak bisa mengubah akun sendiri (`403 SELF_ACTION_FORBIDDEN`) atau akun admin lain (`403 ADMIN_PROTECTED`). |
+| GET | `/api/admin/companies?q=&status=` | Daftar perusahaan, yang menunggu tindakan di atas. `meta.counts` per status verifikasi. |
+| GET | `/api/admin/companies/{id}` | Profil, pemilik, riwayat verifikasi, dan lowongan perusahaan. |
+| GET | `/api/admin/jobs?q=&status=&moderation=&source=&demo=` | Semua lowongan untuk moderasi. `moderation`: none, removed. |
+| PATCH | `/api/admin/jobs/{id}/moderation` | Body `{ "action": "remove" \| "restore", "reason": "..." }`. Alasan wajib (min. 10 karakter) saat menurunkan. |
+| GET | `/api/admin/audit-logs?action=&target_type=&actor_id=` | Log audit (baca saja). `meta.actions` berisi label setiap jenis tindakan. |
+
+**Akun ditangguhkan:** login dan semua endpoint terproteksi mengembalikan `403` dengan `error_code: ACCOUNT_SUSPENDED`, termasuk token yang dibuat sebelum penangguhan.
+
+**Lowongan diturunkan admin:** tidak tampil di `GET /api/jobs`, `GET /api/jobs/{id}` mengembalikan `404`, dan lamaran baru ditolak `400`. Pemilik tetap melihatnya di `GET /api/jobs/my` beserta `moderation_status` dan `moderation_reason`, tetapi tidak bisa membukanya lagi (`403 JOB_REMOVED_BY_ADMIN`) sampai admin memulihkannya.
+
+**Sinkron sumber lowongan:** `POST /api/aggregator/sync` dibatasi 6 kali per menit dan dicatat di log audit.
+
+---
+
 ## 5. Ringkasan Status Code Matrix
 
 | Endpoint Pattern | `200` | `201` | `400` | `401` | `403` | `404` | `409` | `422` | `500` |

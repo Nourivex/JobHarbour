@@ -5,7 +5,7 @@ import { initMenus } from '../../recruiter/components.js';
 import { initJobForm, openJobForm, skillSuggestions } from '../../recruiter/job-form.js';
 import { mountCandidateWorkspace } from '../../recruiter/candidate-workspace.js';
 import {
-    esc, icon, hydrateIcons, LEVEL, jobStatusBadge, scoreInfo, formatDate, relativeTime, emptyState, errorMessage,
+    esc, icon, hydrateIcons, LEVEL, jobStatusBadge, moderationPill, scoreInfo, formatDate, relativeTime, emptyState, errorMessage,
 } from '../../recruiter/ui.js';
 import { EMPLOYMENT_SHORT, salaryRange } from '../../job-ui.js';
 
@@ -18,7 +18,10 @@ function renderHeader() {
     document.title = `${j.title} - Portal Recruiter JobHarbour`;
     $('ws-crumb').textContent = j.title;
     $('jd-title').textContent = j.title;
-    $('jd-badges').innerHTML = jobStatusBadge(j.status) + (j.status === 'open' ? `<a href="/jobs/${j.id}" target="_blank" rel="noopener" class="ws-pill ws-pill-neutral hover:underline">${icon('external-link', 'w-3.5 h-3.5')}Lihat di katalog</a>` : '');
+    const removed = j.moderation_status === 'removed';
+    $('jd-badges').innerHTML = jobStatusBadge(j.status) + moderationPill(j)
+        + (j.status === 'open' && !removed ? `<a href="/jobs/${j.id}" target="_blank" rel="noopener" class="ws-pill ws-pill-neutral hover:underline">${icon('external-link', 'w-3.5 h-3.5')}Lihat di katalog</a>` : '')
+        + (removed ? `<span class="ws-meta">Tidak tampil di katalog. Alasan: ${esc(j.moderation_reason || '-')}</span>` : '');
     $('jd-sub').textContent = [j.company, j.location, EMPLOYMENT_SHORT[j.employment_type] || j.employment_type].filter(Boolean).join(' · ');
 
     const rule = publishRule(state.ctx, state.jobs, j.id);

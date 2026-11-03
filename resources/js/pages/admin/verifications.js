@@ -1,5 +1,5 @@
 import { admin, toast, downloadProtected } from '../../api.js';
-import { bootShell } from '../../recruiter/shell.js';
+import { bootAdmin } from '../../admin/shell.js';
 import { initMenus, openDialog, setBusy } from '../../recruiter/components.js';
 import { esc, icon, hydrateIcons, companyLogo, verifyBadge, formatDate, relativeTime, formatBytes, emptyState, skeletonRows, errorMessage } from '../../recruiter/ui.js';
 
@@ -10,9 +10,11 @@ const state = { status: 'pending', items: [], counts: {}, current: null };
 function renderList() {
     document.querySelectorAll('#av-tabs [data-status]').forEach((t) => t.setAttribute('aria-selected', String(t.dataset.status === state.status)));
     document.querySelectorAll('[data-count]').forEach((el) => { el.textContent = state.counts[el.dataset.count] || 0; });
-    const navCount = document.getElementById('ws-nav-pending');
-    navCount.textContent = state.counts.pending || 0;
-    navCount.classList.toggle('hidden', !state.counts.pending);
+    const navCount = document.getElementById('adm-nav-verifications');
+    if (navCount) {
+        navCount.textContent = state.counts.pending || 0;
+        navCount.classList.toggle('hidden', !state.counts.pending);
+    }
 
     const list = state.items.filter((i) => i.status === state.status);
     if (!list.length) {
@@ -46,7 +48,7 @@ function renderDialog(v) {
     $('av-d-title').textContent = c.name || '-';
     $('av-d-sub').textContent = [c.industry, c.city, c.website].filter(Boolean).join(' · ');
     $('av-d-body').innerHTML = `
-        <div class="flex flex-wrap items-center gap-2">${verifyBadge(c.verification_status)}<span class="ws-meta">Diajukan ${formatDate(v.submitted_at, true)} oleh ${esc(c.owner?.name || '-')} (${esc(c.owner?.email || '-')})</span></div>
+        <div class="flex flex-wrap items-center gap-2">${verifyBadge(c.verification_status)}<span class="ws-meta">Diajukan ${formatDate(v.submitted_at, true)} oleh ${esc(c.owner?.name || '-')} (${esc(c.owner?.email || '-')})</span>${c.id ? `<a href="/admin/companies/${c.id}" class="ws-btn ws-btn-ghost ws-btn-sm ml-auto">Detail perusahaan${icon('arrow-right')}</a>` : ''}</div>
         <dl class="grid sm:grid-cols-2 gap-4 text-sm">
             <div><dt class="ws-meta">Nama badan usaha</dt><dd class="font-medium">${esc(v.legal_name)}</dd></div>
             <div><dt class="ws-meta">Nama di profil</dt><dd class="font-medium">${esc(c.name || '-')}</dd></div>
@@ -100,7 +102,7 @@ async function load() {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-    const ctx = await bootShell({ page: 'admin-verifications', roles: ['admin'] });
+    const ctx = await bootAdmin({ page: 'admin-verifications' });
     if (!ctx) return;
     initMenus();
 

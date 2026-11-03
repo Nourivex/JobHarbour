@@ -11,7 +11,7 @@ import {
     RefreshCw, RotateCcw, Search, Send, Settings, ShieldAlert, ShieldCheck, ShieldX, Sparkles, Sun, Target, Trash2,
     TrendingUp, Upload, UserRound, Users, X, Archive, Megaphone, KeyRound, Palette,
     ChevronsLeft, ChartColumn, StickyNote, Video, Table2, LayoutList, CalendarCheck, UserCheck, Timer, ListChecks,
-    FilePenLine, MessageSquareText,
+    FilePenLine, MessageSquareText, ScrollText, UserX,
 } from 'lucide';
 import { util } from '../api.js';
 
@@ -25,7 +25,7 @@ const ICONS = {
     RefreshCw, RotateCcw, Search, Send, Settings, ShieldAlert, ShieldCheck, ShieldX, Sparkles, Sun, Target, Trash2,
     TrendingUp, Upload, UserRound, Users, X, Archive, Megaphone, KeyRound, Palette,
     ChevronsLeft, ChartColumn, StickyNote, Video, Table2, LayoutList, CalendarCheck, UserCheck, Timer, ListChecks,
-    FilePenLine, MessageSquareText,
+    FilePenLine, MessageSquareText, ScrollText, UserX,
 };
 
 const toPascal = (name) => name.replace(/(^|-)([a-z0-9])/g, (_, __, c) => c.toUpperCase());
@@ -116,6 +116,12 @@ export const JOB_STATUS = {
 export function jobStatusBadge(status) {
     const s = JOB_STATUS[status] || JOB_STATUS.closed;
     return `<span class="ws-pill ws-pill-${s.tone}">${icon(s.icon, 'w-3.5 h-3.5')}${s.label}</span>`;
+}
+
+/** Penanda lowongan yang diturunkan admin dari katalog, beserta alasannya di tooltip. */
+export function moderationPill(job) {
+    if (job?.moderation_status !== 'removed') return '';
+    return `<span class="ws-pill ws-pill-danger" title="${esc(job.moderation_reason || '')}">${icon('ban', 'w-3.5 h-3.5')}Diturunkan admin</span>`;
 }
 
 // ------------------------------------------------------------------ status verifikasi

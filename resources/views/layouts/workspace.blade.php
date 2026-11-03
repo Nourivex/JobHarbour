@@ -91,10 +91,9 @@
 
                 <div id="ws-admin-nav" class="hidden">
                     <p class="ws-nav-label">Admin</p>
-                    <a href="/admin/verifications" class="ws-nav-link" @if (($active ?? '') === 'admin-verifications') aria-current="page" @endif>
-                        <i data-lucide="badge-check"></i>
-                        <span>Periksa Verifikasi</span>
-                        <span id="ws-nav-pending" class="ws-nav-count hidden"></span>
+                    <a href="/admin" class="ws-nav-link">
+                        <i data-lucide="shield-check"></i>
+                        <span>Buka Admin Portal</span>
                     </a>
                 </div>
 

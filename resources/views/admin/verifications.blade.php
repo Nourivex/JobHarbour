@@ -1,7 +1,7 @@
-<x-layouts.workspace title="Periksa Verifikasi - Admin JobHarbour" active="admin-verifications" crumb="Periksa Verifikasi">
+<x-layouts.admin title="Verifikasi - Admin Portal JobHarbour" active="verifications" crumb="Verifikasi">
     <div class="ws-page-head">
         <div>
-            <h1 class="ws-h1">Periksa Verifikasi</h1>
+            <h1 class="ws-h1">Verifikasi perusahaan</h1>
             <p class="ws-lead">Setujui perusahaan yang dokumennya valid. Penolakan wajib disertai alasan agar recruiter tahu apa yang perlu diperbaiki.</p>
         </div>
     </div>
@@ -36,6 +36,6 @@
     @endpush
 
     @push('scripts')
-        @vite('resources/js/pages/recruiter/admin-verifications.js')
+        @vite('resources/js/pages/admin/verifications.js')
     @endpush
-</x-layouts.workspace>
+</x-layouts.admin>

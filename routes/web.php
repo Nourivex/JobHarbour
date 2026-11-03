@@ -52,8 +52,17 @@ Route::prefix('recruiter')->name('recruiter.')->group(function () {
     Route::view('/settings', 'recruiter.settings')->name('settings');
 });
 
-// Pemeriksaan verifikasi perusahaan oleh admin
-Route::view('/admin/verifications', 'recruiter.admin-verifications')->name('admin.verifications');
+// Admin Portal: tata kelola platform. Halaman hanya kerangka; data dan izin diperiksa di API (jwt.auth:admin).
+Route::prefix('admin')->name('admin.')->group(function () {
+    Route::view('/', 'admin.overview')->name('overview');
+    Route::view('/verifications', 'admin.verifications')->name('verifications');
+    Route::view('/companies', 'admin.companies')->name('companies');
+    Route::get('/companies/{id}', fn (int $id) => view('admin.company', ['companyId' => $id]))->whereNumber('id')->name('company');
+    Route::view('/users', 'admin.users')->name('users');
+    Route::view('/jobs', 'admin.jobs')->name('jobs');
+    Route::view('/sources', 'admin.sources')->name('sources');
+    Route::view('/audit', 'admin.audit')->name('audit');
+});
 
 // Dokumentasi Swagger / OpenAPI
 Route::get('/docs', function () {

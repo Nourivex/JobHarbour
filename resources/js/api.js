@@ -256,6 +256,19 @@ export const admin = {
     verifications: (status) => api.get('/admin/verifications', status ? { status } : undefined),
     review: (id, payload) => api.patch('/admin/verifications/' + id, payload),
     setCompanyStatus: (id, payload) => api.patch('/admin/companies/' + id + '/status', payload),
+    // Admin Portal
+    overview: () => api.get('/admin/overview'),
+    users: (query) => api.get('/admin/users', query),
+    user: (id) => api.get('/admin/users/' + id),
+    setUserStatus: (id, payload) => api.patch('/admin/users/' + id + '/status', payload),
+    companies: (query) => api.get('/admin/companies', query),
+    company: (id) => api.get('/admin/companies/' + id),
+    jobs: (query) => api.get('/admin/jobs', query),
+    moderateJob: (id, payload) => api.patch('/admin/jobs/' + id + '/moderation', payload),
+    auditLogs: (query) => api.get('/admin/audit-logs', query),
+    sources: () => api.get('/aggregator/summary'),
+    syncSources: (slug) => api.post('/aggregator/sync', slug ? { source_slug: slug } : {}),
+    health: () => api.get('/health'),
 };
 
 export const matchmaking = {
@@ -346,7 +359,8 @@ export function requireAuth(roles) {
 export function homeFor(user) {
     if (!user) return '/catalog';
     // Admin belum punya dasbor sendiri, jadi memakai Papan Rekrutmen dengan cakupan semua lowongan
-    return user.role === 'recruiter' || user.role === 'admin' ? '/recruiter' : '/my-dock';
+    if (user.role === 'admin') return '/admin';
+    return user.role === 'recruiter' ? '/recruiter' : '/my-dock';
 }
 
 export const util = {

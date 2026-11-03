@@ -6,7 +6,7 @@ import JH, { session, toast } from '../api.js';
 import { data } from './data.js';
 import { hydrateIcons, icon, initials, VERIFY, esc, companyLogo, stageOf, interviewOf } from './ui.js';
 
-function initSidebar() {
+export function initSidebar() {
     const sidebar = document.getElementById('ws-sidebar');
     const openBtn = document.querySelector('[data-sidebar-open]');
     const setOpen = (open) => {
@@ -61,7 +61,7 @@ function initSidebar() {
     });
 }
 
-function renderUser(user) {
+export function renderUser(user) {
     document.getElementById('ws-user-avatar').textContent = initials(user.name);
     document.getElementById('ws-user-name').textContent = user.name || '-';
     document.getElementById('ws-user-role').textContent = user.role === 'admin' ? 'Administrator' : 'Recruiter';
@@ -69,7 +69,7 @@ function renderUser(user) {
         document.getElementById('ws-admin-nav')?.classList.remove('hidden');
         document.getElementById('ws-company-nav')?.classList.add('hidden');
         const card = document.getElementById('ws-company-card');
-        card?.setAttribute('href', '/admin/verifications');
+        card?.setAttribute('href', '/admin');
     }
 }
 
@@ -205,6 +205,11 @@ const BLOCKED = {
  */
 export function publishRule(ctx, jobs = [], exceptId = null) {
     if (ctx?.isAdmin) return { ok: true, trial: false, reason: '' };
+    // Lowongan yang diturunkan admin tidak bisa dibuka lagi sampai dipulihkan (JOB_REMOVED_BY_ADMIN di backend)
+    const self = exceptId != null ? jobs.find((j) => String(j.id) === String(exceptId)) : null;
+    if (self?.moderation_status === 'removed') {
+        return { ok: false, trial: false, reason: `Diturunkan admin JobHarbour: ${self.moderation_reason || 'tanpa keterangan'}. Perbaiki isinya lalu hubungi admin.` };
+    }
     const status = ctx?.company?.verification_status || null;
     if (status === 'verified') return { ok: true, trial: false, reason: '' };
     if (BLOCKED[status]) return { ok: false, trial: false, reason: BLOCKED[status] };
