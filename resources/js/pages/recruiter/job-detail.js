@@ -1,5 +1,5 @@
 import { jobs as jobsApi, toast, confirm, util } from '../../api.js';
-import { bootShell, canPublish } from '../../recruiter/shell.js';
+import { bootShell, publishRule } from '../../recruiter/shell.js';
 import { data, jobById, appsOfJob, stageCounts, averageScore } from '../../recruiter/data.js';
 import { initMenus } from '../../recruiter/components.js';
 import { initJobForm, openJobForm, skillSuggestions } from '../../recruiter/job-form.js';
@@ -21,10 +21,11 @@ function renderHeader() {
     $('jd-badges').innerHTML = jobStatusBadge(j.status) + (j.status === 'open' ? `<a href="/jobs/${j.id}" target="_blank" rel="noopener" class="ws-pill ws-pill-neutral hover:underline">${icon('external-link', 'w-3.5 h-3.5')}Lihat di katalog</a>` : '');
     $('jd-sub').textContent = [j.company, j.location, EMPLOYMENT_SHORT[j.employment_type] || j.employment_type].filter(Boolean).join(' · ');
 
-    const ok = canPublish(state.ctx);
+    const rule = publishRule(state.ctx, state.jobs, j.id);
+    const ok = rule.ok;
     const btns = [`<button type="button" class="ws-btn ws-btn-secondary" data-act="edit">${icon('pencil')}Edit</button>`];
     if (j.status === 'draft' || j.status === 'closed') {
-        btns.push(`<span ${ok ? '' : 'data-tip="Perusahaan harus terverifikasi terlebih dahulu"'}><button type="button" class="ws-btn ws-btn-primary" data-act="publish" ${ok ? '' : 'disabled'}>${icon('send')}${j.status === 'draft' ? 'Publikasikan' : 'Buka lagi'}</button></span>`);
+        btns.push(`<span ${ok ? '' : `data-tip="${esc(rule.reason)}"`}><button type="button" class="ws-btn ws-btn-primary" data-act="publish" ${ok ? '' : 'disabled'}>${icon('send')}${j.status === 'draft' ? 'Publikasikan' : 'Buka lagi'}</button></span>`);
     }
     if (j.status === 'open') btns.push(`<button type="button" class="ws-btn ws-btn-secondary" data-act="close">${icon('lock')}Tutup lowongan</button>`);
     if (j.status === 'closed' || j.status === 'draft') btns.push(`<button type="button" class="ws-btn ws-btn-ghost" data-act="archive">${icon('archive')}Arsipkan</button>`);
@@ -110,6 +111,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     state.ctx = ctx;
     initMenus();
     initJobForm(ctx, {
+        jobs: () => state.jobs,
         onSave: async () => {
             data.invalidate('jobs');
             state.jobs = await data.jobs();

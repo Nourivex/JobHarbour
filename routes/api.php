@@ -87,7 +87,7 @@ Route::get('/health', function () {
 // =========================================================================
 Route::prefix('auth')->group(function () {
     // Rute Publik (Tanpa Token JWT)
-    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:login');
     Route::post('/register', [AuthController::class, 'register']);
 
     // Rute Terproteksi (Wajib Header: Authorization: Bearer <token>)

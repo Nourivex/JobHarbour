@@ -93,6 +93,7 @@
         </div>
 
         <div class="ws-dialog-foot">
+            <p id="jf-trial-hint" class="ws-meta w-full hidden"></p>
             <button type="button" class="ws-btn ws-btn-ghost mr-auto" data-dialog-close>Batal</button>
             <button type="submit" class="ws-btn ws-btn-secondary" data-submit="draft">Simpan draft</button>
             <span id="jf-publish-wrap">

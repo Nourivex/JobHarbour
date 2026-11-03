@@ -73,6 +73,7 @@ Seluruh API endpoint **wajib** mengembalikan response dalam format envelope beri
 > - `TOKEN_EXPIRED`: Token JWT telah habis masa berlakunya (HTTP 401).
 > - `TOKEN_INVALID` / `MISSING_BEARER_TOKEN`: Token tidak valid atau header Authorization tidak ditemukan (HTTP 401).
 > - `IDOR_FORBIDDEN`: Upaya mengakses atau memanipulasi resource milik pengguna lain (HTTP 403).
+> - `TOO_MANY_REQUESTS`: Terlalu banyak percobaan dalam waktu singkat (HTTP 429). Saat ini berlaku untuk `POST /api/auth/login`: maksimal 5 percobaan per menit untuk kombinasi email + IP dan 20 per menit per IP. Header `Retry-After` dan `meta.retry_after` berisi jeda dalam detik.
 > - `INSUFFICIENT_ROLE`: Peran pengguna (role) tidak mencukupi untuk aksi tersebut (HTTP 403).
 > - `VALIDATION_ERROR`: Kegagalan validasi form request (HTTP 422).
 > - `CANCELLATION_NOT_ALLOWED`: Pembatalan lamaran ditolak karena sudah masuk tahap lanjut (HTTP 409).
@@ -360,7 +361,7 @@ Status verifikasi perusahaan: `unverified`, `pending`, `revision_required`, `ver
 | `POST` | `/jobs/{id}/requirements` | Tambah skill requirement | ✅ | Recruiter |
 | `PATCH` | `/jobs/{id}/requirements/{reqId}` | Update weight/level requirement | ✅ | Recruiter |
 
-**Siklus status lowongan:** `draft` → `open` (dipublikasikan) → `closed` → `archived`. `POST /jobs` menerima `status` `draft` atau `open` (bawaan `open`); `PUT/PATCH /jobs/{id}` menerima keempat status. Membuka lowongan (`open`) hanya diizinkan bila perusahaan recruiter berstatus `verified`, selain itu `403` dengan `error_code: COMPANY_NOT_VERIFIED`. Draft dan arsip tidak tampil di `GET /jobs` maupun `GET /jobs/{id}` publik; pemiliknya melihat semua status lewat `GET /jobs/my` (admin melihat semua lowongan). Bila `company` tidak dikirim, nama perusahaan diambil dari profil perusahaan.
+**Siklus status lowongan:** `draft` → `open` (dipublikasikan) → `closed` → `archived`. `POST /jobs` menerima `status` `draft` atau `open` (bawaan `open`); `PUT/PATCH /jobs/{id}` menerima keempat status. Membuka lowongan (`open`) bebas bila perusahaan recruiter berstatus `verified`. Perusahaan berstatus `suspended`, `revision_required`, atau `rejected` tidak bisa membuka lowongan. Selain itu (belum ada profil, `unverified`, `pending`) recruiter boleh memiliki **1 lowongan aktif** sebagai uji coba dengan `verification_status: unverified`; lowongan aktif berikutnya ditolak `403` dengan `error_code: COMPANY_NOT_VERIFIED`. Draft dan arsip tidak tampil di `GET /jobs` maupun `GET /jobs/{id}` publik; pemiliknya melihat semua status lewat `GET /jobs/my` (admin melihat semua lowongan). Bila `company` tidak dikirim, nama perusahaan diambil dari profil perusahaan.
 
 **Tahap Hired:** dicatat sebagai `PATCH /pipelines/{id}/status` dengan `{ "stage": "offering", "status": "passed" }` saat kandidat sudah di tahap Offering. Portal recruiter menampilkannya sebagai kolom Hired.
 

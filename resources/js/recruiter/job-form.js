@@ -5,10 +5,12 @@
 import { jobs, toast } from '../api.js';
 import { util } from '../api.js';
 import { bindDialog, openDialog, setBusy } from './components.js';
+import { publishRule } from './shell.js';
 import { LEVEL, esc, icon, hydrateIcons, jobStatusBadge, showFieldErrors, clearFieldErrors, errorMessage } from './ui.js';
 
 let ctxRef = null;
 let onSaved = () => {};
+let getJobs = () => [];
 let editing = null;
 let lastSkills = [];
 
@@ -52,19 +54,28 @@ function updateWeights() {
 function setPublishState() {
     const btn = document.querySelector('#job-form [data-submit="open"]');
     const wrap = $('jf-publish-wrap');
-    const verified = ctxRef?.isAdmin || ctxRef?.company?.verification_status === 'verified';
+    const rule = publishRule(ctxRef, getJobs(), editing?.id);
     const alreadyOpen = editing?.status === 'open';
     btn.innerHTML = `${icon(alreadyOpen ? 'check' : 'send')}${alreadyOpen ? 'Simpan perubahan' : 'Publikasikan'}`;
-    btn.disabled = !verified && !alreadyOpen;
+    btn.disabled = !rule.ok && !alreadyOpen;
     wrap.toggleAttribute('data-tip', btn.disabled);
-    if (btn.disabled) wrap.dataset.tip = 'Perusahaan harus terverifikasi sebelum bisa mempublikasikan lowongan.';
+    if (btn.disabled) wrap.dataset.tip = rule.reason;
+    // Recruiter belum terverifikasi yang masih punya jatah uji coba diberi tahu lewat label kecil
+    const hint = document.getElementById('jf-trial-hint');
+    if (hint) {
+        hint.textContent = rule.ok && rule.trial && !alreadyOpen ? 'Memakai jatah 1 lowongan uji coba (perusahaan belum terverifikasi).' : '';
+        hint.classList.toggle('hidden', !hint.textContent);
+    }
     // Lowongan yang sudah terbit tidak ditawari "Simpan draft" supaya tidak tidak sengaja ditarik dari katalog
     document.querySelector('#job-form [data-submit="draft"]').classList.toggle('hidden', alreadyOpen || ['closed', 'archived'].includes(editing?.status));
 }
 
-export function initJobForm(ctx, { onSave } = {}) {
+export function initJobForm(ctx, { onSave, jobs: jobList } = {}) {
     ctxRef = ctx;
     onSaved = onSave || onSaved;
+    // Daftar lowongan milik recruiter untuk menghitung jatah uji coba; dibaca saat dialog dibuka.
+    // Namanya jobList agar tidak menimpa modul API `jobs` yang dipakai saat menyimpan.
+    getJobs = jobList || getJobs;
     const dialog = bindDialog($('job-dialog'));
     const form = $('job-form');
     hydrateIcons(dialog);
@@ -157,15 +168,15 @@ export function initJobForm(ctx, { onSave } = {}) {
 /** Panel konfirmasi: centang beranimasi, ringkasan lowongan, dan langkah berikutnya. */
 function showSuccess(job) {
     const published = job.status === 'open';
-    const verified = ctxRef?.isAdmin || ctxRef?.company?.verification_status === 'verified';
+    const rule = publishRule(ctxRef, getJobs(), job.id);
     const reqs = job.requirements || [];
     const totalWeight = reqs.reduce((s, r) => s + (LEVEL[r.level]?.weight || 0), 0);
     const meta = [job.company, job.location, TYPE_LABEL[job.employment_type] || job.employment_type].filter(Boolean).map(esc).join(' · ');
     const note = published
         ? 'Lowongan sudah tampil di katalog. Setiap pelamar yang melamar langsung mendapat skor kecocokan.'
-        : verified
+        : rule.ok
             ? 'Belum tampil di katalog. Publikasikan kapan saja dari halaman lowongan.'
-            : 'Belum tampil di katalog. Lowongan bisa dipublikasikan setelah perusahaan terverifikasi.';
+            : `Belum tampil di katalog. ${rule.reason}`;
     const facts = [
         [icon('list-checks'), `${reqs.length} skill, total bobot ${totalWeight}`],
         [icon('users'), `Kuota ${Number(job.quota) || 1} orang`],
