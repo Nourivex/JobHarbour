@@ -24,7 +24,7 @@ class AdminJobController extends Controller
 
     /**
      * Method  : GET
-     * Endpoint: /api/admin/jobs?q=&status=&moderation=&source=&demo=&page=&per_page=
+     * Endpoint: /api/admin/jobs?id=&q=&status=&moderation=&source=&demo=&page=&per_page=
      */
     public function index(Request $request): JsonResponse
     {
@@ -34,6 +34,7 @@ class AdminJobController extends Controller
         $page = JobVacancy::query()
             ->with(['recruiter:id,name,email', 'recruiter.company:id,owner_id,name,verification_status'])
             ->withCount('applications')
+            ->when($request->filled('id'), fn ($query) => $query->whereKey((int) $request->input('id')))
             ->when($q !== '', fn ($query) => $query->where(fn ($w) => $w->where('title', 'like', "%{$q}%")->orWhere('company', 'like', "%{$q}%")))
             ->when(in_array($request->input('status'), ['draft', 'open', 'closed', 'archived'], true), fn ($query) => $query->where('status', $request->input('status')))
             ->when(in_array($request->input('moderation'), ['none', 'removed'], true), fn ($query) => $query->where('moderation_status', $request->input('moderation')))

@@ -1,5 +1,6 @@
 import { profile, session, toast } from '../../api.js';
 import { bootShell } from '../../recruiter/shell.js';
+import { bootAdmin } from '../../admin/shell.js';
 import { data } from '../../recruiter/data.js';
 import { initMenus, setBusy } from '../../recruiter/components.js';
 import { initials, formatDate, showFieldErrors, clearFieldErrors, errorMessage } from '../../recruiter/ui.js';
@@ -44,7 +45,10 @@ function fillAccount(user) {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-    const ctx = await bootShell({ page: 'settings' });
+    // Halaman yang sama dipakai di Admin Portal (layout admin) dan Portal Recruiter
+    const ctx = document.body.classList.contains('ws-admin')
+        ? await bootAdmin({ page: 'admin-settings' })
+        : await bootShell({ page: 'settings' });
     if (!ctx) return;
     initMenus();
     fillAccount(ctx.user);

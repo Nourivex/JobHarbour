@@ -56,10 +56,10 @@ async function load() {
                         </span>
                     </a>
                 </td>
-                <td><span class="block truncate max-w-[14rem]">${esc(c.owner?.name || '-')}</span><span class="block ws-meta truncate max-w-[14rem]">${esc(c.owner?.email || '')}</span></td>
-                <td>${verifyBadge(c.verification_status)}</td>
-                <td class="num">${c.jobs_open}<span class="ws-meta"> / ${c.jobs_total}</span></td>
-                <td class="whitespace-nowrap">${formatDate(c.created_at)}</td>
+                <td data-label="Pemilik"><span class="block truncate max-w-[14rem]">${esc(c.owner?.name || '-')}</span><span class="block ws-meta truncate max-w-[14rem]">${esc(c.owner?.email || '')}</span></td>
+                <td data-label="Status">${verifyBadge(c.verification_status)}</td>
+                <td data-label="Lowongan aktif" class="num">${c.jobs_open}<span class="ws-meta"> / ${c.jobs_total}</span></td>
+                <td data-label="Terdaftar" class="whitespace-nowrap">${formatDate(c.created_at)}</td>
             </tr>`).join('');
         $('co-pager').innerHTML = pager(res.meta?.pagination, 'perusahaan');
         hydrateIcons($('co-pager'));

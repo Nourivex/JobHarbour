@@ -12,8 +12,8 @@ const state = { action: params.get('action') || '', page: Number(params.get('pag
 
 const TARGET_LINK = {
     company: (id) => `/admin/companies/${id}`,
-    user: () => '/admin/users',
-    jobvacancy: () => '/admin/jobs',
+    user: (id) => `/admin/users?open=${id}`,
+    jobvacancy: (id) => `/admin/jobs?id=${id}`,
     jobsource: () => '/admin/sources',
 };
 
@@ -49,10 +49,10 @@ async function load() {
             return `
             <tr>
                 <td class="whitespace-nowrap"><span class="block">${relativeTime(a.created_at)}</span><span class="block ws-meta">${formatDateTime(a.created_at)}</span></td>
-                <td>${esc(a.actor?.name || 'Sistem')}</td>
-                <td class="font-medium text-[var(--ws-text)]">${esc(a.action_label)}</td>
-                <td class="max-w-[16rem]">${a.target_label ? (link ? `<a href="${link}" class="text-[var(--ws-info)] hover:underline">${esc(a.target_label)}</a>` : esc(a.target_label)) : '<span class="ws-meta">-</span>'}</td>
-                <td class="max-w-[22rem] text-sm">${a.reason ? esc(a.reason) : '<span class="ws-meta">-</span>'}</td>
+                <td data-label="Admin">${esc(a.actor?.name || 'Sistem')}</td>
+                <td data-label="Tindakan" class="font-medium text-[var(--ws-text)]">${esc(a.action_label)}</td>
+                <td data-label="Objek" class="max-w-[16rem]">${a.target_label ? (link ? `<a href="${link}" class="text-[var(--ws-info)] hover:underline">${esc(a.target_label)}</a>` : esc(a.target_label)) : '<span class="ws-meta">-</span>'}</td>
+                <td data-label="Alasan" class="max-w-[22rem] text-sm">${a.reason ? esc(a.reason) : '<span class="ws-meta">-</span>'}</td>
             </tr>`;
         }).join('');
         $('au-pager').innerHTML = pager(res.meta?.pagination, 'catatan');

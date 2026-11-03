@@ -42,9 +42,10 @@
                     <option value="true">Hanya data demo</option>
                 </select>
             </div>
+            <div id="jb-only" class="ws-fchips mt-2"></div>
         </div>
         <div class="ws-table-wrap mt-3">
-            <table class="ws-table">
+            <table class="ws-table adm-stack">
                 <thead>
                     <tr>
                         <th scope="col">Lowongan</th>

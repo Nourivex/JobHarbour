@@ -15,6 +15,7 @@ const state = {
     role: ROLE[params.get('role')] ? params.get('role') : '',
     status: ['active', 'suspended'].includes(params.get('status')) ? params.get('status') : '',
     page: Number(params.get('page')) || 1,
+    open: params.get('open'),
     me: null,
     current: null,
 };
@@ -54,10 +55,10 @@ async function load() {
                         </span>
                     </button>
                 </td>
-                <td>${roleBadge(u.role)}</td>
-                <td>${userStatusBadge(u.status)}</td>
-                <td class="text-sm">${activity(u)}</td>
-                <td class="whitespace-nowrap">${formatDate(u.created_at)}</td>
+                <td data-label="Peran">${roleBadge(u.role)}</td>
+                <td data-label="Status">${userStatusBadge(u.status)}</td>
+                <td data-label="Aktivitas" class="text-sm">${activity(u)}</td>
+                <td data-label="Bergabung" class="whitespace-nowrap">${formatDate(u.created_at)}</td>
             </tr>`).join('');
         $('us-pager').innerHTML = pager(res.meta?.pagination, 'pengguna');
         hydrateIcons($('us-pager'));
@@ -150,4 +151,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     await load();
+    // Tautan langsung dari detail perusahaan atau Log Audit: buka laci akun yang dimaksud
+    if (state.open) openUser(state.open);
 });

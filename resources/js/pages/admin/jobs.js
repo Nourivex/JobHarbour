@@ -10,7 +10,7 @@ import { esc, icon, hydrateIcons, jobStatusBadge, formatDate, emptyState, errorM
 
 const $ = (id) => document.getElementById(id);
 const params = new URLSearchParams(location.search);
-const FILTERS = ['q', 'moderation', 'status', 'source', 'demo'];
+const FILTERS = ['id', 'q', 'moderation', 'status', 'source', 'demo'];
 const state = { page: Number(params.get('page')) || 1, items: [] };
 FILTERS.forEach((k) => { state[k] = params.get(k) || ''; });
 
@@ -31,6 +31,9 @@ async function load() {
         FILTERS.forEach((k) => { if (state[k]) query[k] = state[k]; });
         const res = await admin.jobs(query);
         state.items = res.data || [];
+        $('jb-only').innerHTML = state.id
+            ? `<button type="button" class="ws-fchip" data-clear-id>Hanya lowongan #${esc(state.id)} <span aria-hidden="true">&times;</span><span class="sr-only">tampilkan semua</span></button>`
+            : '';
         if (!state.items.length) {
             $('jb-rows').innerHTML = tableMessage(5, emptyState({ iconName: 'briefcase-business', title: 'Tidak ada lowongan yang cocok', text: 'Ubah kata kunci atau filter.' }));
             $('jb-pager').innerHTML = '';
@@ -45,10 +48,10 @@ async function load() {
                     <span class="block ws-meta">${esc([j.company, j.location].filter(Boolean).join(' · '))}${j.recruiter ? ` · oleh ${esc(j.recruiter.name)}` : ''}</span>
                     ${removed && j.moderation_reason ? `<span class="block mt-1 text-[13px] text-[var(--ws-danger)]">Alasan: ${esc(j.moderation_reason)}</span>` : ''}
                 </td>
-                <td><span class="flex flex-wrap gap-1">${jobStatusBadge(j.status)}${moderationBadge(j)}</span></td>
-                <td class="text-sm"><span class="block">${SOURCE[j.source_type] || esc(j.source_type || '-')}</span>${j.is_demo ? '<span class="ws-pill ws-pill-muted mt-1">Data demo</span>' : ''}</td>
-                <td class="num">${j.applications_count}</td>
-                <td class="text-right whitespace-nowrap">
+                <td data-label="Status"><span class="flex flex-wrap justify-end sm:justify-start gap-1">${jobStatusBadge(j.status)}${moderationBadge(j)}</span></td>
+                <td data-label="Sumber" class="text-sm"><span class="block">${SOURCE[j.source_type] || esc(j.source_type || '-')}</span>${j.is_demo ? '<span class="ws-pill ws-pill-muted mt-1">Data demo</span>' : ''}</td>
+                <td data-label="Pelamar" class="num">${j.applications_count}</td>
+                <td class="adm-actions text-right whitespace-nowrap">
                     ${j.status === 'open' && !removed ? `<a href="/jobs/${j.id}" target="_blank" rel="noopener" class="ws-btn ws-btn-ghost ws-btn-sm" title="Buka di katalog">${icon('external-link')}</a>` : ''}
                     ${removed
                         ? `<button type="button" class="ws-btn ws-btn-secondary ws-btn-sm" data-moderate="restore" data-id="${j.id}">${icon('rotate-ccw')}Pulihkan</button>`
@@ -78,6 +81,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.addEventListener('click', (e) => {
         const pg = e.target.closest('[data-goto-page]');
         if (pg && !pg.disabled) { state.page = Number(pg.dataset.gotoPage); load(); return; }
+        if (e.target.closest('[data-clear-id]')) { state.id = ''; state.page = 1; load(); return; }
         const btn = e.target.closest('[data-moderate]');
         if (!btn) return;
         const job = state.items.find((j) => String(j.id) === btn.dataset.id);

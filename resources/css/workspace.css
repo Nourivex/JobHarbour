@@ -903,3 +903,17 @@ html.dark .ws-body.ws-admin { --ws-navy: #0B1018; --ws-navy-2: #151C28; }
 .adm-filters { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
 .adm-filters .ws-search { flex: 1 1 220px; max-width: 24rem; }
 @media (max-width: 639px) { .adm-filters > select { flex: 1 1 40%; min-width: 0; } }
+
+/* Tabel admin di layar sempit: setiap baris menjadi kartu, kolom pertama sebagai judul,
+   kolom lain tampil sebagai pasangan label (dari data-label) dan nilai */
+@media (max-width: 639px) {
+    .adm-stack thead { display: none; }
+    .adm-stack, .adm-stack tbody { display: block; }
+    .adm-stack tbody tr { display: block; padding: 0.8rem 1rem; border-bottom: 1px solid var(--ws-border); }
+    .adm-stack tbody tr:last-child { border-bottom: 0; }
+    .adm-stack td { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0.2rem 0; border: 0; text-align: right; }
+    .adm-stack td:first-child { display: block; padding-bottom: 0.45rem; text-align: left; }
+    .adm-stack td[data-label]::before { content: attr(data-label); flex: none; font-size: 12px; color: var(--ws-muted); text-align: left; }
+    .adm-stack td:empty { display: none; }
+    .adm-stack td.adm-actions { justify-content: flex-end; padding-top: 0.5rem; }
+}

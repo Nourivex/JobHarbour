@@ -13,6 +13,9 @@
             ['key' => 'sources', 'href' => '/admin/sources', 'icon' => 'globe', 'label' => 'Sumber Lowongan', 'dot' => 'adm-nav-sources'],
             ['key' => 'audit', 'href' => '/admin/audit', 'icon' => 'scroll-text', 'label' => 'Log Audit'],
         ]],
+        ['label' => 'Akun', 'items' => [
+            ['key' => 'settings', 'href' => '/admin/settings', 'icon' => 'settings', 'label' => 'Pengaturan'],
+        ]],
     ];
 @endphp
 <!DOCTYPE html>
@@ -106,13 +109,13 @@
                         <i data-lucide="moon" class="icon-moon"></i>
                         <i data-lucide="sun" class="icon-sun"></i>
                     </button>
-                    <span class="ws-user" aria-label="Akun admin">
+                    <a href="/admin/settings" class="ws-user" aria-label="Pengaturan akun admin">
                         <span id="ws-user-avatar" class="ws-avatar">?</span>
                         <span class="hidden md:block min-w-0 text-left">
                             <span id="ws-user-name" class="block text-sm font-semibold text-[var(--ws-text)] truncate max-w-[160px]">-</span>
                             <span id="ws-user-role" class="block text-xs text-[var(--ws-muted)]">-</span>
                         </span>
-                    </span>
+                    </a>
                 </div>
             </header>
 

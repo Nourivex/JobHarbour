@@ -93,7 +93,7 @@ function render(c) {
                     <div class="ws-card-head"><h2 class="ws-h2">Pemilik akun</h2>${owner ? userStatusBadge(owner.status) : ''}</div>
                     <div class="ws-card-body">
                         ${owner ? `${dl([['Nama', esc(owner.name)], ['Email', esc(owner.email)], ['Bergabung', formatDate(owner.created_at)]])}
-                        <a href="/admin/users?q=${encodeURIComponent(owner.email)}" class="ws-btn ws-btn-ghost ws-btn-sm mt-3 -ml-2">Kelola akun${icon('arrow-right')}</a>` : '<p class="ws-meta">Tidak ada pemilik.</p>'}
+                        <a href="/admin/users?q=${encodeURIComponent(owner.email)}&open=${owner.id}" class="ws-btn ws-btn-ghost ws-btn-sm mt-3 -ml-2">Kelola akun${icon('arrow-right')}</a>` : '<p class="ws-meta">Tidak ada pemilik.</p>'}
                     </div>
                 </section>
 
