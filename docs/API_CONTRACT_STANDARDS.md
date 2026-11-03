@@ -743,6 +743,8 @@ Semua endpoint di bawah memakai `Authorization: Bearer <token_admin>` dan dilind
 - `POST /api/reports` (semua pengguna yang masuk, dibatasi 10 per jam): body `{ "target_type": "job" | "company", "target_id", "category": "scam" | "misleading" | "discrimination" | "spam" | "other", "description" (min. 20) }`. 201 + `Location`. Laporan ganda yang masih aktif: `409 DUPLICATE_REPORT`. Melaporkan milik sendiri: `403 SELF_REPORT_FORBIDDEN`.
 - `POST /api/jobs/{id}/appeal` (recruiter pemilik, dibatasi 10 per jam): body `{ "description" (min. 20) }` untuk lowongan yang diturunkan admin. Lowongan tidak sedang diturunkan: `409 NOT_REMOVED`; banding aktif sudah ada: `409 DUPLICATE_APPEAL`. `GET /api/jobs/my` menyertakan `has_open_appeal`.
 
+**Pemberitahuan (lonceng):** `GET /api/notifications` (20 terbaru + `meta.unread_count`), `PATCH /api/notifications/{id}/read`, `POST /api/notifications/read-all`. Hanya milik pengguna yang masuk (milik orang lain: `404`). Dibuat server saat tahap lamaran berubah (assessment, wawancara dan jadwal ulang, penawaran, diterima, ditolak), lowongan diturunkan atau dipulihkan, keputusan verifikasi, status perusahaan berubah, dan laporan atau banding ditutup. Catatan internal recruiter tidak pernah ikut dikirim.
+
 **Akun ditangguhkan:** login dan semua endpoint terproteksi mengembalikan `403` dengan `error_code: ACCOUNT_SUSPENDED`, termasuk token yang dibuat sebelum penangguhan.
 
 **Lowongan diturunkan admin:** tidak tampil di `GET /api/jobs`, `GET /api/jobs/{id}` mengembalikan `404`, dan lamaran baru ditolak `400`. Pemilik tetap melihatnya di `GET /api/jobs/my` beserta `moderation_status` dan `moderation_reason`, tetapi tidak bisa membukanya lagi (`403 JOB_REMOVED_BY_ADMIN`) sampai admin memulihkannya.

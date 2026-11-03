@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\ApplicationNoteController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CompanyController;
 use App\Http\Controllers\Api\JobVacancyController;
+use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\PipelineController;
 use App\Http\Controllers\Api\ProfileSkillController;
 use App\Http\Controllers\Api\ReportController;
@@ -135,6 +136,13 @@ Route::middleware('jwt.auth:admin')->prefix('admin')->group(function () {
     Route::patch('/jobs/{id}/moderation', [AdminJobController::class, 'moderate'])->whereNumber('id');
     Route::get('/reports', [AdminReportController::class, 'index']);
     Route::patch('/reports/{id}', [AdminReportController::class, 'update'])->whereNumber('id');
+});
+
+// Lonceng pemberitahuan milik pengguna yang sedang masuk
+Route::middleware('jwt.auth')->prefix('notifications')->group(function () {
+    Route::get('/', [NotificationController::class, 'index']);
+    Route::post('/read-all', [NotificationController::class, 'markAllRead']);
+    Route::patch('/{id}/read', [NotificationController::class, 'markRead'])->whereNumber('id');
 });
 
 // Laporan pengguna dan banding recruiter (dibatasi agar tidak dipakai untuk spam)

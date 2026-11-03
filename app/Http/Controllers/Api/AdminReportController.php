@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\AdminAuditLog;
 use App\Models\Report;
+use App\Models\UserNotification;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -92,6 +93,17 @@ class AdminReportController extends Controller
         AdminAuditLog::record($request, 'report.'.$request->status, $report,
             ($report->kind === 'appeal' ? 'Banding: ' : 'Laporan: ').($target?->title ?? $target?->name ?? "#{$report->target_id}"),
             $request->resolution, ['kind' => $report->kind, 'category' => $report->category, 'target_type' => $report->target_type, 'target_id' => $report->target_id]);
+
+        if ($request->status !== 'in_review') {
+            $name = $target?->title ?? $target?->name ?? 'yang kamu laporkan';
+            [$title, $body] = $report->kind === 'appeal'
+                ? [$request->status === 'resolved' ? 'Pengajuan pemulihan disetujui' : 'Pengajuan pemulihan ditolak', "{$name}: {$request->resolution}"]
+                : ['Laporanmu sudah ditinjau', $request->status === 'resolved'
+                    ? "Terima kasih. Laporan atas {$name} sudah ditindaklanjuti admin."
+                    : "Terima kasih. Laporan atas {$name} sudah diperiksa dan tidak ditemukan pelanggaran."];
+            UserNotification::send($report->reporter_id, 'report.'.$request->status, $title, $body,
+                $report->kind === 'appeal' ? "/recruiter/jobs/{$report->target_id}" : null);
+        }
 
         return $this->successResponse($report->fresh(['reporter', 'handler'])->toApiArray(true), match ($request->status) {
             'in_review' => 'Laporan ditandai sedang ditinjau.',

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\AdminAuditLog;
 use App\Models\JobVacancy;
+use App\Models\UserNotification;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -119,6 +120,11 @@ class AdminJobController extends Controller
         ])->save();
 
         AdminAuditLog::record($request, $remove ? 'job.removed' : 'job.restored', $job, "{$job->title} · {$job->company}", $request->reason, ['job_status' => $job->status]);
+
+        UserNotification::send($job->posted_by, $remove ? 'job.removed' : 'job.restored',
+            $remove ? 'Lowonganmu diturunkan admin' : 'Lowonganmu dipulihkan',
+            $remove ? "{$job->title}: {$request->reason}" : "{$job->title} kembali mengikuti statusnya semula.",
+            "/recruiter/jobs/{$job->id}");
 
         return $this->successResponse([
             'id' => $job->id,

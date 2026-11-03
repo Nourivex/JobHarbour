@@ -101,9 +101,9 @@
                     <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg>
                     Filter <span id="filter-toggle-count" class="hidden min-w-5 h-5 px-1.5 rounded-full bg-[#0C2238] text-white text-[11px] leading-5"></span>
                 </button>
-                <label class="flex-1 sm:flex-none flex items-center gap-2 h-12 pl-4 pr-2 rounded-xl bg-white border border-[#C5CFDA] text-sm text-[#3D4B5C]">
-                    <span class="shrink-0">Urutkan:</span>
-                    <select id="catalog-sort" class="bg-transparent border-0 outline-none font-bold text-[#0B1B2B] pr-1 cursor-pointer">
+                <label class="flex-1 min-w-0 sm:flex-none flex items-center gap-2 h-12 pl-4 pr-2 rounded-xl bg-white border border-[#C5CFDA] text-sm text-[#3D4B5C]">
+                    <span class="shrink-0 hidden min-[380px]:inline">Urutkan:</span>
+                    <select id="catalog-sort" class="min-w-0 flex-1 sm:flex-none bg-transparent border-0 outline-none font-bold text-[#0B1B2B] pr-1 cursor-pointer text-ellipsis">
                         <option value="match" data-applicant-only>Kecocokan tertinggi</option>
                         <option value="latest">Terbaru</option>
                         <option value="salary_high">Gaji tertinggi</option>

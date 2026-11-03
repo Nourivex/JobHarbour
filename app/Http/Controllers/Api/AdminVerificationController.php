@@ -7,6 +7,7 @@ use App\Models\AdminAuditLog;
 use App\Models\Company;
 use App\Models\CompanyVerification;
 use App\Models\JobVacancy;
+use App\Models\UserNotification;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -129,6 +130,12 @@ class AdminVerificationController extends Controller
             default => 'company.verification_rejected',
         }, $submission->company, $submission->company->name, $request->admin_notes, ['verification_id' => $submission->id]);
 
+        UserNotification::send($submission->company->owner_id, 'company.verification_'.$decision, match ($decision) {
+            'approve' => 'Perusahaanmu terverifikasi',
+            'revision' => 'Admin meminta perbaikan verifikasi',
+            default => 'Pengajuan verifikasi ditolak',
+        }, $approved ? "{$submission->company->name} sekarang bisa mempublikasikan lowongan tanpa batas." : $request->admin_notes, '/recruiter/verification');
+
         return $this->successResponse($submission->fresh(['reviewer'])->toApiArray(), $message);
     }
 
@@ -172,6 +179,11 @@ class AdminVerificationController extends Controller
         ]);
 
         AdminAuditLog::record($request, $request->status === 'suspended' ? 'company.suspended' : 'company.reinstated', $company, $company->name, $request->note);
+
+        UserNotification::send($company->owner_id, $request->status === 'suspended' ? 'company.suspended' : 'company.reinstated',
+            $request->status === 'suspended' ? 'Perusahaanmu ditangguhkan admin' : 'Penangguhan perusahaanmu dicabut',
+            $request->status === 'suspended' ? $request->note : "{$company->name} kembali bisa mempublikasikan lowongan.",
+            '/recruiter/verification');
 
         return $this->successResponse($company->fresh(), $request->status === 'suspended'
             ? 'Perusahaan ditangguhkan. Lowongan barunya tidak dapat dipublikasikan.'

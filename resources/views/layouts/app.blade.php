@@ -66,7 +66,8 @@
                     </a>
                 </div>
 
-                <!-- Sudah login -->
+                <!-- Sudah login: lonceng pemberitahuan lalu menu profil -->
+                <div data-jh-auth-only data-notif="nav" style="display:none;"></div>
                 <div data-jh-auth-only style="display:none;" class="relative">
                     <button
                         id="user-menu-button"

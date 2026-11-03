@@ -135,6 +135,7 @@
                     </ol>
                 </nav>
                 <div class="flex items-center gap-1.5">
+                    <div data-notif="ws"></div>
                     <button type="button" class="ws-icon-btn" data-theme-toggle aria-label="Ganti mode tema">
                         <i data-lucide="moon" class="icon-moon"></i>
                         <i data-lucide="sun" class="icon-sun"></i>

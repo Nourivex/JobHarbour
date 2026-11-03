@@ -158,6 +158,13 @@ export const jobs = {
     appeal: (id, payload) => api.post('/jobs/' + id + '/appeal', payload),
 };
 
+/** Lonceng pemberitahuan milik pengguna yang sedang masuk. */
+export const notifications = {
+    list: () => api.get('/notifications'),
+    read: (id) => api.patch('/notifications/' + id + '/read'),
+    readAll: () => api.post('/notifications/read-all'),
+};
+
 /** Laporan pengguna atas lowongan atau perusahaan. */
 export const reports = {
     create: (payload) => api.post('/reports', payload),

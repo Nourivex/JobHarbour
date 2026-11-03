@@ -1,4 +1,5 @@
 import JH, { session, auth, util } from './api.js';
+import { initNotifications } from './notifications.js';
 
 /**
  * Inisialisasi status sesi pengguna pada navigasi desktop & ponsel.
@@ -203,6 +204,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initThemeToggle();
     initHeroNav();
     initScrollReveal();
+    initNotifications();
 });
 
 export { bindSessionUI, initUserDropdown, initScrollReveal, countUp };
