@@ -5,6 +5,7 @@
 import JH, { session, toast, admin } from '../api.js';
 import { data } from '../recruiter/data.js';
 import { initSidebar, renderUser } from '../recruiter/shell.js';
+import { initMenus } from '../recruiter/components.js';
 import { hydrateIcons } from '../recruiter/ui.js';
 
 /** Angka "menunggu" di sidebar. queue = data.queue dari GET /api/admin/overview. */
@@ -32,6 +33,7 @@ export async function bootAdmin({ page, loadNav = true } = {}) {
     document.body.dataset.page = page;
     hydrateIcons();
     initSidebar();
+    initMenus(); // menu akun di topbar
 
     const cached = session.user();
     if (!session.isLoggedIn() || !cached) {

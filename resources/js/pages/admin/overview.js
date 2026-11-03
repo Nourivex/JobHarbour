@@ -1,6 +1,6 @@
 /**
  * Admin Portal: Ringkasan sebagai pusat kendali. Urutan menurut prioritas kerja admin:
- * kondisi platform (pita navy), keputusan yang menunggu, kesehatan pasar kerja, pertumbuhan dan neraca skill,
+ * hero dengan status layanan, empat angka utama berwarna kategori, keputusan yang menunggu, kesehatan pasar kerja, pertumbuhan dan neraca skill,
  * lalu tindakan admin terbaru. Semua angka dari GET /api/admin/overview.
  * Nilai null ditampilkan "belum cukup data" beserta alasannya, bukan nol. Data demo selalu diberi penanda.
  * Animasi hanya transform/opacity dan mengikuti setelan kurangi gerakan.
@@ -31,34 +31,43 @@ function countUp(root) {
     });
 }
 
-function stat(label, n, sub) {
-    return `<div class="adm-stat"><span class="adm-stat-label">${label}</span><span class="adm-stat-num">${counter(n)}</span><span class="adm-stat-sub">${sub}</span></div>`;
+/** Status layanan di hero: titik berwarna selalu disertai teks. */
+function renderStatus(d, healthy) {
+    const degraded = d.sources.degraded || [];
+    const j = d.jobs;
+    $('ov-status').innerHTML = `
+        <span><span class="adm-dot ${healthy ? '' : 'is-bad'}"></span>API ${healthy ? 'berjalan normal' : 'tidak merespons'}</span>
+        <span><span class="adm-dot ${!d.sources.total ? 'is-idle' : (degraded.length ? 'is-bad' : '')}"></span>${d.sources.total
+            ? `${d.sources.enabled} dari ${d.sources.total} sumber lowongan aktif${degraded.length ? `, ${degraded.length} bermasalah · <a href="/admin/sources">Periksa</a>` : ''}`
+            : 'Belum ada sumber lowongan otomatis'}</span>
+        ${j.open_demo ? `<span><span class="adm-dot is-idle"></span>Data demo ${j.demo_hidden ? 'disembunyikan dari' : 'tampil di'} katalog publik</span>` : ''}`;
 }
 
-/** Pita navy: status layanan di atas, isi platform di bawah. */
-function renderCommand(d, healthy, windowDays) {
-    const degraded = d.sources.degraded || [];
+function kpi({ tone, iconName, label, n, sub, trend = '' }) {
+    return `<div class="adm-kpi is-${tone}">
+        <span class="adm-kpi-icon">${icon(iconName, 'w-6 h-6')}</span>
+        <span class="min-w-0">
+            <span class="adm-kpi-label">${label}</span>
+            <span class="adm-kpi-num">${counter(n)}</span>
+            <span class="adm-kpi-sub">${sub}</span>
+            ${trend ? `<span class="adm-kpi-trend">${icon('arrow-up', 'w-3.5 h-3.5')}${trend}</span>` : ''}
+        </span>
+    </div>`;
+}
+
+/** Empat angka utama, masing-masing dengan warna kategori sendiri. */
+function renderKpis(d, windowDays) {
     const roles = d.users.by_role || {};
     const companies = d.companies.by_status || {};
     const j = d.jobs;
-    const newSub = (n) => (n ? ` · <b>+${n}</b> dalam ${windowDays} hari` : '');
-    const demoNote = j.open_demo
-        ? `<span class="adm-demo-tag" title="Lowongan contoh dari seeder, bukan lowongan nyata">DEMO</span> ${j.open_real} nyata, ${j.open_demo} data demo`
-        : 'semuanya lowongan nyata';
-    $('ov-command').innerHTML = `
-        <div class="adm-command-status">
-            <span><span class="adm-dot ${healthy ? '' : 'is-bad'}"></span>API ${healthy ? 'berjalan normal' : 'tidak merespons'}</span>
-            <span><span class="adm-dot ${!d.sources.total ? 'is-idle' : (degraded.length ? 'is-bad' : '')}"></span>${d.sources.total
-                ? `${d.sources.enabled} dari ${d.sources.total} sumber lowongan aktif${degraded.length ? `, ${degraded.length} bermasalah · <a href="/admin/sources">Periksa</a>` : ''}`
-                : 'Belum ada sumber lowongan otomatis'}</span>
-            ${j.open_demo ? `<span><span class="adm-dot is-idle"></span>Data demo ${j.demo_hidden ? 'disembunyikan dari' : 'tampil di'} katalog publik</span>` : ''}
-        </div>
-        <div class="adm-command-stats">
-            ${stat('Pengguna', sum(roles), `${roles.applicant || 0} pelamar, ${roles.recruiter || 0} recruiter${newSub(d.users.new_30d)}`)}
-            ${stat('Perusahaan', sum(companies), `${companies.verified || 0} terverifikasi${newSub(d.companies.new_30d)}`)}
-            ${stat('Lowongan terbuka', j.open_real + j.open_demo, demoNote)}
-            ${stat('Lamaran', d.applications.total, d.applications.total ? `total sejak awal${newSub(d.applications.new_30d)}` : 'belum ada lamaran masuk')}
-        </div>`;
+    const trend = (n) => (n ? `+${n} dalam ${windowDays} hari` : '');
+    $('ov-kpis').innerHTML = [
+        kpi({ tone: 'blue', iconName: 'users', label: 'Pengguna', n: sum(roles), sub: `${roles.applicant || 0} pelamar, ${roles.recruiter || 0} recruiter`, trend: trend(d.users.new_30d) }),
+        kpi({ tone: 'purple', iconName: 'building-2', label: 'Perusahaan', n: sum(companies), sub: `${companies.verified || 0} terverifikasi`, trend: trend(d.companies.new_30d) }),
+        kpi({ tone: 'orange', iconName: 'briefcase-business', label: 'Lowongan terbuka', n: j.open_real + j.open_demo,
+            sub: j.open_demo ? `<span class="adm-demo-tag" title="Lowongan contoh dari seeder, bukan lowongan nyata">DEMO</span> ${j.open_real} nyata, ${j.open_demo} data demo` : 'Semuanya lowongan nyata' }),
+        kpi({ tone: 'green', iconName: 'file-text', label: 'Lamaran', n: d.applications.total, sub: d.applications.total ? 'Total sejak awal' : 'Belum ada lamaran masuk', trend: trend(d.applications.new_30d) }),
+    ].join('');
 }
 
 /** Antrean keputusan sebagai daftar: yang berisi dan paling mendesak di atas. */
@@ -80,7 +89,7 @@ function renderQueue(q) {
     const pending = items.some((it) => it.level > 0);
 
     $('ov-queue').innerHTML = `
-        ${pending ? '' : `<p class="adm-allclear mb-2">${icon('circle-check')}Tidak ada keputusan yang menunggu. Antrean bersih.</p>`}
+        ${pending ? '' : `<p class="adm-allclear">${icon('circle-check')}Tidak ada keputusan yang menunggu. Antrean bersih.</p>`}
         ${items.map((it) => `
             <a href="${it.href}" class="adm-queue-item ${it.level === 3 ? 'is-bad' : (it.level === 2 ? 'is-hot' : '')} ${it.n ? '' : 'is-clear'}">
                 <span class="adm-queue-icon">${icon(it.icon)}</span>
@@ -164,20 +173,18 @@ function renderSkills(s) {
     $('ov-skills-sub').textContent = `Dari ${plural(s.open_jobs, 'lowongan terbuka')} dan ${plural(s.applicants, 'pelamar aktif')}.`;
     const pct = (v, total) => (total ? Math.round((v / total) * 100) : 0);
     $('ov-skills').innerHTML = `
-        <div class="adm-legend mb-2">
-            <span><i style="background:var(--ws-chart-2)"></i>Diminta lowongan</span>
-            <span><i style="background:var(--ws-chart-1)"></i>Dimiliki pelamar</span>
-        </div>
         <div>${s.items.map((it) => {
             const dj = pct(it.jobs, s.open_jobs);
             const da = pct(it.applicants, s.applicants);
             return `
-            <div class="adm-skill">
-                <span class="adm-skill-name" title="${esc(it.skill)}">${esc(it.skill)}</span>
+            <div class="adm-skill" title="${esc(it.skill)}: diminta ${dj}% lowongan, dimiliki ${da}% pelamar">
+                <span class="adm-skill-name">${esc(it.skill)}</span>
                 <span class="adm-skill-bars">
-                    <span class="adm-skill-bar"><span class="adm-skill-track"><span style="width:${Math.max(dj, 2)}%;background:var(--ws-chart-2)"></span></span>${dj}% lowongan</span>
-                    <span class="adm-skill-bar"><span class="adm-skill-track"><span style="width:${Math.max(da, 2)}%;background:var(--ws-chart-1)"></span></span>${da}% pelamar</span>
+                    <span class="adm-skill-track"><span style="width:${Math.max(dj, 2)}%;background:var(--ws-chart-2)"></span></span>
+                    <span class="adm-skill-track"><span style="width:${Math.max(da, 2)}%;background:var(--ws-chart-1)"></span></span>
                 </span>
+                <span class="adm-skill-pct" aria-label="${dj}% lowongan">${dj}%</span>
+                <span class="adm-skill-pct is-muted" aria-label="${da}% pelamar">${da}%</span>
             </div>`;
         }).join('')}</div>
         <p class="ws-meta mt-3">Skill yang banyak dicari tetapi jarang dimiliki pelamar menjelaskan kenapa skor kecocokan rendah.</p>`;
@@ -202,7 +209,8 @@ function renderAudit(list) {
 }
 
 function skeletons() {
-    $('ov-command').innerHTML = '<div class="h-[10.5rem] opacity-60"></div>';
+    $('ov-status').innerHTML = '';
+    $('ov-kpis').innerHTML = Array.from({ length: 4 }, () => '<div class="ws-skel h-[7.5rem] rounded-2xl"></div>').join('');
     $('ov-queue').innerHTML = `<div class="px-4 pb-4">${skeletonRows(4, 'h-12')}</div>`;
     $('ov-market').innerHTML = Array.from({ length: 4 }, () => '<div class="adm-metric"><div class="ws-skel h-16 rounded-lg"></div></div>').join('');
     $('ov-growth').innerHTML = skeletonRows(1, 'h-40');
@@ -219,7 +227,8 @@ async function load() {
         ]);
         const d = res.data;
         renderNavCounts(d.queue);
-        renderCommand(d, healthy, res.meta?.window_days || 30);
+        renderStatus(d, healthy);
+        renderKpis(d, res.meta?.window_days || 30);
         renderQueue(d.queue);
         renderMarket(d.market, d.jobs);
         renderGrowth(d.growth);
@@ -227,10 +236,12 @@ async function load() {
         renderAudit(d.recent_actions || []);
         hydrateIcons();
         countUp($('ws-main'));
-        $('ov-updated').textContent = `Diperbarui ${new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}`;
+        $('ov-updated').textContent = `Terakhir diperbarui: ${new Date().toLocaleString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}`;
     } catch (err) {
         // Gagal memuat dibedakan dari nol: tidak ada angka yang ditampilkan sama sekali
-        $('ov-command').innerHTML = `<div class="adm-command-status"><span><span class="adm-dot is-bad"></span>Ringkasan gagal dimuat: ${esc(errorMessage(err))}</span></div>`;
+        $('ov-updated').textContent = 'Gagal memuat data';
+        $('ov-status').innerHTML = `<span><span class="adm-dot is-bad"></span>Ringkasan gagal dimuat: ${esc(errorMessage(err))}</span>`;
+        $('ov-kpis').innerHTML = '';
         $('ov-queue').innerHTML = `<div class="ws-card-body">${emptyState({ iconName: 'circle-alert', title: 'Data tidak bisa diambil', text: 'Angka tidak ditampilkan agar tidak tertukar dengan nol. Coba muat ulang.', action: '<button type="button" class="ws-btn ws-btn-secondary" data-retry>Muat ulang</button>' })}</div>`;
         ['ov-market', 'ov-market-note', 'ov-growth', 'ov-skills', 'ov-audit'].forEach((id) => { $(id).innerHTML = ''; });
         hydrateIcons();

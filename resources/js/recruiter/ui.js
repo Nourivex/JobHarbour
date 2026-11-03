@@ -11,7 +11,7 @@ import {
     RefreshCw, RotateCcw, Search, Send, Settings, ShieldAlert, ShieldCheck, ShieldX, Sparkles, Sun, Target, Trash2,
     TrendingUp, Upload, UserRound, Users, X, Archive, Megaphone, KeyRound, Palette,
     ChevronsLeft, ChartColumn, StickyNote, Video, Table2, LayoutList, CalendarCheck, UserCheck, Timer, ListChecks,
-    FilePenLine, MessageSquareText, ScrollText, UserX, Flag, EyeOff, SlidersHorizontal, UserRoundCog,
+    FilePenLine, MessageSquareText, ScrollText, UserX, Flag, EyeOff, SlidersHorizontal, UserRoundCog, TriangleAlert, Activity, Layers, ArrowUp,
 } from 'lucide';
 import { util } from '../api.js';
 
@@ -25,7 +25,7 @@ const ICONS = {
     RefreshCw, RotateCcw, Search, Send, Settings, ShieldAlert, ShieldCheck, ShieldX, Sparkles, Sun, Target, Trash2,
     TrendingUp, Upload, UserRound, Users, X, Archive, Megaphone, KeyRound, Palette,
     ChevronsLeft, ChartColumn, StickyNote, Video, Table2, LayoutList, CalendarCheck, UserCheck, Timer, ListChecks,
-    FilePenLine, MessageSquareText, ScrollText, UserX, Flag, EyeOff, SlidersHorizontal, UserRoundCog,
+    FilePenLine, MessageSquareText, ScrollText, UserX, Flag, EyeOff, SlidersHorizontal, UserRoundCog, TriangleAlert, Activity, Layers, ArrowUp,
 };
 
 const toPascal = (name) => name.replace(/(^|-)([a-z0-9])/g, (_, __, c) => c.toUpperCase());

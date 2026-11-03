@@ -81,6 +81,8 @@
             </nav>
 
             <div class="ws-sidebar-foot">
+                {{-- Ilustrasi mercusuar: latar gambar sama dengan warna sidebar, tepi atas dipudarkan --}}
+                <img src="/images/admin-sidebar-lighthouse.webp" alt="" class="adm-side-art" aria-hidden="true" decoding="async" width="560" height="417">
                 <a href="/" class="ws-nav-link">
                     <i data-lucide="external-link"></i>
                     <span>Lihat situs publik</span>
@@ -112,20 +114,26 @@
                         <i data-lucide="moon" class="icon-moon"></i>
                         <i data-lucide="sun" class="icon-sun"></i>
                     </button>
-                    <a href="/admin/settings" class="ws-user" aria-label="Pengaturan akun admin">
-                        <span id="ws-user-avatar" class="ws-avatar">?</span>
-                        <span class="hidden md:block min-w-0 text-left">
-                            <span id="ws-user-name" class="block text-sm font-semibold text-[var(--ws-text)] truncate max-w-[160px]">-</span>
-                            <span id="ws-user-role" class="block text-xs text-[var(--ws-muted)]">-</span>
-                        </span>
-                    </a>
+                    <div data-notif="ws"></div>
+                    <div class="ws-menu adm-account">
+                        <button type="button" class="ws-user" data-menu-trigger aria-haspopup="menu" aria-expanded="false" aria-label="Menu akun admin">
+                            <span id="ws-user-avatar" class="ws-avatar">?</span>
+                            <span class="hidden md:block min-w-0 text-left">
+                                <span id="ws-user-name" class="block text-sm font-semibold text-[var(--ws-text)] truncate max-w-[180px]">-</span>
+                                <span id="ws-user-role" class="block text-xs text-[var(--ws-muted)]">-</span>
+                            </span>
+                            <i data-lucide="chevron-down" class="adm-account-caret hidden md:block"></i>
+                        </button>
+                        <div class="ws-menu-list" role="menu">
+                            <a href="/admin/settings" role="menuitem" class="ws-menu-item"><i data-lucide="user-round-cog"></i><span>Akun saya</span></a>
+                            <a href="/admin/platform" role="menuitem" class="ws-menu-item"><i data-lucide="sliders-horizontal"></i><span>Pengaturan platform</span></a>
+                            <a href="/" role="menuitem" class="ws-menu-item"><i data-lucide="external-link"></i><span>Lihat situs publik</span></a>
+                            <div class="ws-menu-sep" role="separator"></div>
+                            <button type="button" role="menuitem" class="ws-menu-item danger" data-jh-logout><i data-lucide="log-out"></i><span>Keluar</span></button>
+                        </div>
+                    </div>
                 </div>
             </header>
-
-            <div class="adm-modebar" role="note">
-                <i data-lucide="shield-check"></i>
-                <span><b>Mode admin</b><span class="hidden sm:inline"> · Tindakan di sini berlaku untuk seluruh platform dan tercatat di Log Audit.</span></span>
-            </div>
 
             <div id="jh-announcement"></div>
 
