@@ -69,8 +69,9 @@ class AdminOverviewController extends Controller
             ],
             'jobs' => [
                 'by_status' => JobVacancy::query()->select('status', DB::raw('count(*) as total'))->groupBy('status')->pluck('total', 'status'),
-                'open_real' => JobVacancy::where('status', 'open')->where('is_demo', false)->where('moderation_status', '!=', 'removed')->count(),
-                'open_demo' => JobVacancy::where('status', 'open')->where('is_demo', true)->where('moderation_status', '!=', 'removed')->count(),
+                'open_real' => JobVacancy::where('status', 'open')->demo(false)->where('moderation_status', '!=', 'removed')->count(),
+                'open_demo' => JobVacancy::where('status', 'open')->demo()->where('moderation_status', '!=', 'removed')->count(),
+                'demo_hidden' => (bool) \App\Models\PlatformSetting::read('hide_demo_jobs'),
                 'new_30d' => JobVacancy::where('created_at', '>=', $since)->count(),
             ],
             'applications' => [
@@ -190,7 +191,7 @@ class AdminOverviewController extends Controller
 
         $page = AdminAuditLog::with('actor:id,name')
             ->when(array_key_exists((string) $request->input('action'), AdminAuditLog::ACTIONS), fn ($q) => $q->where('action', $request->input('action')))
-            ->when(in_array($request->input('target_type'), ['user', 'company', 'jobvacancy', 'jobsource', 'companyverification', 'report'], true), fn ($q) => $q->where('target_type', $request->input('target_type')))
+            ->when(in_array($request->input('target_type'), ['user', 'company', 'jobvacancy', 'jobsource', 'companyverification', 'report', 'announcement'], true), fn ($q) => $q->where('target_type', $request->input('target_type')))
             ->when($request->filled('actor_id'), fn ($q) => $q->where('actor_id', (int) $request->input('actor_id')))
             ->latest('id')
             ->paginate($perPage);

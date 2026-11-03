@@ -165,6 +165,11 @@ export const notifications = {
     readAll: () => api.post('/notifications/read-all'),
 };
 
+/** Pengumuman situs yang sedang berlaku (publik). */
+export const announcements = {
+    active: () => api.get('/announcements/active'),
+};
+
 /** Laporan pengguna atas lowongan atau perusahaan. */
 export const reports = {
     create: (payload) => api.post('/reports', payload),
@@ -284,6 +289,13 @@ export const admin = {
     health: () => api.get('/health'),
     reports: (query) => api.get('/admin/reports', query),
     updateReport: (id, payload) => api.patch('/admin/reports/' + id, payload),
+    settings: () => api.get('/admin/settings'),
+    updateSettings: (payload) => api.put('/admin/settings', payload),
+    announcements: () => api.get('/admin/announcements'),
+    createAnnouncement: (payload) => api.post('/admin/announcements', payload),
+    endAnnouncement: (id) => api.patch('/admin/announcements/' + id + '/end'),
+    toggleSource: (id, payload) => api.patch('/admin/sources/' + id, payload),
+    sourceLogs: (id) => api.get('/admin/sources/' + id + '/logs'),
 };
 
 export const matchmaking = {

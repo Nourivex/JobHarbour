@@ -979,3 +979,10 @@ a.adm-tile:focus-visible { outline: none; box-shadow: var(--ws-focus); }
     .adm-skill-track > span { transition: none; }
 }
 @media (max-width: 767px) { .adm-tiles > :last-child:nth-child(odd) { grid-column: span 2; } }
+
+/* Pilihan bersegmen berbasis radio (mis. jenis pengumuman) */
+.ws-seg-opt { display: inline-flex; align-items: center; height: 2.15rem; padding: 0 0.9rem; border-radius: 0.55rem; font-size: 13px; font-weight: 500; color: var(--ws-muted); transition: background-color 150ms ease, color 150ms ease; }
+.ws-seg label:hover .ws-seg-opt { color: var(--ws-text); }
+.ws-seg input:checked + .ws-seg-opt { background: var(--ws-navy); color: #FFFFFF; font-weight: 600; }
+.ws-seg input:focus-visible + .ws-seg-opt { box-shadow: var(--ws-focus); }
+html.dark .ws-seg input:checked + .ws-seg-opt { background: #E8EDF4; color: #0B111C; }

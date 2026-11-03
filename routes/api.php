@@ -2,9 +2,11 @@
 
 use App\Http\Controllers\Api\AdminJobController;
 use App\Http\Controllers\Api\AdminOverviewController;
+use App\Http\Controllers\Api\AdminPlatformController;
 use App\Http\Controllers\Api\AdminReportController;
 use App\Http\Controllers\Api\AdminUserController;
 use App\Http\Controllers\Api\AdminVerificationController;
+use App\Http\Controllers\Api\AnnouncementController;
 use App\Http\Controllers\Api\ApplicationController;
 use App\Http\Controllers\Api\ApplicationNoteController;
 use App\Http\Controllers\Api\AuthController;
@@ -136,7 +138,17 @@ Route::middleware('jwt.auth:admin')->prefix('admin')->group(function () {
     Route::patch('/jobs/{id}/moderation', [AdminJobController::class, 'moderate'])->whereNumber('id');
     Route::get('/reports', [AdminReportController::class, 'index']);
     Route::patch('/reports/{id}', [AdminReportController::class, 'update'])->whereNumber('id');
+    Route::get('/settings', [AdminPlatformController::class, 'settings']);
+    Route::put('/settings', [AdminPlatformController::class, 'updateSettings']);
+    Route::get('/announcements', [AdminPlatformController::class, 'announcements']);
+    Route::post('/announcements', [AdminPlatformController::class, 'storeAnnouncement']);
+    Route::patch('/announcements/{id}/end', [AdminPlatformController::class, 'endAnnouncement'])->whereNumber('id');
+    Route::patch('/sources/{id}', [AdminPlatformController::class, 'toggleSource'])->whereNumber('id');
+    Route::get('/sources/{id}/logs', [AdminPlatformController::class, 'sourceLogs'])->whereNumber('id');
 });
+
+// Pengumuman situs yang sedang berlaku (publik, untuk banner)
+Route::get('/announcements/active', [AnnouncementController::class, 'active']);
 
 // Lonceng pemberitahuan milik pengguna yang sedang masuk
 Route::middleware('jwt.auth')->prefix('notifications')->group(function () {

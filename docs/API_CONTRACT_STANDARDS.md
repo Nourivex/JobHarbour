@@ -735,9 +735,15 @@ Semua endpoint di bawah memakai `Authorization: Bearer <token_admin>` dan dilind
 | GET | `/api/admin/jobs?q=&status=&moderation=&source=&demo=` | Semua lowongan untuk moderasi. `moderation`: none, removed. |
 | PATCH | `/api/admin/jobs/{id}/moderation` | Body `{ "action": "remove" \| "restore", "reason": "..." }`. Alasan wajib (min. 10 karakter) saat menurunkan. |
 | GET | `/api/admin/audit-logs?action=&target_type=&actor_id=` | Log audit (baca saja). `meta.actions` berisi label setiap jenis tindakan. |
-
 | GET | `/api/admin/reports?status=&kind=` | Laporan pengguna dan banding recruiter. `status`: active (open + in_review, bawaan), open, in_review, resolved, dismissed. `kind`: report, appeal. Diurutkan dari yang paling lama menunggu. |
 | PATCH | `/api/admin/reports/{id}` | Body `{ "status": "in_review" \| "resolved" \| "dismissed", "resolution": "..." }`. Hasil pemeriksaan wajib (min. 10 karakter) saat menyelesaikan atau menolak. Laporan yang sudah ditutup: `409 ALREADY_CLOSED`. |
+| GET | `/api/admin/settings` | Pengaturan platform. Saat ini `{ "hide_demo_jobs": bool }`. |
+| PUT | `/api/admin/settings` | Body `{ "hide_demo_jobs": bool }`. Dicatat di log audit (`settings.updated`). |
+| GET | `/api/admin/announcements` | 30 pengumuman terbaru beserta `state`: live, scheduled, ended. |
+| POST | `/api/admin/announcements` | Body `{ "message" (10 sampai 240 karakter), "level": "info" \| "warning", "audience": "all" \| "applicant" \| "recruiter", "starts_at"?, "ends_at"? }`. `ends_at` harus di masa depan dan setelah `starts_at`. 201. |
+| PATCH | `/api/admin/announcements/{id}/end` | Mengakhiri pengumuman lebih awal. Sudah berakhir: `409 ALREADY_ENDED`. |
+| PATCH | `/api/admin/sources/{id}` | Body `{ "is_enabled": bool, "reason": "..." }`. Alasan wajib (min. 10 karakter) saat menonaktifkan. Status sama dengan sekarang: `409 INVALID_TRANSITION`. |
+| GET | `/api/admin/sources/{id}/logs` | 20 riwayat sinkronisasi terakhir sumber ini (waktu, hasil, jumlah diambil, baru, diperbarui, durasi, pesan galat). |
 
 **Laporan dan banding (pengguna):**
 - `POST /api/reports` (semua pengguna yang masuk, dibatasi 10 per jam): body `{ "target_type": "job" | "company", "target_id", "category": "scam" | "misleading" | "discrimination" | "spam" | "other", "description" (min. 20) }`. 201 + `Location`. Laporan ganda yang masih aktif: `409 DUPLICATE_REPORT`. Melaporkan milik sendiri: `403 SELF_REPORT_FORBIDDEN`.
@@ -750,6 +756,10 @@ Semua endpoint di bawah memakai `Authorization: Bearer <token_admin>` dan dilind
 **Lowongan diturunkan admin:** tidak tampil di `GET /api/jobs`, `GET /api/jobs/{id}` mengembalikan `404`, dan lamaran baru ditolak `400`. Pemilik tetap melihatnya di `GET /api/jobs/my` beserta `moderation_status` dan `moderation_reason`, tetapi tidak bisa membukanya lagi (`403 JOB_REMOVED_BY_ADMIN`) sampai admin memulihkannya.
 
 **Sinkron sumber lowongan:** `POST /api/aggregator/sync` dibatasi 6 kali per menit dan dicatat di log audit.
+
+**Data demo:** lowongan dianggap data demo bila `is_demo = true` atau `verification_status = demo_sample` (sama dengan lencana "Data Demo" di katalog). Saat `hide_demo_jobs` aktif, lowongan demo tidak tampil di `GET /api/jobs` dan `GET /api/jobs/{id}` mengembalikan `404`. Data tidak dihapus dan tetap terlihat di `GET /api/admin/jobs`.
+
+**Pengumuman situs:** `GET /api/announcements/active` (publik, tanpa token) mengembalikan maksimal 3 pengumuman yang sedang berlaku. Penyaringan `audience` dilakukan di frontend karena isinya memang publik.
 
 ---
 

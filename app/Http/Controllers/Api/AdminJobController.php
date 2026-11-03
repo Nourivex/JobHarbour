@@ -40,7 +40,7 @@ class AdminJobController extends Controller
             ->when(in_array($request->input('status'), ['draft', 'open', 'closed', 'archived'], true), fn ($query) => $query->where('status', $request->input('status')))
             ->when(in_array($request->input('moderation'), ['none', 'removed'], true), fn ($query) => $query->where('moderation_status', $request->input('moderation')))
             ->when(in_array($request->input('source'), ['direct', 'external', 'partner'], true), fn ($query) => $query->where('source_type', $request->input('source')))
-            ->when($request->filled('demo'), fn ($query) => $query->where('is_demo', filter_var($request->input('demo'), FILTER_VALIDATE_BOOLEAN)))
+            ->when($request->filled('demo'), fn ($query) => $query->demo(filter_var($request->input('demo'), FILTER_VALIDATE_BOOLEAN)))
             ->latest('id')
             ->paginate($perPage);
 
@@ -55,7 +55,7 @@ class AdminJobController extends Controller
             'moderated_at' => $j->moderated_at?->toIso8601String(),
             'source_type' => $j->source_type,
             'verification_status' => $j->verification_status,
-            'is_demo' => (bool) $j->is_demo,
+            'is_demo' => $j->isDemoData(),
             'applications_count' => $j->applications_count,
             'recruiter' => $j->recruiter?->only(['id', 'name', 'email']),
             'company_record' => $j->recruiter?->company?->only(['id', 'name', 'verification_status']),

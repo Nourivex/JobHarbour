@@ -151,6 +151,7 @@
             </header>
 
             <!-- Pengumuman status verifikasi (diisi oleh shell.js) -->
+            <div id="jh-announcement"></div>
             <div id="ws-banner" class="hidden"></div>
 
             <main id="ws-main" class="ws-main" tabindex="-1">

@@ -63,6 +63,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::view('/sources', 'admin.sources')->name('sources');
     Route::view('/audit', 'admin.audit')->name('audit');
     Route::view('/reports', 'admin.reports')->name('reports');
+    Route::view('/announcements', 'admin.announcements')->name('announcements');
     Route::view('/settings', 'admin.settings')->name('settings');
 });
 

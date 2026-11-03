@@ -6,6 +6,8 @@
         </div>
     </div>
 
+    <div id="jb-demo-setting" class="adm-health mb-4" aria-live="polite"></div>
+
     <div class="ws-card">
         <div class="ws-card-body !pb-0">
             <div class="adm-filters">

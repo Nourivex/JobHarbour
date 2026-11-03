@@ -1048,3 +1048,20 @@ html.dark .jh-notif-readall { color: #7CC4F5; }
     [data-notif="nav"] .jh-notif-btn, header .theme-toggle { width: 2.25rem; height: 2.25rem; }
     header [data-notif="nav"] { margin-left: -0.25rem; margin-right: -0.25rem; }
 }
+
+
+/* Banner pengumuman situs (publik dan portal) */
+.jh-ann { display: flex; align-items: center; gap: 0.6rem; padding: 0.5rem 1rem; font-size: 13.5px; line-height: 1.4; animation: jh-ann-in 220ms cubic-bezier(0.23, 1, 0.32, 1); }
+.jh-ann svg { width: 1.05rem; height: 1.05rem; flex: none; }
+.jh-ann p { flex: 1; min-width: 0; }
+.jh-ann button { flex: none; display: inline-flex; width: 1.75rem; height: 1.75rem; align-items: center; justify-content: center; border-radius: 0.5rem; cursor: pointer; opacity: 0.75; }
+.jh-ann button:hover { opacity: 1; background: rgba(0, 0, 0, 0.06); }
+.jh-ann-info { background: #EBF3FB; color: #124B7D; border-bottom: 1px solid #CFE3F5; }
+.jh-ann-warning { background: #FEF3E2; color: #7A3A06; border-bottom: 1px solid #F6D9A8; }
+html.dark .jh-ann-info { background: #13283A; color: #A9D8F8; border-color: #1E3A54; }
+html.dark .jh-ann-warning { background: #2E2410; color: #FBD38D; border-color: #4A3A16; }
+html.dark .jh-ann button:hover { background: rgba(255, 255, 255, 0.08); }
+.jh-ann.is-leaving { opacity: 0; transform: translateY(-4px); transition: opacity 160ms ease, transform 160ms ease; }
+@media (min-width: 640px) { .jh-ann { padding: 0.5rem 1.5rem; } }
+@keyframes jh-ann-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .jh-ann { animation: none; } .jh-ann.is-leaving { transition: none; } }

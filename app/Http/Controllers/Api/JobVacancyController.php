@@ -50,8 +50,10 @@ class JobVacancyController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        // Lowongan yang diturunkan admin (moderasi) tidak pernah tampil di katalog publik
-        $query = JobVacancy::query()->where('moderation_status', '!=', 'removed');
+        // Lowongan yang diturunkan admin (moderasi) tidak pernah tampil di katalog publik,
+        // dan data demo disembunyikan bila admin menyalakan pengaturan hide_demo_jobs
+        $query = JobVacancy::query()->where('moderation_status', '!=', 'removed')
+            ->when(\App\Models\PlatformSetting::read('hide_demo_jobs'), fn ($q) => $q->demo(false));
 
         // 1. Filter Status Lowongan: secara default hanya menampilkan lowongan yang masih dibuka ('open').
         //    Draft dan arsip tidak pernah tampil di katalog publik.
@@ -153,7 +155,8 @@ class JobVacancyController extends Controller
         $job = JobVacancy::with('recruiter:id,name,email')->find($id);
 
         // Draft dan arsip diperlakukan tidak ada bagi publik; pemiliknya melihatnya lewat /api/jobs/my
-        if (! $job || ! in_array($job->status, self::PUBLIC_STATUSES, true) || $job->moderation_status === 'removed') {
+        $hiddenDemo = $job && $job->isDemoData() && \App\Models\PlatformSetting::read('hide_demo_jobs');
+        if (! $job || ! in_array($job->status, self::PUBLIC_STATUSES, true) || $job->moderation_status === 'removed' || $hiddenDemo) {
             return $this->notFoundResponse('Lowongan pekerjaan yang dicari tidak ditemukan.');
         }
 

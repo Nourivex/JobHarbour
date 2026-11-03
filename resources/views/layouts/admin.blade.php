@@ -12,6 +12,7 @@
         ]],
         ['label' => 'Sistem', 'items' => [
             ['key' => 'sources', 'href' => '/admin/sources', 'icon' => 'globe', 'label' => 'Sumber Lowongan', 'dot' => 'adm-nav-sources'],
+            ['key' => 'announcements', 'href' => '/admin/announcements', 'icon' => 'megaphone', 'label' => 'Pengumuman'],
             ['key' => 'audit', 'href' => '/admin/audit', 'icon' => 'scroll-text', 'label' => 'Log Audit'],
         ]],
         ['label' => 'Akun', 'items' => [
@@ -124,6 +125,8 @@
                 <i data-lucide="shield-check"></i>
                 <span><b>Mode admin</b><span class="hidden sm:inline"> · Tindakan di sini berlaku untuk seluruh platform dan tercatat di Log Audit.</span></span>
             </div>
+
+            <div id="jh-announcement"></div>
 
             <main id="ws-main" class="ws-main" tabindex="-1">
                 {{ $slot }}

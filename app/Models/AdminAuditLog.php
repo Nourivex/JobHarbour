@@ -40,6 +40,11 @@ class AdminAuditLog extends Model
         'report.in_review' => 'Meninjau laporan',
         'report.resolved' => 'Menyelesaikan laporan',
         'report.dismissed' => 'Menolak laporan',
+        'settings.updated' => 'Mengubah pengaturan platform',
+        'announcement.published' => 'Menerbitkan pengumuman',
+        'announcement.ended' => 'Mengakhiri pengumuman',
+        'source.enabled' => 'Mengaktifkan sumber lowongan',
+        'source.disabled' => 'Menonaktifkan sumber lowongan',
     ];
 
     public function actor(): BelongsTo
