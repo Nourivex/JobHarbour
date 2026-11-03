@@ -64,6 +64,10 @@ Route::get('/api/documentation', function () {
     return view('swagger');
 })->name('swagger.docs.alias');
 
+// API Studio & Interactive Demo Console (kembaran modern Swagger UI untuk demonstrasi UTS)
+Route::view('/api-studio', 'api-studio')->name('api.studio');
+Route::view('/docs/studio', 'api-studio')->name('api.studio.docs');
+
 Route::get('/api/docs/openapi.yaml', function () {
     $path = base_path('docs/openapi.yaml');
 

@@ -177,16 +177,20 @@
         </div>
 
         <nav class="pk-links">
+            <a href="{{ url('/api-studio') }}" style="background: rgba(34, 211, 238, .15); color: #67e8f9; border-color: rgba(34, 211, 238, .4); font-weight: 600;">✨ API Studio (UTS Demo)</a>
             <a href="{{ url('/') }}">Beranda</a>
             <a href="{{ url('/api/docs/openapi.yaml') }}">openapi.yaml</a>
         </nav>
     </header>
 
     <main class="pk-main">
-        <p class="pk-hint">
-            Spesifikasi dimuat langsung dari rute lokal
-            <code>/api/docs/openapi.yaml</code>. Gunakan tombol <strong>Authorize</strong>
-            untuk menempelkan token Bearer, lalu coba endpoint langsung dari halaman ini.
+        <p class="pk-hint" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+            <span>
+                Spesifikasi dimuat langsung dari rute lokal <code>/api/docs/openapi.yaml</code>. Gunakan tombol <strong>Authorize</strong> untuk menempelkan token Bearer, lalu coba endpoint langsung dari halaman ini.
+            </span>
+            <a href="{{ url('/api-studio') }}" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; background: #0f172a; color: #38bdf8; text-decoration: none; font-size: 12px; font-weight: 600;">
+                🚀 Buka API Studio & Demo Console &rarr;
+            </a>
         </p>
 
         <div id="swagger-ui"></div>
