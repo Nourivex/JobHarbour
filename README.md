@@ -20,8 +20,21 @@
 ![DDEV](https://img.shields.io/badge/DDEV-supported-0D1117?style=flat-square)
 ![Platform](https://img.shields.io/badge/Platform-Linux%20%2F%20Windows-294172?style=flat-square)
 ![Team](https://img.shields.io/badge/Team-Kelompok%204%20UHN-orange?style=flat-square)
+![Production](https://img.shields.io/badge/Live-jobharbour.nour.web.id-10b981?style=flat-square&logo=cloudflare&logoColor=white)
 
 </p>
+
+---
+
+## 🌐 Live Production & Demo Links (Siap Diuji Dosen)
+
+| Layanan / Halaman | Tautan Akses Live | Keterangan & Demonstrasi |
+|---|---|---|
+| **Portal Publik JobHarbour** | [https://jobharbour.nour.web.id](https://jobharbour.nour.web.id) | Antarmuka utama pencari kerja, katalog, dan lamaran |
+| **Postman API Client** | [https://jobharbour.nour.web.id/postman](https://jobharbour.nour.web.id/postman) | Konsol interaktif pengujian 18 endpoint microservices & rubrik UTS |
+| **OpenAPI Swagger UI** | [https://jobharbour.nour.web.id/docs](https://jobharbour.nour.web.id/docs) | Dokumentasi resmi REST API OpenAPI v3.1.0 |
+| **Portal Recruiter & Kanban** | [https://jobharbour.nour.web.id/recruiter](https://jobharbour.nour.web.id/recruiter) | Workspace rekruter, profil perusahaan, dan linimasa pelamar |
+| **Status Pemantauan Server** | [UptimeRobot Monitor](https://dashboard.uptimerobot.com/monitors/804528529) | Health check otomatis 24/7 (interval 10 menit) |
 
 ---
 

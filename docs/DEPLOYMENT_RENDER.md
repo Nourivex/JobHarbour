@@ -70,14 +70,15 @@ Setelah deploy selesai, sistem otomatis menjalankan database seeder dengan akun 
 
 ## 5. Rute Penting untuk Demonstrasi Dosen
 
-Setelah aplikasi online di Render:
+Setelah aplikasi online di domain resmi:
 
-- **Portal Utama:** `https://<nama-app>.onrender.com/`
-- **Katalog Lowongan:** `https://<nama-app>.onrender.com/catalog`
-- **Postman API Client:** `https://<nama-app>.onrender.com/postman` (Konsol interaktif uji 18 endpoint)
-- **Swagger UI:** `https://<nama-app>.onrender.com/docs`
-- **Portal Recruiter:** `https://<nama-app>.onrender.com/recruiter`
-- **Admin Verifikasi Perusahaan:** `https://<nama-app>.onrender.com/admin/verifications`
+- **Portal Utama:** `https://jobharbour.nour.web.id/`
+- **Katalog Lowongan:** `https://jobharbour.nour.web.id/catalog`
+- **Postman API Client:** `https://jobharbour.nour.web.id/postman` (Konsol interaktif uji 18 endpoint)
+- **Swagger UI:** `https://jobharbour.nour.web.id/docs`
+- **Portal Recruiter:** `https://jobharbour.nour.web.id/recruiter`
+- **Admin Verifikasi Perusahaan:** `https://jobharbour.nour.web.id/admin/verifications`
+- **Monitor Uptime:** `https://dashboard.uptimerobot.com/monitors/804528529`
 
 ---
 
