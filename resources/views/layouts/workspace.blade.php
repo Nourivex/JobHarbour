@@ -24,6 +24,7 @@
     <link rel="icon" href="/images/favicon-jobharbour.ico" sizes="any">
     <script>try { var t = localStorage.getItem('jh_theme'); if (t === 'dark') document.documentElement.classList.add('dark'); if (localStorage.getItem('jh_ws_collapsed') === '1') document.documentElement.classList.add('ws-collapsed'); } catch (e) {}</script>
 
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('styles')
 </head>

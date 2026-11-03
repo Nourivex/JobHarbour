@@ -16,6 +16,9 @@
     <link rel="icon" href="/images/favicon-jobharbour.ico" sizes="any">
     <link rel="apple-touch-icon" href="/images/logo-icon-256.png">
 
+    <!-- Upgrade semua request aset ke HTTPS untuk mencegah Mixed Content di balik proxy SSL -->
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+
     <!-- Terapkan mode malam sebelum halaman dirender supaya tidak berkedip -->
     <script>try { var t = localStorage.getItem('jh_theme'); if (t === 'dark') document.documentElement.classList.add('dark'); } catch (e) {}</script>
 

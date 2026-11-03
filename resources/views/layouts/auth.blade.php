@@ -17,6 +17,7 @@
     <script>try { var t = localStorage.getItem('jh_theme'); if (t === 'dark') document.documentElement.classList.add('dark'); } catch (e) {}</script>
     <link rel="preload" as="image" href="/images/auth-lighthouse.webp" type="image/webp">
 
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('styles')
 </head>
