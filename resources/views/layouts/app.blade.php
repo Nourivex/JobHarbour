@@ -27,12 +27,12 @@
     <!-- Navbar: transparan di atas hero beranda, navy di halaman lain dan saat di-scroll -->
     @php $heroNav = $heroNav ?? false; @endphp
     <header id="site-nav" data-hero-nav="{{ $heroNav ? '1' : '0' }}" class="site-nav {{ $heroNav ? 'fixed is-hero' : 'sticky is-solid' }} top-0 inset-x-0 z-40 text-white">
-        <div class="max-w-[1240px] mx-auto px-5 sm:px-8 h-[72px] flex items-center gap-6">
+        <div class="max-w-[1240px] mx-auto px-4 sm:px-8 h-[72px] flex items-center gap-3 sm:gap-6">
 
             <!-- Brand -->
             <a href="/" class="flex items-center gap-2.5 shrink-0 group" aria-label="JobHarbour, ke beranda">
                 <img src="/images/logo-jobharbour.webp" width="256" height="239" alt="" class="w-9 h-auto transition-transform duration-300 group-hover:-rotate-6" aria-hidden="true">
-                <span class="font-heading font-extrabold text-[22px] tracking-tight">JobHarbour</span>
+                <span class="font-heading font-extrabold text-[20px] sm:text-[22px] tracking-tight">JobHarbour</span>
             </a>
 
             <!-- Navigasi utama (desktop) -->
@@ -57,9 +57,9 @@
                     <a href="/login" class="hidden sm:inline-flex items-center h-10 px-5 rounded-lg text-sm font-semibold text-white ring-1 ring-white/45 hover:ring-white hover:bg-white/8 transition">
                         Masuk
                     </a>
-                    <a href="/login?tab=register" class="btn-press group whitespace-nowrap inline-flex items-center gap-1.5 h-10 px-4 sm:px-5 rounded-lg text-sm font-semibold text-white bg-[#F26A1B] hover:bg-[#FF7D33] transition-colors">
-                        Daftar Gratis
-                        <svg class="w-4 h-4 transition-transform group-hover:translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                    <a href="/login?tab=register" class="btn-press group whitespace-nowrap inline-flex items-center gap-1.5 h-10 px-4 sm:px-5 rounded-lg text-sm font-semibold text-white bg-orange-harbour hover:bg-orange-harbour-hover transition-colors">
+                        Daftar<span class="hidden sm:inline">&nbsp;Gratis</span>
+                        <svg class="hidden sm:block w-4 h-4 transition-transform group-hover:translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
                     </a>
                 </div>
 

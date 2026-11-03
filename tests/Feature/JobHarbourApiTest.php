@@ -477,6 +477,26 @@ class JobHarbourApiTest extends TestCase
             ->assertJsonStructure(['errors' => ['description', 'location', 'requirements']]);
     }
 
+    public function test_register_requires_password_of_at_least_eight_characters(): void
+    {
+        // Sandi 7 karakter ditolak saat daftar
+        $this->postJson('/api/auth/register', [
+            'name' => 'Pelamar Baru',
+            'email' => 'baru@test.com',
+            'password' => 'abc1234',
+        ])
+            ->assertStatus(422)
+            ->assertJsonPath('error_code', 'VALIDATION_ERROR')
+            ->assertJsonStructure(['errors' => ['password']]);
+
+        // Sandi 8 karakter diterima
+        $this->postJson('/api/auth/register', [
+            'name' => 'Pelamar Baru',
+            'email' => 'baru@test.com',
+            'password' => 'abcd1234',
+        ])->assertStatus(201);
+    }
+
     public function test_missing_resource_returns_404(): void
     {
         $this->getJson('/api/jobs/999999')

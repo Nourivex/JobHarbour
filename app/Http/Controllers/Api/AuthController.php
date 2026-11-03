@@ -44,15 +44,15 @@ class AuthController extends Controller
      */
     public function login(Request $request): JsonResponse
     {
-        // 1. Validasi input: email wajib berformat valid, password minimal 6 karakter
+        // 1. Validasi input: email wajib berformat valid, password wajib diisi.
+        //    Panjang minimal tidak dicek saat login agar akun lama dengan sandi pendek tetap bisa masuk.
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
-            'password' => 'required|string|min:6',
+            'password' => 'required|string',
         ], [
             'email.required' => 'Alamat email wajib diisi.',
             'email.email' => 'Format alamat email tidak valid.',
             'password.required' => 'Kata sandi wajib diisi.',
-            'password.min' => 'Kata sandi minimal berjumlah 6 karakter.',
         ]);
 
         // Jika validasi gagal, kembalikan HTTP 422 Unprocessable Entity
@@ -99,7 +99,7 @@ class AuthController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:6',
+            'password' => 'required|string|min:8',
             // Akun admin hanya dibuat lewat seeder, tidak lewat pendaftaran publik
             'role' => 'nullable|in:applicant,recruiter',
             'phone' => 'nullable|string|max:20',
@@ -110,7 +110,7 @@ class AuthController extends Controller
             'email.required' => 'Alamat email wajib diisi.',
             'email.unique' => 'Alamat email ini sudah terdaftar dalam sistem.',
             'password.required' => 'Kata sandi wajib diisi.',
-            'password.min' => 'Kata sandi minimal 6 karakter.',
+            'password.min' => 'Kata sandi minimal 8 karakter.',
             'role.in' => 'Pilihan peran yang diperbolehkan: applicant atau recruiter.',
         ]);
 

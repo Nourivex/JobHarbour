@@ -10,17 +10,17 @@
         </picture>
         <div class="catalog-banner-fade absolute inset-0 pointer-events-none" aria-hidden="true"></div>
 
-        <div class="relative max-w-[1240px] mx-auto px-5 sm:px-8 pt-10 sm:pt-12 pb-10 grid lg:grid-cols-[minmax(0,1fr)_auto] gap-8 items-end">
+        <div class="relative max-w-[1240px] mx-auto px-5 sm:px-8 pt-7 sm:pt-12 pb-6 sm:pb-10 grid lg:grid-cols-[minmax(0,1fr)_auto] gap-5 sm:gap-8 items-end">
             <div class="hero-in" style="--d: 0ms">
-                <p class="text-sm font-extrabold uppercase tracking-[0.12em] text-[#C8460B]">Job Discovery</p>
-                <h1 class="mt-2 text-[2.1rem] sm:text-[2.6rem] leading-[1.08] font-extrabold text-[#0B1B2B]">
+                <p class="text-xs sm:text-sm font-extrabold uppercase tracking-[0.12em] text-[#C8460B]">Job Discovery</p>
+                <h1 class="mt-2 text-[1.85rem] sm:text-[2.6rem] leading-[1.08] font-extrabold text-[#0B1B2B]">
                     Temukan lowongan<br>yang <span class="text-[#F26A1B]">paling sesuai</span> denganmu.
                 </h1>
-                <p id="catalog-subtitle" class="mt-3 text-[15px] text-[#3D4B5C] max-w-[34rem]">Lowongan diurutkan dan dinilai berdasarkan skill di profilmu.</p>
+                <p id="catalog-subtitle" class="mt-2 sm:mt-3 text-sm sm:text-[15px] text-[#3D4B5C] max-w-[34rem]">Lowongan diurutkan dan dinilai berdasarkan skill di profilmu.</p>
             </div>
 
             <!-- Ringkasan: isi diatur oleh catalog.js sesuai status login -->
-            <div id="catalog-summary" class="hero-in bg-white/95 backdrop-blur rounded-2xl border border-[#E2E7ED] shadow-[0_18px_40px_-24px_rgba(12,34,56,0.35)] px-5 py-4 flex flex-wrap items-center gap-x-6 gap-y-4" style="--d: 120ms">
+            <div id="catalog-summary" class="hero-in bg-white/95 backdrop-blur rounded-2xl border border-[#E2E7ED] shadow-[0_18px_40px_-24px_rgba(12,34,56,0.35)] px-4 py-3 sm:px-5 sm:py-4 flex flex-wrap items-center gap-x-6 gap-y-3 sm:gap-y-4" style="--d: 120ms">
                 <div class="h-12 w-[420px] max-w-full rounded-xl animate-skeleton bg-[#F4F6F8]"></div>
             </div>
         </div>
@@ -31,8 +31,10 @@
     <!-- ============================================================== -->
     <div class="max-w-[1240px] mx-auto px-5 sm:px-8 py-8 grid lg:grid-cols-[272px_minmax(0,1fr)] gap-6 items-start">
 
-        <!-- Sidebar filter -->
-        <aside class="lg:sticky lg:top-[88px]" aria-label="Filter lowongan">
+        <!-- Sidebar filter. Di ponsel dan tablet tampil sebagai panel bawah yang dibuka lewat tombol Filter,
+             supaya daftar lowongan langsung terlihat tanpa menggulir melewati semua pilihan filter. -->
+        <div id="filter-backdrop" class="hidden lg:hidden fixed inset-0 z-40 bg-[#0C2238]/45" data-filter-close></div>
+        <aside id="filter-panel" class="hidden lg:block lg:sticky lg:top-[88px]" aria-label="Filter lowongan">
             <div class="bg-white rounded-2xl border border-[#E2E7ED] p-5">
                 <div class="flex items-center justify-between gap-2 pb-4 border-b border-[#E2E7ED]">
                     <h2 class="flex items-center gap-2.5 text-lg font-extrabold text-[#0B1B2B]">
@@ -40,6 +42,9 @@
                         Filter Lowongan
                     </h2>
                     <span id="filter-active-count" class="hidden text-xs font-bold px-2 py-0.5 rounded-full bg-[#FFF3EA] text-[#8A2E05]"></span>
+                    <button type="button" class="lg:hidden ml-auto w-9 h-9 rounded-full inline-flex items-center justify-center text-[#3D4B5C] hover:bg-[#F4F6F8]" data-filter-close aria-label="Tutup filter">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                    </button>
                 </div>
 
                 <div id="catalog-filters" class="divide-y divide-[#E2E7ED]">
@@ -77,6 +82,9 @@
                     <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
                     Reset Filter
                 </button>
+                <button type="button" class="lg:hidden btn-press mt-3 w-full inline-flex items-center justify-center h-11 rounded-xl bg-[#0C2238] text-white font-semibold" data-filter-close>
+                    Tampilkan <span id="filter-result-count" class="mx-1">hasil</span>
+                </button>
             </div>
         </aside>
 
@@ -88,7 +96,12 @@
                     <span class="sr-only">Cari lowongan</span>
                     <input id="catalog-search" type="search" placeholder="Cari posisi, perusahaan, atau keahlian..." class="w-full bg-transparent border-0 outline-none text-[15px] text-[#0B1B2B] placeholder:text-[#8C98A8]">
                 </label>
-                <label class="flex items-center gap-2 h-12 pl-4 pr-2 rounded-xl bg-white border border-[#C5CFDA] text-sm text-[#3D4B5C]">
+                <div class="flex gap-3">
+                <button type="button" id="filter-toggle" class="lg:hidden btn-press flex-1 sm:flex-none inline-flex items-center justify-center gap-2 h-12 px-4 rounded-xl bg-white border border-[#C5CFDA] text-sm font-bold text-[#0B1B2B]" aria-controls="filter-panel" aria-expanded="false">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg>
+                    Filter <span id="filter-toggle-count" class="hidden min-w-5 h-5 px-1.5 rounded-full bg-[#0C2238] text-white text-[11px] leading-5"></span>
+                </button>
+                <label class="flex-1 sm:flex-none flex items-center gap-2 h-12 pl-4 pr-2 rounded-xl bg-white border border-[#C5CFDA] text-sm text-[#3D4B5C]">
                     <span class="shrink-0">Urutkan:</span>
                     <select id="catalog-sort" class="bg-transparent border-0 outline-none font-bold text-[#0B1B2B] pr-1 cursor-pointer">
                         <option value="match" data-applicant-only>Kecocokan tertinggi</option>
@@ -97,6 +110,7 @@
                         <option value="salary_low">Gaji terendah</option>
                     </select>
                 </label>
+                </div>
             </div>
 
             <div class="mt-5 flex flex-wrap items-center gap-2 min-h-7">
