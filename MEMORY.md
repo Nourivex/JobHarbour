@@ -82,6 +82,13 @@ Dokumen ini berfungsi sebagai memori jangka panjang (*long-term memory*) untuk m
   - Response viewer warna Postman dengan status code, response time (ms), response size, copy response, dan copy cURL.
   - Tab "Panduan Rubrik UTS" menjelaskan poin kriteria penilaian dosen untuk setiap endpoint.
 
+### Deployment Produksi Cloud (Render + Supabase PostgreSQL + Custom Domain):
+- Deployment Docker multi-stage build berhasil dipasang di Render.com.
+- Database persisten PostgreSQL cloud terhubung via Supabase (Project ID: `irrdaftlsuurdavytuuk`, Pooler `aws-0-ap-northeast-1.pooler.supabase.com:5432`).
+- Domain resmi kustom aktif: `https://jobharbour.nour.web.id` (dengan SSL HTTPS Cloudflare).
+- Monitor uptime aktif 24/7 via UptimeRobot (ping berkala 10 menit menjaga server tetap hangat dan bebas cold start).
+- Seluruh 38 automated tests (288 assertions) lulus 100%.
+
 ---
 
 ## 3. Catatan Teknis Penting (Gotchas & Caveats)
