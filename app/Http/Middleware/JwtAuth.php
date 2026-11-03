@@ -83,6 +83,14 @@ class JwtAuth
             );
         }
 
+        // 3c. Token dari sebelum "keluar dari semua perangkat" atau ganti kata sandi sudah dibatalkan.
+        if ((int) ($payload->tv ?? 0) !== (int) $user->token_version) {
+            return $this->unauthorizedResponse(
+                'Sesi ini sudah dikeluarkan. Silakan masuk kembali.',
+                'TOKEN_REVOKED'
+            );
+        }
+
         // 4. Pengecekan Otorisasi Peran (Role Check) jika ditentukan di route
         if ($requiredRole !== null && $user->role !== $requiredRole && $user->role !== 'admin') {
             return $this->forbiddenResponse(

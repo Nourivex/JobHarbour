@@ -46,6 +46,7 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'token_version',
     ];
 
     /**
@@ -57,6 +58,7 @@ class User extends Authenticatable
     {
         return [
             'status_changed_at' => 'datetime',
+            'token_version' => 'integer',
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'skills' => 'array', // Otomatis mengubah data JSON database menjadi PHP array

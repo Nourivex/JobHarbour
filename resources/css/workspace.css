@@ -380,6 +380,10 @@ select.ws-input { appearance: none; padding-right: 2.25rem; cursor: pointer; bac
 .ws-tab[aria-selected="true"] .ws-count { background: var(--ws-accent-soft); color: var(--ws-accent-text); }
 
 .ws-panel-enter { animation: ws-fade-up 240ms var(--ws-ease); }
+
+/* Konfirmasi di dalam kartu (Pengaturan > Keamanan > Sesi masuk) */
+.st-confirm { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; margin-top: 1rem; padding: 0.75rem 0.875rem; border-radius: 0.75rem; background: var(--ws-danger-soft); color: var(--ws-text); animation: ws-fade-up 200ms var(--ws-ease); }
+.st-confirm[hidden] { display: none; }
 @keyframes ws-fade-up { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
 /* ------------------------------------------------------------------ tabel */

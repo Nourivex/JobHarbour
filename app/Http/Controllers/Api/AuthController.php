@@ -84,7 +84,7 @@ class AuthController extends Controller
         return $this->successResponse([
             'token' => $token,
             'token_type' => 'Bearer',
-            'expires_in' => 86400 * 7, // Berlaku selama 7 hari (dalam detik)
+            'expires_in' => $this->jwtService->ttlFor($user), // Detik: 7 hari, atau 8 jam untuk admin
             'user' => [
                 'id' => $user->id,
                 'name' => $user->name,
@@ -218,9 +218,30 @@ class AuthController extends Controller
             );
         }
 
+        // Ganti kata sandi sekaligus mengeluarkan perangkat lain; perangkat ini menerima token baru.
         $user->password = Hash::make($request->password);
+        $user->token_version = (int) $user->token_version + 1;
         $user->save();
 
-        return $this->successResponse(null, 'Kata sandi berhasil diganti.');
+        return $this->successResponse([
+            'token' => $this->jwtService->generateToken($user),
+            'token_type' => 'Bearer',
+            'expires_in' => $this->jwtService->ttlFor($user),
+        ], 'Kata sandi berhasil diganti. Perangkat lain sudah dikeluarkan.');
+    }
+
+    /**
+     * Keluar dari semua perangkat, termasuk perangkat ini. Semua token yang pernah terbit langsung ditolak.
+     *
+     * Method  : POST
+     * Endpoint: /api/auth/logout-all
+     */
+    public function logoutAll(Request $request): JsonResponse
+    {
+        $user = $request->attributes->get('auth_user') ?? $request->user();
+        $user->token_version = (int) $user->token_version + 1;
+        $user->save();
+
+        return $this->successResponse(null, 'Semua sesi sudah dikeluarkan. Silakan masuk kembali.');
     }
 }

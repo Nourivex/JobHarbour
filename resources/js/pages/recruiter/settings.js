@@ -1,4 +1,4 @@
-import { profile, session, toast } from '../../api.js';
+import { auth, profile, session, toast } from '../../api.js';
 import { bootShell } from '../../recruiter/shell.js';
 import { bootAdmin } from '../../admin/shell.js';
 import { data } from '../../recruiter/data.js';
@@ -130,12 +130,36 @@ document.addEventListener('DOMContentLoaded', async () => {
             pwForm.reset();
             bars.forEach((b) => { b.style.background = ''; });
             $('st-strength-text').textContent = '';
-            toast('Kata sandi berhasil diganti.', 'success');
+            toast('Kata sandi diganti. Perangkat lain sudah dikeluarkan.', 'success');
         } catch (err) {
             if (!showFieldErrors(pwForm, err)) toast(errorMessage(err, 'Kata sandi gagal diganti.'), 'error');
             pwForm.querySelector('.is-invalid')?.focus();
         }
         setBusy(btn, false);
+    });
+
+    // Sesi masuk: konfirmasi langsung di kartu, tanpa dialog
+    if (ctx.user.role === 'admin') $('st-session-ttl').textContent = 'Sesi admin berakhir otomatis 8 jam setelah masuk.';
+    const confirmBox = $('st-logout-confirm');
+    const showConfirm = (show) => {
+        confirmBox.hidden = !show;
+        $('st-logout-all').classList.toggle('hidden', show); // atribut hidden kalah oleh display .ws-btn
+        $('st-logout-error').textContent = '';
+        (show ? $('st-logout-cancel') : $('st-logout-all')).focus();
+    };
+    $('st-logout-all').addEventListener('click', () => showConfirm(true));
+    $('st-logout-cancel').addEventListener('click', () => showConfirm(false));
+    $('st-logout-go').addEventListener('click', async () => {
+        const btn = $('st-logout-go');
+        setBusy(btn, true, 'Mengeluarkan...');
+        try {
+            await auth.logoutAll();
+            toast('Semua perangkat sudah dikeluarkan.', 'success');
+            setTimeout(() => { window.location.href = '/login'; }, 700);
+        } catch (err) {
+            setBusy(btn, false);
+            $('st-logout-error').textContent = errorMessage(err, 'Gagal mengeluarkan sesi. Coba lagi.');
+        }
     });
 
     // Tampilan

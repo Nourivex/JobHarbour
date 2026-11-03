@@ -104,7 +104,9 @@ export async function request(path, options = {}) {
         if (response.status === 401 && options.auth !== false && token) {
             session.clear();
             const next = encodeURIComponent(window.location.pathname + window.location.search);
-            toast('Sesi Anda telah berakhir. Silakan masuk kembali.', 'warning', 4000);
+            toast(payload?.error_code === 'TOKEN_REVOKED'
+                ? 'Sesi ini sudah dikeluarkan. Silakan masuk kembali.'
+                : 'Sesi Anda telah berakhir. Silakan masuk kembali.', 'warning', 4000);
             setTimeout(() => {
                 window.location.href = '/login?next=' + next;
             }, 800);
@@ -145,6 +147,11 @@ export const auth = {
     logout(redirectTo = '/login') {
         session.clear();
         window.location.href = redirectTo;
+    },
+    /** Membatalkan semua token akun ini di server, termasuk perangkat ini. */
+    async logoutAll() {
+        await api.post('/auth/logout-all');
+        session.clear();
     },
 };
 
@@ -237,7 +244,12 @@ export const pipelines = {
 export const profile = {
     updateSkills: (skills) => api.put('/profile/skills', { skills }),
     update: (payload) => api.put('/profile', payload),
-    changePassword: (payload) => api.put('/auth/password', payload),
+    // Server mengeluarkan perangkat lain dan memberi token baru untuk perangkat ini
+    async changePassword(payload) {
+        const res = await api.put('/auth/password', payload);
+        if (res.data?.token) session.save(res.data.token);
+        return res;
+    },
 };
 
 /** Unduh berkas yang dilindungi token lalu buka di tab baru (atau simpan bila pop-up diblokir). */

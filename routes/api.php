@@ -101,6 +101,7 @@ Route::prefix('auth')->group(function () {
     // Rute Terproteksi (Wajib Header: Authorization: Bearer <token>)
     Route::get('/me', [AuthController::class, 'me'])->middleware('jwt.auth');
     Route::put('/password', [AuthController::class, 'changePassword'])->middleware('jwt.auth');
+    Route::post('/logout-all', [AuthController::class, 'logoutAll'])->middleware('jwt.auth');
 });
 
 // Profil perusahaan dan pengajuan verifikasi (khusus recruiter)

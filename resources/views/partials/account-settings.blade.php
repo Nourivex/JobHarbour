@@ -88,6 +88,25 @@
                 <button type="submit" class="ws-btn ws-btn-primary">Ganti kata sandi</button>
             </div>
         </form>
+
+        <div class="ws-card ws-card-body mt-6" id="st-sessions">
+            <div class="flex flex-col md:flex-row md:items-start gap-4">
+                <div class="min-w-0 flex-1">
+                    <h2 class="ws-h2">Sesi masuk</h2>
+                    <p class="ws-meta mt-0.5" id="st-session-ttl">Sesi berakhir otomatis 7 hari setelah masuk.</p>
+                    <p class="text-sm mt-2 text-[var(--ws-text-2)]">Lupa keluar di komputer lain atau curiga ada yang memakai akun ini? Keluarkan semua perangkat sekaligus, termasuk perangkat ini. Mengganti kata sandi juga mengeluarkan perangkat lain.</p>
+                </div>
+                <button type="button" class="ws-btn ws-btn-danger-ghost shrink-0 self-start" id="st-logout-all"><i data-lucide="log-out"></i>Keluar dari semua perangkat</button>
+            </div>
+            <div id="st-logout-confirm" class="st-confirm" hidden>
+                <p class="text-sm flex-1">Semua perangkat akan dikeluarkan dan kamu perlu masuk lagi. Lanjutkan?</p>
+                <div class="flex gap-2 shrink-0">
+                    <button type="button" class="ws-btn ws-btn-ghost ws-btn-sm" id="st-logout-cancel">Batal</button>
+                    <button type="button" class="ws-btn ws-btn-danger ws-btn-sm" id="st-logout-go">Ya, keluarkan semua</button>
+                </div>
+            </div>
+            <p class="ws-error" id="st-logout-error" role="alert"></p>
+        </div>
     </section>
 
     <!-- Tampilan -->

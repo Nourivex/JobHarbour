@@ -39,6 +39,20 @@ class JwtService
      */
     protected int $ttl = 86400 * 7;
 
+    /**
+     * Masa berlaku token admin dibuat lebih pendek (8 jam): akun admin bisa menangguhkan pengguna
+     * dan menurunkan lowongan, jadi token yang tertinggal di perangkat lain tidak boleh hidup seminggu.
+     */
+    public const ADMIN_TTL = 3600 * 8;
+
+    /**
+     * Masa berlaku token (detik) sesuai peran pengguna.
+     */
+    public function ttlFor(User $user): int
+    {
+        return $user->role === 'admin' ? self::ADMIN_TTL : $this->ttl;
+    }
+
     public function __construct()
     {
         // Ambil kunci rahasia dari konfigurasi Laravel (APP_KEY)
@@ -70,7 +84,8 @@ class JwtService
             'email' => $user->email,                             // Alamat email pengguna
             'role' => $user->role,                               // Peran pengguna (applicant/recruiter/admin)
             'iat' => $waktuSekarang,                             // Issued At: waktu token diterbitkan
-            'exp' => $waktuSekarang + $this->ttl,                // Expiration Time: batas akhir berlakunya token
+            'exp' => $waktuSekarang + $this->ttlFor($user),      // Expiration Time: batas akhir berlakunya token
+            'tv' => (int) $user->token_version,                  // Token Version: dibatalkan bila versi di database naik
         ];
 
         // Lakukan encode menggunakan algoritma HS256 dan kunci rahasia

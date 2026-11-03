@@ -753,6 +753,8 @@ Semua endpoint di bawah memakai `Authorization: Bearer <token_admin>` dan dilind
 
 **Akun ditangguhkan:** login dan semua endpoint terproteksi mengembalikan `403` dengan `error_code: ACCOUNT_SUSPENDED`, termasuk token yang dibuat sebelum penangguhan.
 
+**Sesi dan token:** token admin berlaku 8 jam, peran lain 7 hari (`expires_in` di respons login dalam detik). Setiap token membawa klaim versi `tv`. `POST /api/auth/logout-all` menaikkan versi sehingga semua token akun itu langsung ditolak `401` dengan `error_code: TOKEN_REVOKED`, termasuk token perangkat yang memanggilnya. `PUT /api/auth/password` juga menaikkan versi dan mengembalikan `{ "token", "token_type", "expires_in" }` baru untuk perangkat yang sedang dipakai, sehingga hanya perangkat lain yang dikeluarkan.
+
 **Lowongan diturunkan admin:** tidak tampil di `GET /api/jobs`, `GET /api/jobs/{id}` mengembalikan `404`, dan lamaran baru ditolak `400`. Pemilik tetap melihatnya di `GET /api/jobs/my` beserta `moderation_status` dan `moderation_reason`, tetapi tidak bisa membukanya lagi (`403 JOB_REMOVED_BY_ADMIN`) sampai admin memulihkannya.
 
 **Sinkron sumber lowongan:** `POST /api/aggregator/sync` dibatasi 6 kali per menit dan dicatat di log audit.
