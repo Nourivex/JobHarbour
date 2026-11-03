@@ -100,7 +100,8 @@ class AuthController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:8',
-            'role' => 'nullable|in:applicant,recruiter,admin',
+            // Akun admin hanya dibuat lewat seeder, tidak lewat pendaftaran publik
+            'role' => 'nullable|in:applicant,recruiter',
             'phone' => 'nullable|string|max:20',
             'location' => 'nullable|string|max:100',
             'skills' => 'nullable|array',
@@ -110,7 +111,7 @@ class AuthController extends Controller
             'email.unique' => 'Alamat email ini sudah terdaftar dalam sistem.',
             'password.required' => 'Kata sandi wajib diisi.',
             'password.min' => 'Kata sandi minimal 8 karakter.',
-            'role.in' => 'Pilihan peran yang diperbolehkan: applicant, recruiter, admin.',
+            'role.in' => 'Pilihan peran yang diperbolehkan: applicant atau recruiter.',
         ]);
 
         if ($validator->fails()) {
@@ -166,6 +167,52 @@ class AuthController extends Controller
             'bio' => $user->bio,
             'location' => $user->location,
             'skills' => $user->skills ?? [],
+            'created_at' => $user->created_at?->toIso8601String(),
+            'company' => $user->role === 'recruiter' && $user->company ? [
+                'id' => $user->company->id,
+                'name' => $user->company->name,
+                'logo_url' => $user->company->logo_url,
+                'verification_status' => $user->company->verification_status,
+            ] : null,
         ], 'Data profil pengguna berhasil dimuat.');
+    }
+
+    /**
+     * Mengganti kata sandi pengguna yang sedang login.
+     *
+     * Method  : PUT
+     * Endpoint: /api/auth/password
+     * Body    : { "current_password", "password", "password_confirmation" }
+     */
+    public function changePassword(Request $request): JsonResponse
+    {
+        $user = $request->attributes->get('auth_user') ?? $request->user();
+
+        $validator = Validator::make($request->all(), [
+            'current_password' => 'required|string',
+            'password' => 'required|string|min:8|confirmed|different:current_password',
+        ], [
+            'current_password.required' => 'Kata sandi saat ini wajib diisi.',
+            'password.required' => 'Kata sandi baru wajib diisi.',
+            'password.min' => 'Kata sandi baru minimal 8 karakter.',
+            'password.confirmed' => 'Konfirmasi kata sandi baru tidak sama.',
+            'password.different' => 'Kata sandi baru harus berbeda dari kata sandi saat ini.',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->validationErrorResponse($validator->errors(), 'Kata sandi gagal diganti.');
+        }
+
+        if (! Hash::check($request->current_password, $user->password)) {
+            return $this->validationErrorResponse(
+                ['current_password' => ['Kata sandi saat ini salah.']],
+                'Kata sandi gagal diganti.'
+            );
+        }
+
+        $user->password = Hash::make($request->password);
+        $user->save();
+
+        return $this->successResponse(null, 'Kata sandi berhasil diganti.');
     }
 }

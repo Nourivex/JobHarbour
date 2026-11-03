@@ -183,6 +183,10 @@ export const applications = {
         });
     },
     cancel: (id) => api.del('/applications/' + id),
+    // Catatan internal recruiter (tidak terlihat oleh pelamar)
+    notes: (id) => api.get('/applications/' + id + '/notes'),
+    addNote: (id, body) => api.post('/applications/' + id + '/notes', { body }),
+    deleteNote: (id, noteId) => api.del('/applications/' + id + '/notes/' + noteId),
     async downloadCv(id) {
         const res = await fetch(API_BASE + '/applications/' + id + '/cv', {
             headers: { Authorization: 'Bearer ' + session.token(), Accept: 'application/pdf' },
@@ -215,6 +219,43 @@ export const pipelines = {
 export const profile = {
     updateSkills: (skills) => api.put('/profile/skills', { skills }),
     update: (payload) => api.put('/profile', payload),
+    changePassword: (payload) => api.put('/auth/password', payload),
+};
+
+/** Unduh berkas yang dilindungi token lalu buka di tab baru (atau simpan bila pop-up diblokir). */
+export async function downloadProtected(url, filename = 'dokumen') {
+    const res = await fetch(url, { headers: { Authorization: 'Bearer ' + session.token() } });
+    if (!res.ok) {
+        let msg = 'Berkas tidak tersedia atau Anda tidak memiliki izin.';
+        try { msg = (await res.json()).message || msg; } catch (e) { /* abaikan */ }
+        throw new ApiError(msg, res.status);
+    }
+    const blobUrl = URL.createObjectURL(await res.blob());
+    const a = document.createElement('a');
+    a.href = blobUrl;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(blobUrl), 60000);
+}
+
+export const company = {
+    show: () => api.get('/company'),
+    update: (payload) => api.put('/company', payload),
+    uploadLogo(file) {
+        const fd = new FormData();
+        fd.append('logo', file);
+        return api.upload('/company/logo', fd);
+    },
+    verification: () => api.get('/company/verification'),
+    submitVerification: (formData) => api.upload('/company/verification', formData),
+};
+
+export const admin = {
+    verifications: (status) => api.get('/admin/verifications', status ? { status } : undefined),
+    review: (id, payload) => api.patch('/admin/verifications/' + id, payload),
+    setCompanyStatus: (id, payload) => api.patch('/admin/companies/' + id + '/status', payload),
 };
 
 export const matchmaking = {
@@ -304,7 +345,8 @@ export function requireAuth(roles) {
 
 export function homeFor(user) {
     if (!user) return '/catalog';
-    return user.role === 'recruiter' ? '/recruiter' : '/my-dock';
+    // Admin belum punya dasbor sendiri, jadi memakai Papan Rekrutmen dengan cakupan semua lowongan
+    return user.role === 'recruiter' || user.role === 'admin' ? '/recruiter' : '/my-dock';
 }
 
 export const util = {
@@ -431,7 +473,10 @@ export const util = {
     },
 };
 
-export function toast(message, type = 'success', timeout = 3800) {
+/**
+ * Notifikasi singkat. opts opsional: detail (kalimat kedua) dan action ({ label, onClick }) untuk satu tombol lanjutan.
+ */
+export function toast(message, type = 'success', timeout = 3800, opts = {}) {
     let wrap = document.getElementById('jh-toast-wrap');
     if (!wrap) {
         wrap = document.createElement('div');
@@ -460,8 +505,12 @@ export function toast(message, type = 'success', timeout = 3800) {
     el.className = `p-4 rounded-xl shadow-lg border text-sm flex items-start gap-3 pointer-events-auto transition-all duration-200 transform translate-y-4 opacity-0 ${bgs[type] || bgs.info}`;
     el.innerHTML = `
         ${icons[type] || icons.info}
-        <div class="flex-1 font-medium leading-relaxed">${util.escapeHtml(message)}</div>
-        <button type="button" aria-label="Tutup notifikasi" class="text-[#627080] hover:text-[#0B1B2B] text-xs ml-1 shrink-0 cursor-pointer">
+        <div class="flex-1 leading-relaxed">
+            <p class="font-medium">${util.escapeHtml(message)}</p>
+            ${opts.detail ? `<p class="mt-0.5 text-[13px] text-[#627080]">${util.escapeHtml(opts.detail)}</p>` : ''}
+            ${opts.action ? `<button type="button" data-toast-action class="mt-2 inline-flex items-center h-8 px-3 rounded-lg text-[13px] font-semibold bg-[#0C2238] text-white hover:bg-[#133150] cursor-pointer">${util.escapeHtml(opts.action.label)}</button>` : ''}
+        </div>
+        <button type="button" data-toast-close aria-label="Tutup notifikasi" class="text-[#627080] hover:text-[#0B1B2B] text-xs ml-1 shrink-0 cursor-pointer">
             <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
     `;
@@ -485,7 +534,11 @@ export function toast(message, type = 'success', timeout = 3800) {
 
     el.addEventListener('mouseenter', stopTimer);
     el.addEventListener('mouseleave', startTimer);
-    el.querySelector('button').addEventListener('click', dismiss);
+    el.querySelector('[data-toast-close]').addEventListener('click', dismiss);
+    el.querySelector('[data-toast-action]')?.addEventListener('click', () => {
+        dismiss();
+        opts.action.onClick?.();
+    });
 
     startTimer();
 }

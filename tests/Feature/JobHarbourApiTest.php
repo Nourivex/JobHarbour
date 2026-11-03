@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Application;
+use App\Models\Company;
 use App\Models\JobVacancy;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -37,6 +38,16 @@ class JobHarbourApiTest extends TestCase
             'password' => Hash::make('secret123'),
             'role' => 'recruiter',
         ]);
+
+        // Recruiter di skenario ini mewakili perusahaan terverifikasi yang boleh mempublikasikan lowongan
+        foreach ([$this->recruiter, $this->recruiterOther] as $owner) {
+            Company::create([
+                'owner_id' => $owner->id,
+                'name' => "PT {$owner->name}",
+                'verification_status' => 'verified',
+                'verified_at' => now(),
+            ]);
+        }
 
         $this->applicant = User::create([
             'name' => 'Applicant Test',
@@ -190,6 +201,59 @@ class JobHarbourApiTest extends TestCase
             ->deleteJson("/api/jobs/{$job->id}");
         $deleteRes->assertStatus(200)
             ->assertJsonPath('data.status', 'closed');
+    }
+
+    public function test_job_catalog_my_jobs_returns_all_jobs_for_admin(): void
+    {
+        User::create([
+            'name' => 'Admin Test',
+            'email' => 'admin@test.com',
+            'password' => Hash::make('secret123'),
+            'role' => 'admin',
+        ]);
+
+        JobVacancy::create([
+            'title' => 'Mobile Developer',
+            'company' => 'PT Karya Bahari',
+            'description' => 'Flutter & Kotlin',
+            'location' => 'Tegal',
+            'posted_by' => $this->recruiter->id,
+            'status' => 'open',
+        ]);
+
+        JobVacancy::create([
+            'title' => 'Data Analyst',
+            'company' => 'PT Data Samudra',
+            'description' => 'SQL & Python',
+            'location' => 'Semarang',
+            'posted_by' => $this->recruiterOther->id,
+            'status' => 'closed',
+        ]);
+
+        $tokenFor = fn (string $email) => $this->postJson('/api/auth/login', [
+            'email' => $email,
+            'password' => 'secret123',
+        ])->json('data.token');
+
+        // Recruiter hanya melihat lowongan miliknya sendiri
+        $this->withHeaders(['Authorization' => 'Bearer '.$tokenFor('recruiter@test.com')])
+            ->getJson('/api/jobs/my')
+            ->assertStatus(200)
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('meta.total_managed_jobs', 1);
+
+        // Admin melihat lowongan dari semua recruiter, termasuk yang sudah ditutup
+        $this->withHeaders(['Authorization' => 'Bearer '.$tokenFor('admin@test.com')])
+            ->getJson('/api/jobs/my')
+            ->assertStatus(200)
+            ->assertJsonPath('status', 'success')
+            ->assertJsonCount(2, 'data')
+            ->assertJsonPath('meta.total_managed_jobs', 2);
+
+        // Pelamar tetap ditolak
+        $this->withHeaders(['Authorization' => 'Bearer '.$tokenFor('applicant@test.com')])
+            ->getJson('/api/jobs/my')
+            ->assertStatus(403);
     }
 
     public function test_application_matchmaking_apply_and_scoring(): void
@@ -399,7 +463,8 @@ class JobHarbourApiTest extends TestCase
             ->assertJsonPath('error_code', 'VALIDATION_ERROR')
             ->assertJsonStructure(['status', 'message', 'data', 'meta', 'errors' => ['email']]);
 
-        // Recruiter membuat lowongan tanpa kolom wajib
+        // Recruiter membuat lowongan tanpa kolom wajib.
+        // Nama perusahaan diisi otomatis dari profil perusahaan recruiter, jadi tidak ikut gagal.
         $token = $this->postJson('/api/auth/login', [
             'email' => 'recruiter@test.com',
             'password' => 'secret123',
@@ -409,7 +474,7 @@ class JobHarbourApiTest extends TestCase
             ->postJson('/api/jobs', ['title' => 'Tanpa syarat skill'])
             ->assertStatus(422)
             ->assertJsonPath('error_code', 'VALIDATION_ERROR')
-            ->assertJsonStructure(['errors' => ['company', 'description', 'location', 'requirements']]);
+            ->assertJsonStructure(['errors' => ['description', 'location', 'requirements']]);
     }
 
     public function test_register_requires_password_of_at_least_eight_characters(): void

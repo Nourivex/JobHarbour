@@ -1,9 +1,13 @@
 import JH, { applications, pipelines, session, util, toast, showError, confirm } from '../api.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
-    // 1. Guard Autentikasi: Pelamar atau Admin
+    // 1. Guard Autentikasi: khusus Pelamar (admin melihat semua lamaran lewat Papan Rekrutmen)
     const currentUser = JH.requireAuth('applicant');
     if (!currentUser) return;
+    if (currentUser.role === 'admin') {
+        window.location.replace(JH.homeFor(currentUser));
+        return;
+    }
 
     const state = {
         applications: [],

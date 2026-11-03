@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Application;
+use App\Models\Company;
 use App\Models\JobVacancy;
 use App\Models\PipelineTimeline;
 use App\Models\User;
@@ -55,6 +56,48 @@ class DatabaseSeeder extends Seeder
                 'location' => 'Tegal',
                 'skills' => ['System Administration', 'DevOps', 'Security'],
             ]
+        );
+
+        // Profil perusahaan recruiter demo. Recruiter utama sudah terverifikasi agar lowongan demo
+        // tetap bisa dipublikasikan; recruiter baru sengaja belum terverifikasi untuk mendemokan alur verifikasi.
+        Company::updateOrCreate(
+            ['owner_id' => $recruiter->id],
+            [
+                'name' => 'PT Teknologi Maju Bahari',
+                'industry' => 'Teknologi Informasi',
+                'size' => '51-200',
+                'founded_year' => 2018,
+                'description' => 'Perusahaan pengembang perangkat lunak dan layanan cloud untuk industri maritim dan logistik di pesisir utara Jawa Tengah.',
+                'address' => 'Jl. Pelabuhan Baru No. 12',
+                'city' => 'Tegal',
+                'website' => 'https://maju-bahari.example.id',
+                'email' => 'karier@maju-bahari.example.id',
+                'phone' => '0283350012',
+                'verification_status' => 'verified',
+                'verified_at' => now(),
+            ]
+        );
+
+        $aliasRecruiter = User::where('email', 'recruiter@padukerja.id')->first();
+        Company::updateOrCreate(
+            ['owner_id' => $aliasRecruiter->id],
+            ['name' => 'PT Teknologi Maju Bahari (Alias)', 'city' => 'Tegal', 'verification_status' => 'verified', 'verified_at' => now()]
+        );
+
+        $newRecruiter = User::updateOrCreate(
+            ['email' => 'recruiter.baru@jobharbour.id'],
+            [
+                'name' => 'Rina Kartika',
+                'password' => Hash::make('password123'),
+                'role' => 'recruiter',
+                'phone' => '081377889900',
+                'bio' => 'HR Generalist yang baru bergabung di JobHarbour.',
+                'location' => 'Brebes',
+            ]
+        );
+        Company::updateOrCreate(
+            ['owner_id' => $newRecruiter->id],
+            ['name' => 'CV Bawang Merah Digital', 'industry' => 'Agribisnis', 'city' => 'Brebes', 'verification_status' => 'unverified']
         );
 
         // =====================================================================
