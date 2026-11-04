@@ -66,7 +66,7 @@
                     <div class="h-72 rounded-2xl animate-skeleton bg-[#F4F6F8]"></div>
                 </section>
 
-                <section class="rounded-3xl border border-[#D3E6F7] bg-[#EEF6FD] p-5 sm:p-6">
+                <section class="rounded-3xl border border-[#D3E6F7] dark:border-[#1E3A54] bg-[#EEF6FD] dark:bg-[#13283A] p-5 sm:p-6">
                     <h2 class="flex items-center gap-2.5 text-lg font-extrabold text-[#0B1B2B]">
                         <svg class="w-5 h-5 text-[#1B65A6]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4M12 8h.01"/></svg>
                         Tips Sebelum Melamar

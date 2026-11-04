@@ -930,6 +930,9 @@ html.dark [class~="bg-white/60"], .dark [class~="bg-white/60"] { background-colo
 .dark [class~="bg-[#EBF3FB]"] { background-color: #13283A; }
 .dark [class~="bg-[#dbeaf8]"] { background-color: #183350; }
 .dark [class~="bg-[#FDEEEC]"] { background-color: #321715; }
+.dark [class~="bg-[#EEF6FD]"] { background-color: #13283A; }
+.dark [class~="bg-[#E7F2FB]"] { background-color: #132B45; }
+.dark [class~="bg-[#FFF6E5]"] { background-color: #2B2111; }
 .dark [class~="bg-[#0C2238]"] { background-color: #16263D; }
 /* Tombol aksi di notifikasi (toast): latar notifikasi ikut gelap, jadi tombolnya dibalik menjadi terang */
 .dark [data-toast-action] { background-color: #E8EDF4; color: #0B111C; }
@@ -952,11 +955,15 @@ html.dark [class~="text-[#0B1B2B]"], .dark [class~="text-[#0B1B2B]"] { color: #E
 .dark [class~="text-[#0284C7]"] { color: #5CC0F2; }
 .dark [class~="text-[#0369a1]"] { color: #7CC4F5; }
 .dark [class~="text-[#124B7D]"] { color: #A9D8F8; }
+.dark [class~="text-[#8A4B00]"] { color: #F5B041; }
+.dark [class~="text-[#5C4A2E]"] { color: #E8D0A9; }
 .dark [class~="text-[#A93A08]"] { color: #FFA06A; }
 .dark [class~="hover:text-[#0B1B2B]"]:hover { color: #FFFFFF; }
 .dark .group:hover [class~="group-hover:text-[#C8460B]"] { color: #FF8A4C; }
 .dark [class~="border-[#E2E7ED]"], .dark [class~="divide-[#E2E7ED]"] > * + * { border-color: #243045; }
 .dark [class~="border-[#C5CFDA]"], .dark [class~="divide-[#C5CFDA]"] > * + * { border-color: #31405A; }
+.dark [class~="border-[#D3E6F7]"] { border-color: #1E3A54; }
+.dark [class~="border-[#F6DFB4]"] { border-color: #4E3918; }
 .dark [class~="border-[#0C2238]"], .dark [class~="divide-[#0C2238]"] > * + * { border-color: #4A5E7A; }
 .dark [class~="hover:border-[#0C2238]"]:hover { border-color: #8C98A8; }
 .dark input, .dark select, .dark textarea { color: #E8EDF4; }
