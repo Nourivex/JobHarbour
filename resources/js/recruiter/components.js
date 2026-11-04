@@ -2,8 +2,13 @@
  * Perilaku komponen bersama: menu tarik turun, dialog, dan status memuat pada tombol.
  */
 
+let menusReady = false;
+
 /** Menu tarik turun berbasis [data-menu]. Satu pendengar di dokumen, aman untuk konten yang dirender ulang. */
 export function initMenus() {
+    // Boleh dipanggil berkali-kali (shell dan halaman); pendengar hanya dipasang sekali
+    if (menusReady) return;
+    menusReady = true;
     const closeAll = (except) => {
         document.querySelectorAll('.ws-menu.is-open').forEach((m) => {
             if (m === except) return;

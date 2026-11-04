@@ -1,11 +1,11 @@
 import { jobs as jobsApi, toast, confirm } from '../../api.js';
 import { util } from '../../api.js';
-import { bootShell, setNavCounts, canPublish } from '../../recruiter/shell.js';
+import { bootShell, setNavCounts, publishRule } from '../../recruiter/shell.js';
 import { data, appsOfJob, averageScore } from '../../recruiter/data.js';
 import { initMenus, menu, debounce } from '../../recruiter/components.js';
 import { initJobForm, openJobForm, skillSuggestions } from '../../recruiter/job-form.js';
 import {
-    esc, icon, hydrateIcons, jobStatusBadge, JOB_STATUS, scoreInfo, stageOf, formatDate, relativeTime, emptyState,
+    esc, icon, hydrateIcons, jobStatusBadge, moderationPill, JOB_STATUS, scoreInfo, stageOf, formatDate, relativeTime, emptyState,
     skeletonRows, daysSince, errorMessage,
 } from '../../recruiter/ui.js';
 import { EMPLOYMENT_SHORT } from '../../job-ui.js';
@@ -59,8 +59,9 @@ function deadlineText(job) {
 }
 
 function actionsFor(job) {
-    const publishOk = canPublish(state.ctx);
-    const tip = publishOk ? '' : 'Perusahaan harus terverifikasi terlebih dahulu';
+    const rule = publishRule(state.ctx, state.jobs, job.id);
+    const publishOk = rule.ok;
+    const tip = rule.reason;
     const items = [{ label: 'Lihat detail', icon: icon('eye'), attrs: `data-act="view" data-id="${job.id}"` }];
     items.push({ label: 'Buka kandidat', icon: icon('users'), attrs: `data-act="pipeline" data-id="${job.id}"` });
     if (job.status !== 'archived') items.push({ label: 'Edit', icon: icon('pencil'), attrs: `data-act="edit" data-id="${job.id}"` });
@@ -96,9 +97,9 @@ function render() {
         box.innerHTML = emptyState({
             iconName: 'briefcase-business',
             title: 'Belum ada lowongan',
-            text: canPublish(state.ctx)
-                ? 'Buat lowongan pertama dengan syarat skill yang jelas agar skor kecocokan pelamar akurat.'
-                : 'Kamu sudah bisa menyiapkan draft. Lowongan bisa dipublikasikan setelah perusahaan terverifikasi.',
+            text: publishRule(state.ctx, state.jobs).trial
+                ? 'Buat lowongan pertama. Sebelum perusahaan terverifikasi, 1 lowongan boleh dipublikasikan sebagai uji coba.'
+                : 'Buat lowongan pertama dengan syarat skill yang jelas agar skor kecocokan pelamar akurat.',
             action: '<button type="button" class="ws-btn ws-btn-primary" data-new-job>Buat lowongan</button>',
         });
         hydrateIcons(box);
@@ -125,7 +126,7 @@ function render() {
                                 <a href="/recruiter/jobs/${j.id}" class="ws-row-link">${esc(j.title)}</a>
                                 <p class="ws-meta">${esc(j.location || '-')} · ${esc(EMPLOYMENT_SHORT[j.employment_type] || j.employment_type || '-')}</p>
                             </td>
-                            <td>${jobStatusBadge(j.status)}</td>
+                            <td><span class="flex flex-wrap gap-1">${jobStatusBadge(j.status)}${moderationPill(j)}</span></td>
                             <td class="num">${applicantsCell(apps)}</td>
                             <td class="num">${avg === null ? '<span class="ws-meta">-</span>' : `<span class="font-semibold" style="color:${scoreInfo(avg).color}">${avg}%</span>`}</td>
                             <td class="whitespace-nowrap">${deadlineText(j)}</td>
@@ -143,7 +144,7 @@ function render() {
                 <li class="rounded-xl border border-[var(--ws-border)] p-4">
                     <div class="flex items-start gap-3">
                         <div class="min-w-0 flex-1">
-                            <div class="mb-1.5">${jobStatusBadge(j.status)}</div>
+                            <div class="mb-1.5 flex flex-wrap gap-1">${jobStatusBadge(j.status)}${moderationPill(j)}</div>
                             <a href="/recruiter/jobs/${j.id}" class="ws-row-link block">${esc(j.title)}</a>
                             <p class="ws-meta">${esc(j.location || '-')} · ${apps.length} pelamar · diperbarui ${relativeTime(j.updated_at)}</p>
                         </div>
@@ -178,6 +179,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     $('jobs-list').innerHTML = skeletonRows(4, 'h-14');
 
     initJobForm(ctx, {
+        jobs: () => state.jobs,
         onSave: async (saved) => {
             data.invalidate('jobs');
             state.jobs = await data.jobs();

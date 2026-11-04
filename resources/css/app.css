@@ -978,3 +978,90 @@ html.dark [class~="text-[#0B1B2B]"], .dark [class~="text-[#0B1B2B]"] { color: #E
 .dark .auth-tab:hover { color: #E8EDF4; }
 .dark [class~="bg-[#F8FAFC]"] { background-color: #0E1522; }
 .dark .skill-chip button:hover { background: #243045; }
+
+
+/* Dialog laporan lowongan (halaman publik): muncul halus, centang tergambar saat terkirim */
+.report-dialog[open] { animation: report-in 200ms cubic-bezier(0.23, 1, 0.32, 1); }
+.report-dialog::backdrop { background: rgba(11, 27, 43, 0.5); }
+.report-option:has(input:checked) { border-color: #C8460B; background: #FFF3EA; }
+.dark .report-option:has(input:checked) { background: #33200F; }
+.report-check circle { stroke-dasharray: 151; stroke-dashoffset: 151; animation: report-draw 420ms ease-out forwards; }
+.report-check path { stroke-dasharray: 36; stroke-dashoffset: 36; animation: report-draw 260ms ease-out 340ms forwards; }
+@keyframes report-in { from { opacity: 0; transform: translateY(8px) scale(0.98); } to { opacity: 1; transform: none; } }
+@keyframes report-draw { to { stroke-dashoffset: 0; } }
+@media (prefers-reduced-motion: reduce) {
+    .report-dialog[open] { animation: none; }
+    .report-check circle, .report-check path { animation: none; stroke-dashoffset: 0; }
+}
+
+
+/* ==================================================================== */
+/* Lonceng pemberitahuan (halaman publik dan Portal Recruiter)          */
+/* ==================================================================== */
+.jh-notif { position: relative; }
+.jh-notif-btn { position: relative; display: inline-flex; align-items: center; justify-content: center; width: 2.5rem; height: 2.5rem; border-radius: 9999px; cursor: pointer; transition: background-color 150ms ease, color 150ms ease; }
+.jh-notif-btn svg { width: 1.25rem; height: 1.25rem; }
+.jh-notif-btn:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(200, 70, 11, 0.35); }
+[data-notif="nav"] .jh-notif-btn { color: rgba(255, 255, 255, 0.85); }
+[data-notif="nav"] .jh-notif-btn:hover, [data-notif="nav"].is-open .jh-notif-btn { color: #FFFFFF; background: rgba(255, 255, 255, 0.1); }
+[data-notif="ws"] .jh-notif-btn { width: 2.25rem; height: 2.25rem; border-radius: 0.6rem; color: var(--ws-text-2); }
+[data-notif="ws"] .jh-notif-btn:hover, [data-notif="ws"].is-open .jh-notif-btn { background: var(--ws-surface-2); color: var(--ws-text); }
+.jh-notif-badge { position: absolute; top: 0.2rem; right: 0.15rem; min-width: 1.15rem; height: 1.15rem; padding: 0 0.3rem; border-radius: 9999px; background: #C8460B; color: #FFFFFF; font-size: 10.5px; font-weight: 700; line-height: 1.15rem; text-align: center; border: 2px solid #0C2238; box-sizing: content-box; }
+[data-notif="ws"] .jh-notif-badge { border-color: var(--ws-surface); top: 0; right: -0.1rem; }
+.jh-notif-badge.is-pop { animation: jh-notif-pop 360ms cubic-bezier(0.23, 1, 0.32, 1); }
+.jh-notif-panel { position: absolute; right: 0; top: calc(100% + 0.5rem); z-index: 70; width: min(22rem, calc(100vw - 1.5rem)); max-height: min(28rem, 75vh); display: flex; flex-direction: column; border-radius: 14px; background: #FFFFFF; border: 1px solid #E2E7ED; box-shadow: 0 18px 40px -16px rgba(12, 34, 56, 0.35); color: #0B1B2B; overflow: hidden; animation: jh-notif-in 160ms cubic-bezier(0.23, 1, 0.32, 1); }
+.jh-notif-head { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0.8rem 1rem; border-bottom: 1px solid #E2E7ED; }
+.jh-notif-title { font-weight: 700; font-size: 15px; }
+.jh-notif-readall { font-size: 12.5px; font-weight: 600; color: #1B65A6; cursor: pointer; }
+.jh-notif-readall:hover { text-decoration: underline; }
+.jh-notif-list { overflow-y: auto; }
+.jh-notif-item { display: flex; gap: 0.6rem; width: 100%; padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid #F0F3F6; cursor: pointer; transition: background-color 120ms ease; }
+.jh-notif-item:hover { background: #F4F6F8; }
+.jh-notif-item:focus-visible { outline: none; background: #F4F6F8; box-shadow: inset 3px 0 0 #C8460B; }
+.jh-notif-dot { flex: none; width: 0.5rem; height: 0.5rem; margin-top: 0.4rem; border-radius: 9999px; background: transparent; }
+.jh-notif-item.is-unread .jh-notif-dot { background: #C8460B; }
+.jh-notif-text { min-width: 0; display: grid; gap: 0.1rem; }
+.jh-notif-item-title { font-size: 14px; font-weight: 500; color: #3D4B5C; }
+.jh-notif-item.is-unread .jh-notif-item-title { font-weight: 700; color: #0B1B2B; }
+.jh-notif-item-body { font-size: 13px; color: #627080; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.jh-notif-time { font-size: 12px; color: #8C98A8; }
+.jh-notif-empty { padding: 1.25rem 1rem; font-size: 13.5px; color: #627080; text-align: center; }
+html.dark .jh-notif-panel { background: #121A28; border-color: #243045; color: #E8EDF4; }
+html.dark .jh-notif-head { border-color: #243045; }
+html.dark .jh-notif-item { border-color: #1B2536; }
+html.dark .jh-notif-item:hover, html.dark .jh-notif-item:focus-visible { background: #172133; }
+html.dark .jh-notif-item-title { color: #B8C2CF; }
+html.dark .jh-notif-item.is-unread .jh-notif-item-title { color: #FFFFFF; }
+html.dark .jh-notif-item-body, html.dark .jh-notif-empty { color: #8C98A8; }
+html.dark .jh-notif-readall { color: #7CC4F5; }
+@keyframes jh-notif-in { from { opacity: 0; transform: translateY(-4px) scale(0.98); } to { opacity: 1; transform: none; } }
+@keyframes jh-notif-pop { 40% { transform: scale(1.3); } }
+@media (prefers-reduced-motion: reduce) {
+    .jh-notif-panel, .jh-notif-badge.is-pop { animation: none; }
+}
+/* Layar sempit: panel lonceng selebar layar, tombol header dirapatkan agar tidak melebar */
+@media (max-width: 639px) {
+    .jh-notif-panel { position: fixed; left: 0.75rem; right: 0.75rem; top: 4.5rem; width: auto; }
+    .ws-body .jh-notif-panel { top: 3.75rem; }
+}
+@media (max-width: 380px) {
+    [data-notif="nav"] .jh-notif-btn, header .theme-toggle { width: 2.25rem; height: 2.25rem; }
+    header [data-notif="nav"] { margin-left: -0.25rem; margin-right: -0.25rem; }
+}
+
+
+/* Banner pengumuman situs (publik dan portal) */
+.jh-ann { display: flex; align-items: center; gap: 0.6rem; padding: 0.5rem 1rem; font-size: 13.5px; line-height: 1.4; animation: jh-ann-in 220ms cubic-bezier(0.23, 1, 0.32, 1); }
+.jh-ann svg { width: 1.05rem; height: 1.05rem; flex: none; }
+.jh-ann p { flex: 1; min-width: 0; }
+.jh-ann button { flex: none; display: inline-flex; width: 1.75rem; height: 1.75rem; align-items: center; justify-content: center; border-radius: 0.5rem; cursor: pointer; opacity: 0.75; }
+.jh-ann button:hover { opacity: 1; background: rgba(0, 0, 0, 0.06); }
+.jh-ann-info { background: #EBF3FB; color: #124B7D; border-bottom: 1px solid #CFE3F5; }
+.jh-ann-warning { background: #FEF3E2; color: #7A3A06; border-bottom: 1px solid #F6D9A8; }
+html.dark .jh-ann-info { background: #13283A; color: #A9D8F8; border-color: #1E3A54; }
+html.dark .jh-ann-warning { background: #2E2410; color: #FBD38D; border-color: #4A3A16; }
+html.dark .jh-ann button:hover { background: rgba(255, 255, 255, 0.08); }
+.jh-ann.is-leaving { opacity: 0; transform: translateY(-4px); transition: opacity 160ms ease, transform 160ms ease; }
+@media (min-width: 640px) { .jh-ann { padding: 0.5rem 1.5rem; } }
+@keyframes jh-ann-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .jh-ann { animation: none; } .jh-ann.is-leaving { transition: none; } }

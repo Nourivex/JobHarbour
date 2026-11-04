@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Application;
 use App\Models\PipelineTimeline;
+use App\Models\UserNotification;
 use App\Traits\ApiResponse;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -192,6 +193,8 @@ class PipelineController extends Controller
             }
         }
 
+        $previousStage = $pipeline->current_stage;
+
         // 7. Simpan pembaruan ke tabel database
         $pipeline->current_stage = $newStage;
         $pipeline->stages = $stages;
@@ -200,6 +203,9 @@ class PipelineController extends Controller
         // 8. Sinkronisasikan status utama berkas lamaran
         $application->status = $newStage;
         $application->save();
+
+        // 8b. Beri tahu pelamar lewat lonceng pemberitahuan (tanpa catatan internal recruiter)
+        $this->notifyApplicant($application, $previousStage, $newStage, $stageStatus, $interviewSchedule);
 
         // 9. Kembalikan response HTTP 200 OK dengan data riwayat linimasa terbaru
         return $this->successResponse([
@@ -286,5 +292,31 @@ class PipelineController extends Controller
                 'stages_total' => 4, // 4 Tahapan Utama: Screening, Assessment, Interview, Offering
             ],
         ], 'Riwayat linimasa proses lamaran berhasil dimuat.');
+    }
+
+    /**
+     * Pemberitahuan ke pelamar saat tahapnya berubah, jadwal wawancara diatur, atau diterima.
+     */
+    private function notifyApplicant(Application $application, ?string $from, string $to, string $status, ?array $schedule): void
+    {
+        $job = $application->jobVacancy;
+        $where = trim(($job->title ?? 'Lowongan').' · '.($job->company ?? ''), ' ·');
+        $when = ! empty($schedule['datetime'])
+            ? \Illuminate\Support\Carbon::parse($schedule['datetime'])->timezone(config('app.timezone'))->locale('id')->translatedFormat('l, j F Y H.i')
+            : null;
+
+        [$type, $title] = match (true) {
+            $to === 'offering' && $status === 'passed' => ['application.hired', 'Selamat, kamu diterima bekerja'],
+            $to === 'rejected' && $from !== 'rejected' => ['application.rejected', 'Lamaranmu belum dilanjutkan'],
+            $to === 'interview' && $from !== 'interview' => ['application.interview', 'Kamu diundang wawancara'],
+            $to === 'interview' && ! empty($schedule) => ['application.interview_rescheduled', 'Jadwal wawancaramu diperbarui'],
+            $to === 'offering' && $from !== 'offering' => ['application.offering', 'Kamu menerima penawaran kerja'],
+            $to === 'assessment' && $from !== 'assessment' => ['application.assessment', 'Lamaranmu lanjut ke tahap Assessment'],
+            default => [null, null],
+        };
+
+        if ($type) {
+            UserNotification::send($application->user_id, $type, $title, $when ? "{$where} · {$when}" : $where, '/my-dock');
+        }
     }
 }

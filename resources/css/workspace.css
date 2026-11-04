@@ -380,6 +380,10 @@ select.ws-input { appearance: none; padding-right: 2.25rem; cursor: pointer; bac
 .ws-tab[aria-selected="true"] .ws-count { background: var(--ws-accent-soft); color: var(--ws-accent-text); }
 
 .ws-panel-enter { animation: ws-fade-up 240ms var(--ws-ease); }
+
+/* Konfirmasi di dalam kartu (Pengaturan > Keamanan > Sesi masuk) */
+.st-confirm { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; margin-top: 1rem; padding: 0.75rem 0.875rem; border-radius: 0.75rem; background: var(--ws-danger-soft); color: var(--ws-text); animation: ws-fade-up 200ms var(--ws-ease); }
+.st-confirm[hidden] { display: none; }
 @keyframes ws-fade-up { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
 /* ------------------------------------------------------------------ tabel */
@@ -871,3 +875,413 @@ html.dark .ws-skill-pick button[aria-pressed="true"] { background: #E8EDF4; bord
 .ws-tpl-chip:hover { border-color: var(--ws-border-strong); color: var(--ws-text); }
 .ws-tpl-chip:focus-visible { outline: none; box-shadow: var(--ws-focus); }
 .ws-tpl-chip[aria-pressed="true"] { background: var(--ws-danger-soft); border-color: color-mix(in srgb, var(--ws-danger) 35%, transparent); color: var(--ws-danger); }
+
+/* ==================================================================== */
+/* Admin Portal: shell yang sama, identitas berbeda                     */
+/* Sidebar slate gelap (bukan navy brand) dan label "Admin Portal" agar  */
+/* admin selalu sadar sedang memegang kendali platform.                 */
+/* ==================================================================== */
+/* Modern Harbour Command Center: navy struktural, latar hangat, oranye hanya sebagai aksen.
+   Kontras sudah dicek: teks muted 5,2:1 di latar hangat; oranye #F45B0B (3,3:1) tidak dipakai untuk teks,
+   teks beraksen memakai --ws-accent-text. Warna status sedikit digelapkan agar teksnya lolos 4,5:1. */
+.ws-body.ws-admin {
+    --ws-bg: #F7F4EF;
+    --ws-surface: #FFFEFC;
+    --ws-surface-2: #F8F5F0;
+    --ws-border: #ECE6DC;
+    --ws-border-strong: #D6CEC1;
+    --ws-text: #17283D;
+    --ws-text-2: #3B4B5F;
+    --ws-muted: #5B6576;
+    /* Sidebar memakai warna latar ilustrasi mercusuar agar menyatu tanpa garis */
+    --ws-navy: #0D213B;
+    --ws-navy-2: #17304F;
+    --ws-primary: #17283D;
+    --ws-primary-hover: #263B52;
+    --ws-primary-soft: #E6EDF5;
+    --ws-accent: #F45B0B;
+    --ws-accent-text: #A93F08;
+    --ws-accent-soft: #FDEEE3;
+    --ws-panel: #E6EDF5;
+    --ws-panel-border: #D3DEEA;
+    --ws-success: #166534;
+    --ws-success-soft: #E9F6EE;
+    --ws-info: #1F5F99;
+    --ws-info-soft: #E6EDF5;
+    --ws-warning: #92400E;
+    --ws-warning-soft: #FDF1E3;
+    --ws-danger: #B91C1C;
+    --ws-danger-soft: #FBE9E7;
+    --ws-chart-1: #1F3A5F;
+    --ws-chart-2: #F47A2A;
+    --ws-shadow-card: 0 1px 2px rgba(23, 40, 61, 0.04), 0 6px 18px -12px rgba(23, 40, 61, 0.12);
+    --ws-focus: 0 0 0 3px rgba(244, 91, 11, 0.28);
+    /* Warna kategori: hanya untuk membedakan jenis angka, bukan status */
+    --adm-blue: #245C99; --adm-blue-soft: #EEF4FC; --adm-blue-icon: #DCE9F8;
+    --adm-purple: #5B3DB0; --adm-purple-soft: #F4F1FC; --adm-purple-icon: #E6DFF8;
+    --adm-orange: #B4400C; --adm-orange-soft: #FFF5EC; --adm-orange-icon: #FDE3CF;
+    --adm-green: #16703A; --adm-green-soft: #EEF8F1; --adm-green-icon: #D6EFDF;
+}
+html.dark .ws-body.ws-admin {
+    --ws-bg: #0B1420;
+    --ws-surface: #121D2C;
+    --ws-surface-2: #172434;
+    --ws-border: #233247;
+    --ws-border-strong: #33465F;
+    --ws-text: #E8EDF4;
+    --ws-text-2: #C3CCD8;
+    --ws-muted: #96A3B4;
+    --ws-navy: #0D213B;
+    --ws-navy-2: #17304F;
+    --ws-accent-text: #FF9A5C;
+    --ws-accent-soft: #3A1F0E;
+    --ws-panel: #172A40;
+    --ws-panel-border: #22395A;
+    --ws-success-soft: #11291C;
+    --ws-warning-soft: #2E2410;
+    --ws-chart-1: #7FA6CF;
+    --ws-chart-2: #FF8A45;
+    --ws-shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --adm-blue: #8FBCEB; --adm-blue-soft: #132538; --adm-blue-icon: #1B3550;
+    --adm-purple: #BCA8F2; --adm-purple-soft: #1C1A33; --adm-purple-icon: #2B2650;
+    --adm-orange: #FFA36B; --adm-orange-soft: #2A1C12; --adm-orange-icon: #43281A;
+    --adm-green: #7FD7A0; --adm-green-soft: #12261B; --adm-green-icon: #1B3A28;
+}
+.ws-admin .ws-card { border-radius: 1rem; border-color: var(--ws-border); box-shadow: var(--ws-shadow-card); }
+.ws-admin .ws-table td { padding: 0.7rem 1rem; }
+.ws-admin .ws-table tbody tr { transition: background-color 120ms ease; }
+.ws-admin .ws-table tbody tr:hover { background: var(--ws-surface-2); }
+.ws-admin .ws-page-head { margin-bottom: 1.25rem; }
+.ws-admin .ws-h1 { font-size: 1.75rem; color: var(--ws-text); }
+@media (min-width: 640px) { .ws-admin .ws-h1 { font-size: 2rem; } }
+.ws-admin .ws-lead { color: var(--ws-text-2); }
+.ws-admin .ws-topbar { background: color-mix(in srgb, var(--ws-bg) 88%, transparent); }
+
+/* Sidebar: menu aktif berupa pil oranye (putih di atasnya 5:1), mercusuar di kaki sidebar */
+.ws-admin .ws-nav-link { transition: background-color 160ms ease, color 160ms ease; }
+.ws-admin .ws-nav-link[aria-current="page"] { background: #B84D16; color: #FFFFFF; box-shadow: inset 0 0 0 1px rgba(255, 170, 120, 0.25), 0 6px 16px -8px rgba(244, 91, 11, 0.6); }
+.ws-admin .ws-nav-link[aria-current="page"] svg { color: #FFE2CF; }
+.ws-admin .ws-nav-link[aria-current="page"]::before { display: none; }
+.ws-admin .ws-nav-link[aria-current="page"] .ws-nav-count { background: rgba(255, 255, 255, 0.22); color: #FFFFFF; }
+.ws-admin .ws-sidebar-foot { position: relative; isolation: isolate; padding-top: 10rem; border-top: 0; overflow: hidden; }
+/* Diperbesar dan digeser ke kanan: menara berada di samping tautan, bukan di belakang teksnya */
+.adm-side-art { position: absolute; left: 1.75rem; bottom: 0; z-index: -2; width: 135%; max-width: none; height: auto; pointer-events: none; }
+/* Tepi atas menyatu dengan navy sidebar, bagian bawah digelapkan agar tautan tetap terbaca */
+.ws-admin .ws-sidebar-foot::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; background: linear-gradient(to bottom, var(--ws-navy) 0%, rgba(13, 33, 59, 0) 38%), linear-gradient(to top, rgba(13, 33, 59, 0.8) 0%, rgba(13, 33, 59, 0) 46%); }
+@media (min-width: 1024px) { .ws-collapsed .ws-admin .ws-sidebar-foot { padding-top: 0.6rem; } .ws-collapsed .adm-side-art, .ws-collapsed .ws-admin .ws-sidebar-foot::before { display: none; } }
+.ws-admin-tag { display: inline-flex; align-items: center; margin-top: 0.15rem; padding: 0.05rem 0.45rem; border-radius: 0.35rem; background: rgba(244, 91, 11, 0.18); color: #FFB48A; font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+
+/* Menu akun di topbar */
+.adm-account .ws-user { cursor: pointer; }
+.adm-account-caret { width: 1rem; height: 1rem; color: var(--ws-muted); transition: transform 180ms var(--ws-ease); }
+.adm-account.is-open .adm-account-caret { transform: rotate(180deg); }
+.adm-account .ws-menu-list { min-width: 13rem; }
+a.ws-menu-item { text-decoration: none; }
+
+/* Panel permukaan sekunder (biru lembut) untuk informasi pendukung */
+.adm-panel { border-radius: 1rem; background: var(--ws-panel); border: 1px solid var(--ws-panel-border); }
+.adm-panel-head { padding: 1.1rem 1.25rem 0; }
+.adm-panel-body { padding: 0.9rem 1.25rem 1.25rem; }
+
+/* Hero Ringkasan: teks di kiri, ilustrasi kapal layar memudar dari kanan */
+.adm-hero { position: relative; overflow: hidden; margin-bottom: 1.25rem; border-radius: 1.25rem; background: linear-gradient(90deg, var(--ws-bg) 35%, #FCF2E9 100%); }
+.adm-hero-art {
+    position: absolute; top: 0; right: 0; height: 100%; width: min(62%, 720px); object-fit: cover; object-position: right center; pointer-events: none;
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 38%);
+    mask-image: linear-gradient(to right, transparent 0%, #000 38%);
+    animation: ws-fade 600ms ease both;
+}
+.adm-hero-body { position: relative; z-index: 1; max-width: 36rem; padding: 1.25rem 0 1.4rem; }
+.adm-hero-lead { margin-top: 0.35rem; font-size: 15px; color: var(--ws-text-2); }
+.adm-hero-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.9rem; margin-top: 0.9rem; font-size: 13.5px; color: var(--ws-text-2); }
+.adm-hero-meta .ws-btn { background: var(--ws-surface); }
+.adm-hero-status { display: flex; flex-wrap: wrap; gap: 0.35rem 1.1rem; margin-top: 0.7rem; font-size: 13px; color: var(--ws-text-2); }
+.adm-hero-status:empty { display: none; }
+.adm-hero-status a { color: var(--ws-accent-text); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+@media (min-width: 768px) { .adm-hero-body { padding: 1.5rem 0 1.6rem 0.25rem; } }
+@media (max-width: 767px) {
+    /* Layar kecil: ilustrasi jadi pita di atas teks, bukan latar pudar di belakang tulisan */
+    .adm-hero { background: transparent; }
+    .adm-hero-art { position: relative; display: block; width: 100%; height: 7.5rem; border-radius: 1rem; -webkit-mask-image: none; mask-image: none; }
+    .adm-hero-body { padding-right: 0.5rem; }
+}
+.adm-dot { display: inline-block; width: 0.5rem; height: 0.5rem; margin-right: 0.45rem; border-radius: 9999px; background: #22A355; vertical-align: 1px; }
+.adm-dot.is-bad { background: #DC2626; }
+.adm-dot.is-idle { background: #98A2B3; }
+.adm-demo-tag { display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.05rem 0.45rem; border-radius: 0.35rem; font-size: 11px; font-weight: 700; letter-spacing: 0.03em; background: #FCD34D; color: #5B3A06; }
+html.dark .adm-demo-tag { background: rgba(251, 191, 36, 0.2); color: #FCD34D; }
+
+/* Empat angka utama: kartu bertint warna kategori, ikon dalam lingkaran */
+.adm-kpis { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem; }
+@media (min-width: 1100px) { .adm-kpis { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; } }
+.adm-kpi { display: flex; align-items: flex-start; gap: 1rem; min-width: 0; padding: 1.15rem 1.2rem; border-radius: 1rem; background: var(--k-soft); border: 1px solid color-mix(in srgb, var(--k) 12%, transparent); box-shadow: var(--ws-shadow-card); transition: transform 180ms var(--ws-ease), box-shadow 180ms ease; }
+.adm-kpi:hover { transform: translateY(-2px); box-shadow: 0 1px 2px rgba(23, 40, 61, 0.05), 0 12px 24px -14px rgba(23, 40, 61, 0.22); }
+.adm-kpi.is-blue { --k: var(--adm-blue); --k-soft: var(--adm-blue-soft); --k-icon: var(--adm-blue-icon); }
+.adm-kpi.is-purple { --k: var(--adm-purple); --k-soft: var(--adm-purple-soft); --k-icon: var(--adm-purple-icon); }
+.adm-kpi.is-orange { --k: var(--adm-orange); --k-soft: var(--adm-orange-soft); --k-icon: var(--adm-orange-icon); }
+.adm-kpi.is-green { --k: var(--adm-green); --k-soft: var(--adm-green-soft); --k-icon: var(--adm-green-icon); }
+.adm-kpi-icon { display: grid; place-items: center; flex: none; width: 3.25rem; height: 3.25rem; border-radius: 9999px; background: var(--k-icon); color: var(--k); }
+.adm-kpi-label { display: block; font-size: 14px; font-weight: 700; color: var(--ws-text); }
+.adm-kpi-num { display: block; margin-top: 0.1rem; font-family: var(--font-heading); font-size: 2rem; font-weight: 800; line-height: 1.1; font-variant-numeric: tabular-nums; color: var(--ws-text); }
+.adm-kpi-sub { display: block; margin-top: 0.3rem; font-size: 13px; color: var(--ws-text-2); }
+.adm-kpi-trend { display: inline-flex; align-items: center; gap: 0.25rem; margin-top: 0.3rem; font-size: 13px; font-weight: 600; color: var(--k); }
+@media (max-width: 639px) {
+    .adm-kpi { flex-direction: column; gap: 0.6rem; padding: 1rem; }
+    .adm-kpi-icon { width: 2.6rem; height: 2.6rem; }
+    .adm-kpi-icon svg { width: 1.25rem; height: 1.25rem; }
+    .adm-kpi-num { font-size: 1.65rem; }
+}
+
+/* Kepala kartu dengan ikon, dipakai di Ringkasan */
+.adm-card-head { display: flex; align-items: flex-start; gap: 0.75rem; padding: 1.15rem 1.25rem 0.9rem; }
+.adm-card-icon { display: grid; place-items: center; flex: none; width: 2.1rem; height: 2.1rem; border-radius: 9999px; color: var(--ws-text); }
+.adm-card-icon svg { width: 1.2rem; height: 1.2rem; }
+.adm-card-icon.is-orange { background: var(--ws-accent); color: #FFFFFF; }
+.adm-card-title { font-size: 17px; font-weight: 700; line-height: 1.3; color: var(--ws-text); }
+
+/* Layout utama Ringkasan: antrean keputusan lebih lebar dari panel pendukung */
+.adm-main { display: grid; gap: 1rem; margin-top: 1.25rem; }
+@media (min-width: 1024px) { .adm-main { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); align-items: stretch; } }
+
+/* Metrik pasar: kisi 2x2 dengan garis pemisah, tanpa kartu di dalam kartu */
+.adm-metrics { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.adm-metric { min-width: 0; padding: 0.9rem 1rem 1rem; }
+.adm-metric:nth-child(odd) { border-right: 1px solid var(--ws-border); padding-left: 0.25rem; }
+.adm-metric:nth-child(-n + 2) { border-bottom: 1px solid var(--ws-border); }
+.adm-metric-label { display: block; font-size: 14px; font-weight: 700; color: var(--ws-text); }
+.adm-metric-num { display: block; margin-top: 0.15rem; font-family: var(--font-heading); font-size: 1.85rem; font-weight: 800; line-height: 1.15; font-variant-numeric: tabular-nums; color: var(--ws-text); }
+.adm-metric-num.is-warn { color: var(--ws-warning); }
+.adm-metric-na { display: block; margin-top: 0.4rem; font-size: 17px; font-weight: 700; line-height: 1.3; color: var(--ws-text); }
+.adm-metric-def { display: block; margin-top: 0.3rem; font-size: 13px; line-height: 1.45; color: var(--ws-muted); }
+
+/* Kotak masuk keputusan di Ringkasan: daftar antrean, bukan kartu angka */
+.adm-queue { display: flex; flex-direction: column; }
+.adm-queue-item { display: flex; align-items: center; gap: 0.9rem; padding: 0.8rem 1.25rem; border-bottom: 1px solid var(--ws-border); color: var(--ws-text); transition: background-color 120ms ease; }
+.adm-queue-item:last-child { border-bottom: 0; }
+.adm-queue-item:hover { background: var(--ws-surface-2); }
+.adm-queue-item:focus-visible { outline: none; box-shadow: inset var(--ws-focus); }
+.adm-queue-num { min-width: 2.5rem; font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; text-align: right; }
+.adm-queue-icon { display: grid; place-items: center; flex: none; width: 2.25rem; height: 2.25rem; border-radius: 0.6rem; background: var(--ws-surface-2); color: var(--ws-text-2); }
+.adm-queue-icon svg { width: 1.1rem; height: 1.1rem; }
+.adm-queue-item.is-hot .adm-queue-icon { background: var(--ws-warning-soft); color: var(--ws-warning); }
+.adm-queue-item.is-bad .adm-queue-icon { background: var(--ws-danger-soft); color: var(--ws-danger); }
+.adm-queue-item.is-bad .adm-queue-num { color: var(--ws-danger); }
+.adm-queue-text { min-width: 0; flex: 1; }
+.adm-queue-label { display: block; font-size: 14px; font-weight: 600; }
+.adm-queue-sub { display: block; font-size: 12.5px; color: var(--ws-muted); }
+.adm-queue-go { flex: none; width: 1rem; height: 1rem; color: var(--ws-muted); transition: transform 150ms var(--ws-ease); }
+.adm-queue-item:hover .adm-queue-go { transform: translateX(2px); color: var(--ws-text); }
+.adm-allclear { display: flex; align-items: center; gap: 0.6rem; margin: 0 1.25rem 0.4rem; padding: 0.7rem 0.9rem; border-radius: 0.6rem; background: var(--ws-success-soft); color: var(--ws-success); font-size: 13.5px; font-weight: 600; }
+.adm-allclear svg { width: 1.05rem; height: 1.05rem; flex: none; }
+.adm-queue-item.is-clear .adm-queue-num { color: var(--ws-muted); font-weight: 500; }
+.adm-queue-item.is-hot .adm-queue-num { color: var(--ws-warning); }
+.adm-health { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 1.25rem; padding: 0.7rem 1rem; border-radius: var(--ws-r-md); background: var(--ws-surface); border: 1px solid var(--ws-border); font-size: 13.5px; color: var(--ws-text-2); }
+.adm-health .ws-status-dot { width: 0.55rem; height: 0.55rem; border-radius: 9999px; display: inline-block; margin-right: 0.4rem; background: var(--ws-success); }
+.adm-health .is-bad .ws-status-dot { background: var(--ws-danger); }
+.adm-split { display: grid; gap: 1rem; }
+@media (min-width: 1024px) { .adm-split { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); } }
+.adm-dl { display: grid; grid-template-columns: max-content 1fr; gap: 0.45rem 1rem; font-size: 14px; }
+.adm-dl dt { color: var(--ws-muted); }
+.adm-dl dd { color: var(--ws-text); min-width: 0; overflow-wrap: anywhere; }
+.adm-row-btn { width: 100%; text-align: left; }
+.adm-filters { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+.adm-filters .ws-search { flex: 1 1 220px; max-width: 24rem; }
+@media (max-width: 639px) { .adm-filters > select { flex: 1 1 40%; min-width: 0; } }
+
+/* Tabel admin di layar sempit: setiap baris menjadi kartu, kolom pertama sebagai judul,
+   kolom lain tampil sebagai pasangan label (dari data-label) dan nilai */
+@media (max-width: 639px) {
+    .adm-stack thead { display: none; }
+    .adm-stack, .adm-stack tbody { display: block; }
+    .adm-stack tbody tr { display: block; padding: 0.8rem 1rem; border-bottom: 1px solid var(--ws-border); }
+    .adm-stack tbody tr:last-child { border-bottom: 0; }
+    .adm-stack td { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0.2rem 0; border: 0; text-align: right; }
+    .adm-stack td:first-child { display: block; padding-bottom: 0.45rem; text-align: left; }
+    .adm-stack td[data-label]::before { content: attr(data-label); flex: none; font-size: 12px; color: var(--ws-muted); text-align: left; }
+    .adm-stack td:empty { display: none; }
+    .adm-stack td.adm-actions { justify-content: flex-end; padding-top: 0.5rem; }
+}
+
+
+/* ------------------------------------------------------------------ Ringkasan admin */
+.adm-section-title { display: flex; align-items: baseline; justify-content: space-between; gap: 0.75rem; margin: 1.5rem 0 0.6rem; }
+.adm-section-title h2 { font-size: 15px; font-weight: 700; color: var(--ws-text); }
+.adm-tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.6rem; }
+@media (min-width: 768px) { .adm-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 1280px) { .adm-tiles.is-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); } .adm-tiles.is-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.adm-tile { display: flex; flex-direction: column; gap: 0.15rem; min-width: 0; padding: 0.85rem 1rem; border-radius: var(--ws-r-md); background: var(--ws-surface); border: 1px solid var(--ws-border); color: var(--ws-text); transition: border-color 150ms ease, transform 150ms var(--ws-ease); }
+a.adm-tile:hover { border-color: var(--ws-border-strong); transform: translateY(-1px); }
+a.adm-tile:focus-visible { outline: none; box-shadow: var(--ws-focus); }
+.adm-tile-num { font-size: 1.6rem; font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.adm-tile-label { font-size: 13.5px; font-weight: 600; }
+.adm-tile-sub { font-size: 12.5px; color: var(--ws-muted); }
+.adm-tile.is-clear .adm-tile-num { color: var(--ws-muted); font-weight: 500; }
+.adm-tile.is-warn { border-color: color-mix(in srgb, var(--ws-warning) 35%, var(--ws-border)); }
+.adm-tile.is-warn .adm-tile-num { color: var(--ws-warning); }
+.adm-tile.is-bad { border-color: color-mix(in srgb, var(--ws-danger) 35%, var(--ws-border)); }
+.adm-tile.is-bad .adm-tile-num { color: var(--ws-danger); }
+.adm-tile-na { font-size: 13px; color: var(--ws-muted); font-weight: 500; }
+
+/* Grafik pertumbuhan (SVG) dan neraca skill: hanya transform/opacity agar ringan */
+.adm-chart { width: 100%; height: auto; overflow: visible; }
+.adm-chart .bar { fill: var(--ws-chart-1, var(--ws-accent)); transform-box: fill-box; transform-origin: bottom; animation: adm-grow 520ms var(--ws-ease) both; animation-delay: calc(var(--i, 0) * 45ms); }
+.adm-chart .line { fill: none; stroke: var(--ws-chart-2, var(--ws-warning)); stroke-width: 2.25; stroke-linejoin: round; stroke-linecap: round; animation: ws-fade 600ms ease both 250ms; }
+.adm-chart .dot { fill: var(--ws-surface); stroke: var(--ws-chart-2, var(--ws-warning)); stroke-width: 2; }
+.adm-chart .axis { fill: var(--ws-muted); font-size: 11px; }
+.adm-chart .grid { stroke: var(--ws-border); stroke-width: 1; }
+@keyframes adm-grow { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+.adm-legend { display: flex; flex-wrap: wrap; gap: 0.4rem 1rem; font-size: 12.5px; color: var(--ws-muted); }
+.adm-legend i { display: inline-block; width: 0.7rem; height: 0.7rem; border-radius: 0.2rem; margin-right: 0.35rem; vertical-align: -1px; }
+.adm-skill { display: grid; grid-template-columns: minmax(0, 6.5rem) minmax(0, 1fr) 2.75rem 2.75rem; gap: 0.75rem; align-items: center; padding: 0.55rem 0; border-bottom: 1px solid var(--ws-border); }
+.adm-skill:last-child { border-bottom: 0; }
+.adm-skill-name { font-size: 14px; font-weight: 700; color: var(--ws-text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.adm-skill-bars { display: grid; gap: 4px; }
+.adm-skill-pct { font-size: 13px; font-weight: 600; text-align: right; font-variant-numeric: tabular-nums; color: var(--ws-text); }
+.adm-skill-pct.is-muted { color: var(--ws-text-2); font-weight: 500; }
+.adm-skill-track { height: 7px; border-radius: 9999px; background: var(--ws-surface-2); overflow: hidden; }
+.adm-skill-track > span { display: block; height: 100%; border-radius: inherit; transform-origin: left; transform: scaleX(0); transition: transform 600ms var(--ws-ease); }
+.adm-skill-track > span.is-in { transform: scaleX(1); }
+
+/* Sorotan singkat pada baris yang baru diubah admin */
+.adm-flash, .adm-flash > td { animation: adm-flash 1.4s ease-out; }
+@keyframes adm-flash { 0%, 25% { background-color: color-mix(in srgb, var(--ws-accent) 16%, transparent); } 100% { background-color: transparent; } }
+@media (prefers-reduced-motion: reduce) {
+    .adm-chart .bar, .adm-chart .line { animation: none; }
+    .adm-skill-track > span { transition: none; }
+}
+@media (max-width: 767px) { .adm-tiles > :last-child:nth-child(odd) { grid-column: span 2; } }
+
+/* Pilihan bersegmen berbasis radio (mis. jenis pengumuman) */
+.ws-seg-opt { display: inline-flex; align-items: center; height: 2.15rem; padding: 0 0.9rem; border-radius: 0.55rem; font-size: 13px; font-weight: 500; color: var(--ws-muted); transition: background-color 150ms ease, color 150ms ease; }
+.ws-seg label:hover .ws-seg-opt { color: var(--ws-text); }
+.ws-seg input:checked + .ws-seg-opt { background: var(--ws-navy); color: #FFFFFF; font-weight: 600; }
+.ws-seg input:focus-visible + .ws-seg-opt { box-shadow: var(--ws-focus); }
+html.dark .ws-seg input:checked + .ws-seg-opt { background: #E8EDF4; color: #0B111C; }
+
+/* ==================================================================== */
+/* Kepadatan Admin Portal: admin bekerja lama dan memindai banyak data,  */
+/* jadi ukuran lebih rapat dari portal recruiter. Kontrol hanya          */
+/* dirapatkan di desktop; di layar sentuh target tetap minimal 40px.     */
+/* ==================================================================== */
+.ws-body.ws-admin { font-size: 14px; }
+/* Latar html abu-abu kebiruan; tanpa ini warna berubah setelah layar pertama */
+.ws-admin .ws-content { background: var(--ws-bg); }
+.ws-admin .ws-main { max-width: 1240px; padding: 1rem 1rem 2.5rem; }
+@media (min-width: 640px) { .ws-admin .ws-main { padding: 1.25rem 1.5rem 3rem; } }
+@media (min-width: 1280px) { .ws-admin .ws-main { padding: 1.25rem 2rem 3rem; } }
+
+.ws-admin .ws-topbar { height: 3.25rem; }
+.ws-admin .ws-avatar { width: 2rem; height: 2rem; font-size: 12px; }
+.ws-admin .ws-page-head { margin-bottom: 1rem; }
+.ws-admin .ws-h1 { font-size: 1.4rem; line-height: 1.2; }
+.ws-admin .ws-lead { margin-top: 0.2rem; font-size: 13.5px; }
+.ws-admin .ws-h2 { font-size: 14.5px; }
+.ws-admin .ws-meta { font-size: 12.5px; }
+.ws-admin .ws-card-head { padding: 0.85rem 1rem 0; }
+.ws-admin .ws-card-body { padding: 0.85rem 1rem 1rem; }
+.ws-admin .ws-card { border-radius: 0.85rem; }
+.ws-admin .ws-table { font-size: 13.5px; }
+.ws-admin .ws-table th { padding: 0.55rem 0.85rem; }
+.ws-admin .ws-table td { padding: 0.55rem 0.85rem; }
+
+@media (min-width: 1024px) {
+    .ws-body.ws-admin { --ws-sidebar-w: 232px; }
+    .ws-collapsed .ws-body.ws-admin { --ws-sidebar-w: 76px; }
+    .ws-admin .ws-brand { padding: 0.9rem 0.9rem 0.7rem; }
+    .ws-admin .ws-nav { padding: 0.15rem 0.6rem 0.75rem; }
+    .ws-admin .ws-nav-label { padding: 0.75rem 0.6rem 0.3rem; font-size: 10.5px; }
+    .ws-admin .ws-nav-link { min-height: 2.2rem; gap: 0.6rem; padding: 0 0.6rem; font-size: 13.5px; border-radius: 0.55rem; }
+    .ws-admin .ws-nav-link svg { width: 1.05rem; height: 1.05rem; }
+    .ws-admin .ws-sidebar-foot { padding: 7.5rem 0.6rem 0.6rem; }
+    .ws-collapsed .ws-admin .ws-sidebar-foot { padding-top: 0.6rem; }
+    .ws-admin .ws-icon-btn { width: 2.25rem; height: 2.25rem; }
+    .ws-admin .ws-btn { height: 2.4rem; padding: 0 0.95rem; font-size: 13.5px; }
+    .ws-admin .ws-btn-sm { height: 2rem; padding: 0 0.7rem; font-size: 12.5px; }
+    .ws-admin .ws-input { min-height: 2.4rem; font-size: 13.5px; }
+}
+
+/* Kaki sidebar selalu terlihat; hanya daftar menu yang menggulir saat layar pendek */
+.ws-admin .ws-sidebar { overflow: hidden; }
+.ws-admin .ws-nav { flex: 1 1 auto; min-height: 0; overflow-y: auto; align-content: start; scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, 0.22) transparent; }
+.ws-admin .ws-sidebar-foot { flex: none; }
+/* Layar laptop pendek: mercusuar diperkecil, bukan dihilangkan */
+@media (max-height: 700px) {
+    .ws-admin .ws-sidebar-foot { padding-top: 4.75rem; }
+    .adm-side-art { left: 5rem; width: 90%; }
+}
+/* Sangat pendek (misalnya HP mendatar): ruang lebih penting untuk menu */
+@media (max-height: 480px) {
+    .ws-admin .ws-sidebar-foot { padding-top: 0.6rem; border-top: 1px solid rgba(255, 255, 255, 0.08); }
+    .adm-side-art, .ws-admin .ws-sidebar-foot::before { display: none; }
+}
+
+/* Ringkasan */
+.adm-hero { margin-bottom: 0.85rem; border-radius: 1rem; }
+.adm-hero-body { max-width: 40rem; padding: 0.85rem 0 0.95rem; }
+.adm-hero-lead { margin-top: 0.15rem; font-size: 13.5px; }
+.adm-hero-meta { margin-top: 0.55rem; font-size: 12.5px; }
+.adm-hero-status { margin-top: 0.45rem; gap: 0.25rem 1rem; font-size: 12.5px; }
+@media (min-width: 768px) {
+    /* Sisakan ruang untuk kapal: teks status membungkus, tidak menimpa ilustrasi */
+    .adm-hero-body { max-width: min(40rem, calc(100% - 15rem)); padding: 0.9rem 0 1rem 0.25rem; }
+    /* Lebar tetap dan rata bawah: kapal utuh walau hero lebih pendek */
+    .adm-hero-art { width: 380px; object-position: right bottom; }
+}
+@media (max-width: 767px) { .adm-hero-art { height: 5.5rem; } }
+
+/* Mode malam memakai ilustrasi malam sendiri, bukan versi siang yang digelapkan */
+.adm-hero-art--night { display: none; }
+html.dark .adm-hero-art--day { display: none; }
+html.dark .adm-hero-art--night { display: block; object-position: right 43%; }
+html.dark .adm-hero { background: linear-gradient(90deg, var(--ws-bg) 25%, #08192E 100%); }
+@media (min-width: 768px) {
+    /* Lebih lebar dari versi siang agar gelombang malam mengalir ke arah teks; kapal tetap utuh */
+    html.dark .adm-hero-art--night { width: min(100%, 760px); -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 30%); mask-image: linear-gradient(to right, transparent 0%, #000 30%); }
+}
+@media (max-width: 767px) { html.dark .adm-hero { background: transparent; } }
+
+.adm-kpis { gap: 0.6rem; }
+@media (min-width: 1100px) { .adm-kpis { gap: 0.75rem; } }
+.adm-kpi { gap: 0.7rem; padding: 0.75rem 0.85rem; border-radius: 0.85rem; }
+.adm-kpi-icon { width: 2.25rem; height: 2.25rem; }
+.adm-kpi-icon svg { width: 1.1rem; height: 1.1rem; }
+.adm-kpi-label { font-size: 13px; font-weight: 600; }
+.adm-kpi-num { margin-top: 0; font-size: 1.5rem; }
+.adm-kpi-sub { margin-top: 0.1rem; font-size: 12px; }
+.adm-kpi-trend { margin-top: 0.1rem; font-size: 12px; }
+@media (max-width: 639px) {
+    .adm-kpi { gap: 0.45rem; padding: 0.75rem; }
+    .adm-kpi-icon { width: 2.1rem; height: 2.1rem; }
+    .adm-kpi-icon svg { width: 1.05rem; height: 1.05rem; }
+    .adm-kpi-num { font-size: 1.4rem; }
+}
+
+.adm-card-head { gap: 0.6rem; padding: 0.8rem 1rem 0.6rem; }
+.adm-card-icon { width: 1.75rem; height: 1.75rem; }
+.adm-card-icon svg { width: 1rem; height: 1rem; }
+.adm-card-title { font-size: 14.5px; }
+.adm-main { gap: 0.75rem; margin-top: 0.85rem; }
+.adm-main > .ws-card { display: flex; flex-direction: column; }
+/* Baris antrean membagi tinggi kartu agar tidak ada ruang kosong di bawahnya */
+.adm-queue { flex: 1; }
+.adm-queue-item { flex: 1; gap: 0.7rem; padding: 0.55rem 1rem; }
+.adm-queue-icon { width: 1.8rem; height: 1.8rem; border-radius: 0.5rem; }
+.adm-queue-icon svg { width: 0.95rem; height: 0.95rem; }
+.adm-queue-label { font-size: 13.5px; }
+.adm-queue-sub { font-size: 12px; }
+.adm-queue-num { min-width: 1.75rem; font-size: 15px; }
+.adm-allclear { margin: 0 1rem 0.35rem; padding: 0.5rem 0.75rem; font-size: 13px; }
+
+.adm-metric { padding: 0.6rem 0.8rem 0.7rem; }
+.adm-metric-label { font-size: 13px; font-weight: 600; }
+.adm-metric-num { font-size: 1.3rem; }
+.adm-metric-na { margin-top: 0.25rem; font-size: 13.5px; }
+.adm-metric-def { margin-top: 0.15rem; font-size: 12px; line-height: 1.4; }
+.adm-split { gap: 0.75rem; }
+
+.adm-skill { grid-template-columns: minmax(0, 5rem) minmax(0, 1fr) 2.25rem 2.25rem; gap: 0.6rem; padding: 0.38rem 0; }
+.adm-skill-name { font-size: 13px; font-weight: 600; }
+.adm-skill-bars { gap: 3px; }
+.adm-skill-track { height: 6px; }
+.adm-skill-pct { font-size: 12.5px; }
+.adm-legend { font-size: 12px; }

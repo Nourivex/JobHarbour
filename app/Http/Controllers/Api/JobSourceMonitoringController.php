@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\AdminAuditLog;
 use App\Models\JobSource;
 use App\Models\JobSyncLog;
 use App\Models\JobVacancy;
@@ -85,6 +86,10 @@ class JobSourceMonitoringController extends Controller
         }
 
         $service->reconcileExpiredVacancies();
+
+        AdminAuditLog::record($request, 'source.synced', $sources->count() === 1 ? $sources->first() : null,
+            $sources->count() === 1 ? $sources->first()->name : 'Semua sumber aktif', null,
+            ['sources' => $sources->pluck('slug')->all()]);
 
         return $this->successResponse([
             'sources_processed' => count($logs),

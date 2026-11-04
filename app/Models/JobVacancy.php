@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -62,6 +63,7 @@ class JobVacancy extends Model
     protected function casts(): array
     {
         return [
+            'moderated_at' => 'datetime',
             'requirements' => 'array', // Otomatis mengubah JSON requirements menjadi array PHP
             'expires_at' => 'datetime',
             'salary_min' => 'integer',
@@ -90,5 +92,30 @@ class JobVacancy extends Model
     public function applications(): HasMany
     {
         return $this->hasMany(Application::class, 'job_vacancy_id');
+    }
+
+    /**
+     * Data demo: is_demo = true atau verification_status = demo_sample. Definisi ini sama dengan
+     * lencana "Data Demo" di katalog (job-ui.js) agar admin dan pelamar melihat hal yang sama.
+     */
+    public function scopeDemo(Builder $query, bool $demo = true): Builder
+    {
+        return $demo
+            ? $query->where(fn ($q) => $q->where('is_demo', true)->orWhere('verification_status', 'demo_sample'))
+            : $query->where('is_demo', false)
+                ->where(fn ($q) => $q->whereNull('verification_status')->orWhere('verification_status', '!=', 'demo_sample'));
+    }
+
+    public function isDemoData(): bool
+    {
+        return (bool) $this->is_demo || $this->verification_status === 'demo_sample';
+    }
+
+    /**
+     * Relasi: banding recruiter atas lowongan ini (laporan dengan kind = appeal).
+     */
+    public function appeals(): HasMany
+    {
+        return $this->hasMany(Report::class, 'target_id')->where('target_type', 'job')->where('kind', 'appeal');
     }
 }

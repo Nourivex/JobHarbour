@@ -6,7 +6,7 @@ import JH, { session, toast } from '../api.js';
 import { data } from './data.js';
 import { hydrateIcons, icon, initials, VERIFY, esc, companyLogo, stageOf, interviewOf } from './ui.js';
 
-function initSidebar() {
+export function initSidebar() {
     const sidebar = document.getElementById('ws-sidebar');
     const openBtn = document.querySelector('[data-sidebar-open]');
     const setOpen = (open) => {
@@ -61,7 +61,7 @@ function initSidebar() {
     });
 }
 
-function renderUser(user) {
+export function renderUser(user) {
     document.getElementById('ws-user-avatar').textContent = initials(user.name);
     document.getElementById('ws-user-name').textContent = user.name || '-';
     document.getElementById('ws-user-role').textContent = user.role === 'admin' ? 'Administrator' : 'Recruiter';
@@ -69,7 +69,7 @@ function renderUser(user) {
         document.getElementById('ws-admin-nav')?.classList.remove('hidden');
         document.getElementById('ws-company-nav')?.classList.add('hidden');
         const card = document.getElementById('ws-company-card');
-        card?.setAttribute('href', '/admin/verifications');
+        card?.setAttribute('href', '/admin');
     }
 }
 
@@ -111,9 +111,9 @@ function renderBanner(user, company) {
     if (document.body.dataset.page === 'verification') return;
 
     const copy = {
-        none: ['Lengkapi profil perusahaan untuk mulai merekrut.', 'Sebelum diverifikasi, lowongan hanya bisa disimpan sebagai draft.', '/recruiter/company', 'Lengkapi profil', 'info', 'Profil perusahaan belum lengkap'],
-        unverified: ['Perusahaanmu belum terverifikasi.', 'Lowongan bisa disimpan sebagai draft, tetapi baru bisa dipublikasikan setelah verifikasi disetujui.', '/recruiter/verification', 'Ajukan verifikasi', 'info', 'Perusahaan belum terverifikasi'],
-        pending: ['Pengajuan verifikasi sedang diperiksa admin.', 'Siapkan lowonganmu sebagai draft. Publikasikan setelah disetujui.', '/recruiter/verification', 'Lihat status', 'info', 'Verifikasi sedang diperiksa'],
+        none: ['Lengkapi profil perusahaan untuk mulai merekrut.', 'Sebelum diverifikasi, kamu bisa mempublikasikan 1 lowongan sebagai uji coba.', '/recruiter/company', 'Lengkapi profil', 'info', 'Profil perusahaan belum lengkap'],
+        unverified: ['Perusahaanmu belum terverifikasi.', 'Kamu bisa mempublikasikan 1 lowongan sebagai uji coba. Verifikasi untuk mempublikasikan tanpa batas.', '/recruiter/verification', 'Ajukan verifikasi', 'info', 'Perusahaan belum terverifikasi'],
+        pending: ['Pengajuan verifikasi sedang diperiksa admin.', 'Selama diperiksa, 1 lowongan boleh dipublikasikan sebagai uji coba.', '/recruiter/verification', 'Lihat status', 'info', 'Verifikasi sedang diperiksa'],
         revision_required: ['Admin meminta perbaikan verifikasi.', esc(company?.verification_note || 'Lihat catatan admin lalu ajukan ulang.'), '/recruiter/verification', 'Perbaiki pengajuan', 'warning', 'Verifikasi perlu perbaikan'],
         rejected: ['Pengajuan verifikasi ditolak.', esc(company?.verification_note || 'Lihat catatan admin lalu ajukan ulang.'), '/recruiter/verification', 'Perbaiki dan ajukan ulang', 'danger', 'Verifikasi ditolak'],
         suspended: ['Perusahaan sedang ditangguhkan.', esc(company?.verification_note || 'Hubungi admin JobHarbour untuk informasi lebih lanjut.'), '/recruiter/verification', 'Lihat detail', 'danger', 'Perusahaan ditangguhkan'],
@@ -190,6 +190,33 @@ export function setNavCounts(apps) {
     el.classList.toggle('hidden', !n);
 }
 
-export function canPublish(ctx) {
-    return ctx?.isAdmin || ctx?.company?.verification_status === 'verified';
+const TRIAL_FULL = 'Batas 1 lowongan uji coba sudah terpakai. Verifikasi perusahaan untuk mempublikasikan lowongan tanpa batas.';
+const BLOCKED = {
+    suspended: 'Perusahaan sedang ditangguhkan admin sehingga lowongan tidak dapat dipublikasikan.',
+    revision_required: 'Admin meminta perbaikan verifikasi. Perbaiki pengajuan untuk mempublikasikan lowongan.',
+    rejected: 'Pengajuan verifikasi ditolak. Perbaiki data verifikasi untuk mempublikasikan lowongan.',
+};
+
+/**
+ * Aturan publikasi, sama dengan JobVacancyController::publishBlocked di backend:
+ * admin dan perusahaan terverifikasi bebas; ditangguhkan/perlu revisi/ditolak diblok;
+ * selain itu boleh 1 lowongan aktif sebagai uji coba. jobs = lowongan milik recruiter (GET /jobs/my).
+ * Mengembalikan { ok, trial, reason }.
+ */
+export function publishRule(ctx, jobs = [], exceptId = null) {
+    if (ctx?.isAdmin) return { ok: true, trial: false, reason: '' };
+    // Lowongan yang diturunkan admin tidak bisa dibuka lagi sampai dipulihkan (JOB_REMOVED_BY_ADMIN di backend)
+    const self = exceptId != null ? jobs.find((j) => String(j.id) === String(exceptId)) : null;
+    if (self?.moderation_status === 'removed') {
+        return { ok: false, trial: false, reason: `Diturunkan admin JobHarbour: ${self.moderation_reason || 'tanpa keterangan'}. Perbaiki isinya lalu hubungi admin.` };
+    }
+    const status = ctx?.company?.verification_status || null;
+    if (status === 'verified') return { ok: true, trial: false, reason: '' };
+    if (BLOCKED[status]) return { ok: false, trial: false, reason: BLOCKED[status] };
+    const open = jobs.filter((j) => j.status === 'open' && String(j.id) !== String(exceptId)).length;
+    return open < 1 ? { ok: true, trial: true, reason: '' } : { ok: false, trial: true, reason: TRIAL_FULL };
+}
+
+export function canPublish(ctx, jobs = [], exceptId = null) {
+    return publishRule(ctx, jobs, exceptId).ok;
 }

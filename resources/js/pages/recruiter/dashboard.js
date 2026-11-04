@@ -1,4 +1,4 @@
-import { bootShell, setNavCounts, canPublish } from '../../recruiter/shell.js';
+import { bootShell, setNavCounts, publishRule } from '../../recruiter/shell.js';
 import { data, appsOfJob, stageCounts, averageScore } from '../../recruiter/data.js';
 import { initMenus } from '../../recruiter/components.js';
 import { initJobForm, openJobForm, skillSuggestions } from '../../recruiter/job-form.js';
@@ -37,8 +37,10 @@ function renderOnboarding(ctx, jobs) {
             done: status === 'verified' && jobs.some((j) => j.status === 'open'),
             title: 'Publikasikan lowongan pertama',
             text: status !== 'verified' && jobs.some((j) => j.status === 'open')
-                ? 'Lowongan yang sudah terbit tetap tampil. Lowongan baru bisa dipublikasikan setelah verifikasi.'
-                : 'Draft bisa disiapkan sejak sekarang.',
+                ? 'Jatah 1 lowongan uji coba sedang dipakai. Verifikasi untuk mempublikasikan tanpa batas.'
+                : status !== 'verified'
+                    ? 'Sebelum verifikasi, 1 lowongan boleh dipublikasikan sebagai uji coba.'
+                    : 'Draft bisa disiapkan sejak sekarang.',
             href: '#',
             cta: 'Buat lowongan',
             newJob: true,
@@ -127,8 +129,8 @@ function renderActions(ctx, jobs, apps) {
 
     const drafts = jobs.filter((j) => j.status === 'draft');
     if (drafts.length) {
-        const ok = canPublish(ctx);
-        items.push(actionItem('file-pen', 'warning', `${plural(drafts.length, 'draft')} belum dipublikasikan`, ok ? esc(drafts.map((d) => d.title).join(', ')) : 'Publikasikan setelah perusahaan terverifikasi.', '/recruiter/jobs?status=draft', 'Buka'));
+        const rule = publishRule(ctx, jobs);
+        items.push(actionItem('file-pen', 'warning', `${plural(drafts.length, 'draft')} belum dipublikasikan`, rule.ok ? esc(drafts.map((d) => d.title).join(', ')) : esc(rule.reason), '/recruiter/jobs?status=draft', 'Buka'));
     }
 
     const soon = jobs.filter((j) => j.status === 'open' && j.expires_at && (new Date(j.expires_at) - Date.now()) / 86400000 <= 7);
@@ -256,6 +258,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     initJobForm(ctx, {
+        jobs: () => jobs,
         onSave: async () => {
             data.invalidate('jobs');
             jobs = await data.jobs();

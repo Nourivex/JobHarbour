@@ -104,7 +104,9 @@ export async function request(path, options = {}) {
         if (response.status === 401 && options.auth !== false && token) {
             session.clear();
             const next = encodeURIComponent(window.location.pathname + window.location.search);
-            toast('Sesi Anda telah berakhir. Silakan masuk kembali.', 'warning', 4000);
+            toast(payload?.error_code === 'TOKEN_REVOKED'
+                ? 'Sesi ini sudah dikeluarkan. Silakan masuk kembali.'
+                : 'Sesi Anda telah berakhir. Silakan masuk kembali.', 'warning', 4000);
             setTimeout(() => {
                 window.location.href = '/login?next=' + next;
             }, 800);
@@ -146,6 +148,11 @@ export const auth = {
         session.clear();
         window.location.href = redirectTo;
     },
+    /** Membatalkan semua token akun ini di server, termasuk perangkat ini. */
+    async logoutAll() {
+        await api.post('/auth/logout-all');
+        session.clear();
+    },
 };
 
 export const jobs = {
@@ -155,6 +162,24 @@ export const jobs = {
     create: (payload) => api.post('/jobs', payload),
     update: (id, payload) => api.patch('/jobs/' + id, payload),
     close: (id) => api.del('/jobs/' + id),
+    appeal: (id, payload) => api.post('/jobs/' + id + '/appeal', payload),
+};
+
+/** Lonceng pemberitahuan milik pengguna yang sedang masuk. */
+export const notifications = {
+    list: () => api.get('/notifications'),
+    read: (id) => api.patch('/notifications/' + id + '/read'),
+    readAll: () => api.post('/notifications/read-all'),
+};
+
+/** Pengumuman situs yang sedang berlaku (publik). */
+export const announcements = {
+    active: () => api.get('/announcements/active'),
+};
+
+/** Laporan pengguna atas lowongan atau perusahaan. */
+export const reports = {
+    create: (payload) => api.post('/reports', payload),
 };
 
 export const applications = {
@@ -219,7 +244,12 @@ export const pipelines = {
 export const profile = {
     updateSkills: (skills) => api.put('/profile/skills', { skills }),
     update: (payload) => api.put('/profile', payload),
-    changePassword: (payload) => api.put('/auth/password', payload),
+    // Server mengeluarkan perangkat lain dan memberi token baru untuk perangkat ini
+    async changePassword(payload) {
+        const res = await api.put('/auth/password', payload);
+        if (res.data?.token) session.save(res.data.token);
+        return res;
+    },
 };
 
 /** Unduh berkas yang dilindungi token lalu buka di tab baru (atau simpan bila pop-up diblokir). */
@@ -256,6 +286,29 @@ export const admin = {
     verifications: (status) => api.get('/admin/verifications', status ? { status } : undefined),
     review: (id, payload) => api.patch('/admin/verifications/' + id, payload),
     setCompanyStatus: (id, payload) => api.patch('/admin/companies/' + id + '/status', payload),
+    // Admin Portal
+    overview: () => api.get('/admin/overview'),
+    users: (query) => api.get('/admin/users', query),
+    user: (id) => api.get('/admin/users/' + id),
+    setUserStatus: (id, payload) => api.patch('/admin/users/' + id + '/status', payload),
+    companies: (query) => api.get('/admin/companies', query),
+    company: (id) => api.get('/admin/companies/' + id),
+    jobs: (query) => api.get('/admin/jobs', query),
+    job: (id) => api.get('/admin/jobs/' + id),
+    moderateJob: (id, payload) => api.patch('/admin/jobs/' + id + '/moderation', payload),
+    auditLogs: (query) => api.get('/admin/audit-logs', query),
+    sources: () => api.get('/aggregator/summary'),
+    syncSources: (slug) => api.post('/aggregator/sync', slug ? { source_slug: slug } : {}),
+    health: () => api.get('/health'),
+    reports: (query) => api.get('/admin/reports', query),
+    updateReport: (id, payload) => api.patch('/admin/reports/' + id, payload),
+    settings: () => api.get('/admin/settings'),
+    updateSettings: (payload) => api.put('/admin/settings', payload),
+    announcements: () => api.get('/admin/announcements'),
+    createAnnouncement: (payload) => api.post('/admin/announcements', payload),
+    endAnnouncement: (id) => api.patch('/admin/announcements/' + id + '/end'),
+    toggleSource: (id, payload) => api.patch('/admin/sources/' + id, payload),
+    sourceLogs: (id) => api.get('/admin/sources/' + id + '/logs'),
 };
 
 export const matchmaking = {
@@ -346,7 +399,8 @@ export function requireAuth(roles) {
 export function homeFor(user) {
     if (!user) return '/catalog';
     // Admin belum punya dasbor sendiri, jadi memakai Papan Rekrutmen dengan cakupan semua lowongan
-    return user.role === 'recruiter' || user.role === 'admin' ? '/recruiter' : '/my-dock';
+    if (user.role === 'admin') return '/admin';
+    return user.role === 'recruiter' ? '/recruiter' : '/my-dock';
 }
 
 export const util = {

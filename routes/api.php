@@ -1,13 +1,21 @@
 <?php
 
+use App\Http\Controllers\Api\AdminJobController;
+use App\Http\Controllers\Api\AdminOverviewController;
+use App\Http\Controllers\Api\AdminPlatformController;
+use App\Http\Controllers\Api\AdminReportController;
+use App\Http\Controllers\Api\AdminUserController;
 use App\Http\Controllers\Api\AdminVerificationController;
+use App\Http\Controllers\Api\AnnouncementController;
 use App\Http\Controllers\Api\ApplicationController;
 use App\Http\Controllers\Api\ApplicationNoteController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CompanyController;
 use App\Http\Controllers\Api\JobVacancyController;
+use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\PipelineController;
 use App\Http\Controllers\Api\ProfileSkillController;
+use App\Http\Controllers\Api\ReportController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -87,12 +95,13 @@ Route::get('/health', function () {
 // =========================================================================
 Route::prefix('auth')->group(function () {
     // Rute Publik (Tanpa Token JWT)
-    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:login');
     Route::post('/register', [AuthController::class, 'register']);
 
     // Rute Terproteksi (Wajib Header: Authorization: Bearer <token>)
     Route::get('/me', [AuthController::class, 'me'])->middleware('jwt.auth');
     Route::put('/password', [AuthController::class, 'changePassword'])->middleware('jwt.auth');
+    Route::post('/logout-all', [AuthController::class, 'logoutAll'])->middleware('jwt.auth');
 });
 
 // Profil perusahaan dan pengajuan verifikasi (khusus recruiter)
@@ -117,7 +126,42 @@ Route::middleware('jwt.auth:admin')->prefix('admin')->group(function () {
     Route::get('/verifications', [AdminVerificationController::class, 'index']);
     Route::patch('/verifications/{id}', [AdminVerificationController::class, 'review'])->whereNumber('id');
     Route::patch('/companies/{id}/status', [AdminVerificationController::class, 'setCompanyStatus'])->whereNumber('id');
+
+    // Admin Portal: ringkasan, pengguna, perusahaan, moderasi lowongan, dan log audit
+    Route::get('/overview', [AdminOverviewController::class, 'overview']);
+    Route::get('/audit-logs', [AdminOverviewController::class, 'auditLogs']);
+    Route::get('/users', [AdminUserController::class, 'index']);
+    Route::get('/users/{id}', [AdminUserController::class, 'show'])->whereNumber('id');
+    Route::patch('/users/{id}/status', [AdminUserController::class, 'updateStatus'])->whereNumber('id');
+    Route::get('/companies', [AdminVerificationController::class, 'companies']);
+    Route::get('/companies/{id}', [AdminVerificationController::class, 'company'])->whereNumber('id');
+    Route::get('/jobs', [AdminJobController::class, 'index']);
+    Route::get('/jobs/{id}', [AdminJobController::class, 'show'])->whereNumber('id');
+    Route::patch('/jobs/{id}/moderation', [AdminJobController::class, 'moderate'])->whereNumber('id');
+    Route::get('/reports', [AdminReportController::class, 'index']);
+    Route::patch('/reports/{id}', [AdminReportController::class, 'update'])->whereNumber('id');
+    Route::get('/settings', [AdminPlatformController::class, 'settings']);
+    Route::put('/settings', [AdminPlatformController::class, 'updateSettings']);
+    Route::get('/announcements', [AdminPlatformController::class, 'announcements']);
+    Route::post('/announcements', [AdminPlatformController::class, 'storeAnnouncement']);
+    Route::patch('/announcements/{id}/end', [AdminPlatformController::class, 'endAnnouncement'])->whereNumber('id');
+    Route::patch('/sources/{id}', [AdminPlatformController::class, 'toggleSource'])->whereNumber('id');
+    Route::get('/sources/{id}/logs', [AdminPlatformController::class, 'sourceLogs'])->whereNumber('id');
 });
+
+// Pengumuman situs yang sedang berlaku (publik, untuk banner)
+Route::get('/announcements/active', [AnnouncementController::class, 'active']);
+
+// Lonceng pemberitahuan milik pengguna yang sedang masuk
+Route::middleware('jwt.auth')->prefix('notifications')->group(function () {
+    Route::get('/', [NotificationController::class, 'index']);
+    Route::post('/read-all', [NotificationController::class, 'markAllRead']);
+    Route::patch('/{id}/read', [NotificationController::class, 'markRead'])->whereNumber('id');
+});
+
+// Laporan pengguna dan banding recruiter (dibatasi agar tidak dipakai untuk spam)
+Route::middleware(['jwt.auth', 'throttle:10,60'])->post('/reports', [ReportController::class, 'store']);
+Route::middleware(['jwt.auth:recruiter', 'throttle:10,60'])->post('/jobs/{id}/appeal', [ReportController::class, 'appeal'])->whereNumber('id');
 
 Route::middleware('jwt.auth')->group(function () {
     // Method PUT/PATCH: Memperbarui biodata profil & keahlian pengguna
@@ -204,5 +248,5 @@ Route::get('/geo/villages', [\App\Http\Controllers\Api\GeospatialAtlasController
 // =========================================================================
 Route::prefix('aggregator')->middleware('jwt.auth:admin')->group(function () {
     Route::get('/summary', [\App\Http\Controllers\Api\JobSourceMonitoringController::class, 'getMonitoringSummary']);
-    Route::post('/sync', [\App\Http\Controllers\Api\JobSourceMonitoringController::class, 'triggerSync']);
+    Route::post('/sync', [\App\Http\Controllers\Api\JobSourceMonitoringController::class, 'triggerSync'])->middleware('throttle:6,1');
 });

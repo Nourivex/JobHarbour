@@ -614,4 +614,25 @@ class JobHarbourApiTest extends TestCase
         $reactivateRejected->assertStatus(422)
             ->assertJsonPath('error_code', 'INVALID_STAGE_TRANSITION');
     }
+
+    public function test_login_is_rate_limited_with_standard_envelope(): void
+    {
+        // 5 percobaan gagal dalam semenit masih dijawab normal (401)
+        for ($i = 0; $i < 5; $i++) {
+            $this->postJson('/api/auth/login', ['email' => 'recruiter@test.com', 'password' => 'salah-sandi'])
+                ->assertStatus(401);
+        }
+
+        // Percobaan keenam dibatasi dengan 429 dan envelope JSON standar
+        $this->postJson('/api/auth/login', ['email' => 'recruiter@test.com', 'password' => 'secret123'])
+            ->assertStatus(429)
+            ->assertHeader('Retry-After')
+            ->assertJsonPath('status', 'error')
+            ->assertJsonPath('error_code', 'TOO_MANY_REQUESTS')
+            ->assertJsonStructure(['status', 'message', 'data', 'meta' => ['retry_after']]);
+
+        // Email lain dari IP yang sama tetap bisa masuk
+        $this->postJson('/api/auth/login', ['email' => 'applicant@test.com', 'password' => 'secret123'])
+            ->assertStatus(200);
+    }
 }

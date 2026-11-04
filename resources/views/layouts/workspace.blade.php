@@ -91,10 +91,9 @@
 
                 <div id="ws-admin-nav" class="hidden">
                     <p class="ws-nav-label">Admin</p>
-                    <a href="/admin/verifications" class="ws-nav-link" @if (($active ?? '') === 'admin-verifications') aria-current="page" @endif>
-                        <i data-lucide="badge-check"></i>
-                        <span>Periksa Verifikasi</span>
-                        <span id="ws-nav-pending" class="ws-nav-count hidden"></span>
+                    <a href="/admin" class="ws-nav-link">
+                        <i data-lucide="shield-check"></i>
+                        <span>Buka Admin Portal</span>
                     </a>
                 </div>
 
@@ -136,6 +135,7 @@
                     </ol>
                 </nav>
                 <div class="flex items-center gap-1.5">
+                    <div data-notif="ws"></div>
                     <button type="button" class="ws-icon-btn" data-theme-toggle aria-label="Ganti mode tema">
                         <i data-lucide="moon" class="icon-moon"></i>
                         <i data-lucide="sun" class="icon-sun"></i>
@@ -151,6 +151,7 @@
             </header>
 
             <!-- Pengumuman status verifikasi (diisi oleh shell.js) -->
+            <div id="jh-announcement"></div>
             <div id="ws-banner" class="hidden"></div>
 
             <main id="ws-main" class="ws-main" tabindex="-1">

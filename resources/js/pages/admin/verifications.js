@@ -1,6 +1,7 @@
 import { admin, toast, downloadProtected } from '../../api.js';
-import { bootShell } from '../../recruiter/shell.js';
+import { bootAdmin } from '../../admin/shell.js';
 import { initMenus, openDialog, setBusy } from '../../recruiter/components.js';
+import { confirmAction } from '../../admin/ui.js';
 import { esc, icon, hydrateIcons, companyLogo, verifyBadge, formatDate, relativeTime, formatBytes, emptyState, skeletonRows, errorMessage } from '../../recruiter/ui.js';
 
 const $ = (id) => document.getElementById(id);
@@ -10,9 +11,11 @@ const state = { status: 'pending', items: [], counts: {}, current: null };
 function renderList() {
     document.querySelectorAll('#av-tabs [data-status]').forEach((t) => t.setAttribute('aria-selected', String(t.dataset.status === state.status)));
     document.querySelectorAll('[data-count]').forEach((el) => { el.textContent = state.counts[el.dataset.count] || 0; });
-    const navCount = document.getElementById('ws-nav-pending');
-    navCount.textContent = state.counts.pending || 0;
-    navCount.classList.toggle('hidden', !state.counts.pending);
+    const navCount = document.getElementById('adm-nav-verifications');
+    if (navCount) {
+        navCount.textContent = state.counts.pending || 0;
+        navCount.classList.toggle('hidden', !state.counts.pending);
+    }
 
     const list = state.items.filter((i) => i.status === state.status);
     if (!list.length) {
@@ -46,7 +49,7 @@ function renderDialog(v) {
     $('av-d-title').textContent = c.name || '-';
     $('av-d-sub').textContent = [c.industry, c.city, c.website].filter(Boolean).join(' · ');
     $('av-d-body').innerHTML = `
-        <div class="flex flex-wrap items-center gap-2">${verifyBadge(c.verification_status)}<span class="ws-meta">Diajukan ${formatDate(v.submitted_at, true)} oleh ${esc(c.owner?.name || '-')} (${esc(c.owner?.email || '-')})</span></div>
+        <div class="flex flex-wrap items-center gap-2">${verifyBadge(c.verification_status)}<span class="ws-meta">Diajukan ${formatDate(v.submitted_at, true)} oleh ${esc(c.owner?.name || '-')} (${esc(c.owner?.email || '-')})</span>${c.id ? `<a href="/admin/companies/${c.id}" class="ws-btn ws-btn-ghost ws-btn-sm ml-auto">Detail perusahaan${icon('arrow-right')}</a>` : ''}</div>
         <dl class="grid sm:grid-cols-2 gap-4 text-sm">
             <div><dt class="ws-meta">Nama badan usaha</dt><dd class="font-medium">${esc(v.legal_name)}</dd></div>
             <div><dt class="ws-meta">Nama di profil</dt><dd class="font-medium">${esc(c.name || '-')}</dd></div>
@@ -100,7 +103,7 @@ async function load() {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-    const ctx = await bootShell({ page: 'admin-verifications', roles: ['admin'] });
+    const ctx = await bootAdmin({ page: 'admin-verifications' });
     if (!ctx) return;
     initMenus();
 
@@ -146,37 +149,26 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         const cs = e.target.closest('[data-company-status]');
         if (cs) {
-            let note = null;
-            if (cs.dataset.companyStatus === 'suspended') {
-                // Langkah pertama memunculkan kolom alasan, langkah kedua mengirim
-                if (!$('av-suspend-note')) {
-                    $('av-d-body').insertAdjacentHTML('beforeend', `
-                        <div class="ws-panel-enter">
-                            <label for="av-suspend-note" class="ws-label">Alasan penangguhan</label>
-                            <textarea id="av-suspend-note" rows="3" maxlength="1000" class="ws-input" placeholder="Akan ditampilkan kepada recruiter."></textarea>
-                            <p class="ws-error" id="av-suspend-error"></p>
-                        </div>`);
-                    cs.innerHTML = `${icon('ban')}Konfirmasi penangguhan`;
-                    $('av-suspend-note').focus();
-                    return;
-                }
-                note = $('av-suspend-note').value.trim();
-                if (!note) {
-                    $('av-suspend-error').textContent = 'Tulis alasan penangguhan.';
-                    $('av-suspend-note').focus();
-                    return;
-                }
-            }
-            setBusy(cs, true, 'Menyimpan...');
-            try {
-                await admin.setCompanyStatus(state.current.company.id, { status: cs.dataset.companyStatus, note });
-                toast(cs.dataset.companyStatus === 'suspended' ? 'Perusahaan ditangguhkan.' : 'Penangguhan dicabut.', 'success');
-                $('av-dialog').close();
-                await load();
-            } catch (err) {
-                setBusy(cs, false);
-                toast(errorMessage(err, 'Status perusahaan gagal diubah.'), 'error');
-            }
+            // Dialog konfirmasi yang sama dengan halaman Perusahaan: menyebut dampak dan meminta alasan
+            const suspend = cs.dataset.companyStatus === 'suspended';
+            const company = state.current.company;
+            $('av-dialog').close();
+            confirmAction({
+                title: suspend ? 'Tangguhkan perusahaan?' : 'Cabut penangguhan?',
+                subtitle: company.name,
+                impact: suspend
+                    ? 'Recruiter tidak dapat mempublikasikan lowongan baru. Lowongan yang sudah terbit tetap tampil sampai diturunkan. Alasan ditampilkan kepada recruiter.'
+                    : 'Perusahaan kembali berstatus terverifikasi dan bisa mempublikasikan lowongan.',
+                confirmText: suspend ? 'Tangguhkan' : 'Cabut penangguhan',
+                tone: suspend ? 'danger' : 'primary',
+                reason: suspend ? 'required' : 'none',
+                placeholder: 'contoh: Beberapa pelamar melaporkan permintaan biaya pendaftaran.',
+                onConfirm: async (reason) => {
+                    await admin.setCompanyStatus(company.id, { status: cs.dataset.companyStatus, note: reason });
+                    toast(suspend ? 'Perusahaan ditangguhkan dan tercatat di Log Audit.' : 'Penangguhan dicabut.', 'success');
+                    await load();
+                },
+            });
         }
     });
 

@@ -73,6 +73,7 @@ Seluruh API endpoint **wajib** mengembalikan response dalam format envelope beri
 > - `TOKEN_EXPIRED`: Token JWT telah habis masa berlakunya (HTTP 401).
 > - `TOKEN_INVALID` / `MISSING_BEARER_TOKEN`: Token tidak valid atau header Authorization tidak ditemukan (HTTP 401).
 > - `IDOR_FORBIDDEN`: Upaya mengakses atau memanipulasi resource milik pengguna lain (HTTP 403).
+> - `TOO_MANY_REQUESTS`: Terlalu banyak percobaan dalam waktu singkat (HTTP 429). Saat ini berlaku untuk `POST /api/auth/login`: maksimal 5 percobaan per menit untuk kombinasi email + IP dan 20 per menit per IP. Header `Retry-After` dan `meta.retry_after` berisi jeda dalam detik.
 > - `INSUFFICIENT_ROLE`: Peran pengguna (role) tidak mencukupi untuk aksi tersebut (HTTP 403).
 > - `VALIDATION_ERROR`: Kegagalan validasi form request (HTTP 422).
 > - `CANCELLATION_NOT_ALLOWED`: Pembatalan lamaran ditolak karena sudah masuk tahap lanjut (HTTP 409).
@@ -360,7 +361,7 @@ Status verifikasi perusahaan: `unverified`, `pending`, `revision_required`, `ver
 | `POST` | `/jobs/{id}/requirements` | Tambah skill requirement | ✅ | Recruiter |
 | `PATCH` | `/jobs/{id}/requirements/{reqId}` | Update weight/level requirement | ✅ | Recruiter |
 
-**Siklus status lowongan:** `draft` → `open` (dipublikasikan) → `closed` → `archived`. `POST /jobs` menerima `status` `draft` atau `open` (bawaan `open`); `PUT/PATCH /jobs/{id}` menerima keempat status. Membuka lowongan (`open`) hanya diizinkan bila perusahaan recruiter berstatus `verified`, selain itu `403` dengan `error_code: COMPANY_NOT_VERIFIED`. Draft dan arsip tidak tampil di `GET /jobs` maupun `GET /jobs/{id}` publik; pemiliknya melihat semua status lewat `GET /jobs/my` (admin melihat semua lowongan). Bila `company` tidak dikirim, nama perusahaan diambil dari profil perusahaan.
+**Siklus status lowongan:** `draft` → `open` (dipublikasikan) → `closed` → `archived`. `POST /jobs` menerima `status` `draft` atau `open` (bawaan `open`); `PUT/PATCH /jobs/{id}` menerima keempat status. Membuka lowongan (`open`) bebas bila perusahaan recruiter berstatus `verified`. Perusahaan berstatus `suspended`, `revision_required`, atau `rejected` tidak bisa membuka lowongan. Selain itu (belum ada profil, `unverified`, `pending`) recruiter boleh memiliki **1 lowongan aktif** sebagai uji coba dengan `verification_status: unverified`; lowongan aktif berikutnya ditolak `403` dengan `error_code: COMPANY_NOT_VERIFIED`. Draft dan arsip tidak tampil di `GET /jobs` maupun `GET /jobs/{id}` publik; pemiliknya melihat semua status lewat `GET /jobs/my` (admin melihat semua lowongan). Bila `company` tidak dikirim, nama perusahaan diambil dari profil perusahaan.
 
 **Tahap Hired:** dicatat sebagai `PATCH /pipelines/{id}/status` dengan `{ "stage": "offering", "status": "passed" }` saat kandidat sudah di tahap Offering. Portal recruiter menampilkannya sebagai kolom Hired.
 
@@ -716,6 +717,52 @@ Pelamar hanya diperbolehkan membatalkan lamarannya jika proses seleksi masih ber
   }
 }
 ```
+
+---
+
+### 4.5 Admin Portal (tata kelola platform)
+
+Semua endpoint di bawah memakai `Authorization: Bearer <token_admin>` dan dilindungi `jwt.auth:admin` (selain admin mendapat `403 INSUFFICIENT_ROLE`). Daftar memakai halaman di server: query `page` dan `per_page` (5 sampai 100), dengan `meta.pagination` berisi `current_page`, `per_page`, `total`, `last_page`. Password dan token tidak pernah dikirim. Setiap tindakan yang mengubah data dicatat di log audit oleh server.
+
+| Method | Endpoint | Keterangan |
+|---|---|---|
+| GET | `/api/admin/overview` | Antrean keputusan (verifikasi menunggu, sumber bermasalah, revisi, lowongan diturunkan, akun/perusahaan ditangguhkan), jumlah pengguna per peran, perusahaan per status, lowongan nyata vs demo, lamaran, dan 8 tindakan admin terakhir. `meta.window_days` = 30 untuk angka "baru". |
+| GET | `/api/admin/users?q=&role=&status=` | Daftar pengguna. `role`: applicant, recruiter, admin. `status`: active, suspended. |
+| GET | `/api/admin/users/{id}` | Detail akun, lamaran/lowongan terbaru, dan riwayat tindakan admin terhadap akun ini. |
+| PATCH | `/api/admin/users/{id}/status` | Body `{ "status": "suspended" \| "active", "reason": "..." }`. Alasan wajib (min. 10 karakter) saat menangguhkan. Tidak bisa mengubah akun sendiri (`403 SELF_ACTION_FORBIDDEN`) atau akun admin lain (`403 ADMIN_PROTECTED`). |
+| GET | `/api/admin/companies?q=&status=` | Daftar perusahaan, yang menunggu tindakan di atas. `meta.counts` per status verifikasi. |
+| GET | `/api/admin/companies/{id}` | Profil, pemilik, riwayat verifikasi, dan lowongan perusahaan. |
+| GET | `/api/admin/jobs?q=&status=&moderation=&source=&demo=` | Semua lowongan untuk moderasi. `moderation`: none, removed. |
+| GET | `/api/admin/jobs/{id}` | Detail untuk pemeriksaan moderasi: isi, syarat skill, gaji, recruiter, 10 laporan atau banding terbaru atas lowongan ini, dan riwayat tindakan admin. `404` bila tidak ada. |
+| PATCH | `/api/admin/jobs/{id}/moderation` | Body `{ "action": "remove" \| "restore", "reason": "..." }`. Alasan wajib (min. 10 karakter) saat menurunkan. |
+| GET | `/api/admin/audit-logs?action=&target_type=&actor_id=` | Log audit (baca saja). `meta.actions` berisi label setiap jenis tindakan. |
+| GET | `/api/admin/reports?status=&kind=` | Laporan pengguna dan banding recruiter. `status`: active (open + in_review, bawaan), open, in_review, resolved, dismissed. `kind`: report, appeal. Diurutkan dari yang paling lama menunggu. |
+| PATCH | `/api/admin/reports/{id}` | Body `{ "status": "in_review" \| "resolved" \| "dismissed", "resolution": "..." }`. Hasil pemeriksaan wajib (min. 10 karakter) saat menyelesaikan atau menolak. Laporan yang sudah ditutup: `409 ALREADY_CLOSED`. |
+| GET | `/api/admin/settings` | Pengaturan platform. Saat ini `{ "hide_demo_jobs": bool }`. |
+| PUT | `/api/admin/settings` | Body `{ "hide_demo_jobs": bool }`. Dicatat di log audit (`settings.updated`). |
+| GET | `/api/admin/announcements` | 30 pengumuman terbaru beserta `state`: live, scheduled, ended. |
+| POST | `/api/admin/announcements` | Body `{ "message" (10 sampai 240 karakter), "level": "info" \| "warning", "audience": "all" \| "applicant" \| "recruiter", "starts_at"?, "ends_at"? }`. `ends_at` harus di masa depan dan setelah `starts_at`. 201. |
+| PATCH | `/api/admin/announcements/{id}/end` | Mengakhiri pengumuman lebih awal. Sudah berakhir: `409 ALREADY_ENDED`. |
+| PATCH | `/api/admin/sources/{id}` | Body `{ "is_enabled": bool, "reason": "..." }`. Alasan wajib (min. 10 karakter) saat menonaktifkan. Status sama dengan sekarang: `409 INVALID_TRANSITION`. |
+| GET | `/api/admin/sources/{id}/logs` | 20 riwayat sinkronisasi terakhir sumber ini (waktu, hasil, jumlah diambil, baru, diperbarui, durasi, pesan galat). |
+
+**Laporan dan banding (pengguna):**
+- `POST /api/reports` (semua pengguna yang masuk, dibatasi 10 per jam): body `{ "target_type": "job" | "company", "target_id", "category": "scam" | "misleading" | "discrimination" | "spam" | "other", "description" (min. 20) }`. 201 + `Location`. Laporan ganda yang masih aktif: `409 DUPLICATE_REPORT`. Melaporkan milik sendiri: `403 SELF_REPORT_FORBIDDEN`.
+- `POST /api/jobs/{id}/appeal` (recruiter pemilik, dibatasi 10 per jam): body `{ "description" (min. 20) }` untuk lowongan yang diturunkan admin. Lowongan tidak sedang diturunkan: `409 NOT_REMOVED`; banding aktif sudah ada: `409 DUPLICATE_APPEAL`. `GET /api/jobs/my` menyertakan `has_open_appeal`.
+
+**Pemberitahuan (lonceng):** `GET /api/notifications` (20 terbaru + `meta.unread_count`), `PATCH /api/notifications/{id}/read`, `POST /api/notifications/read-all`. Hanya milik pengguna yang masuk (milik orang lain: `404`). Dibuat server saat tahap lamaran berubah (assessment, wawancara dan jadwal ulang, penawaran, diterima, ditolak), lowongan diturunkan atau dipulihkan, keputusan verifikasi, status perusahaan berubah, dan laporan atau banding ditutup. Catatan internal recruiter tidak pernah ikut dikirim.
+
+**Akun ditangguhkan:** login dan semua endpoint terproteksi mengembalikan `403` dengan `error_code: ACCOUNT_SUSPENDED`, termasuk token yang dibuat sebelum penangguhan.
+
+**Sesi dan token:** token admin berlaku 8 jam, peran lain 7 hari (`expires_in` di respons login dalam detik). Setiap token membawa klaim versi `tv`. `POST /api/auth/logout-all` menaikkan versi sehingga semua token akun itu langsung ditolak `401` dengan `error_code: TOKEN_REVOKED`, termasuk token perangkat yang memanggilnya. `PUT /api/auth/password` juga menaikkan versi dan mengembalikan `{ "token", "token_type", "expires_in" }` baru untuk perangkat yang sedang dipakai, sehingga hanya perangkat lain yang dikeluarkan.
+
+**Lowongan diturunkan admin:** tidak tampil di `GET /api/jobs`, `GET /api/jobs/{id}` mengembalikan `404`, dan lamaran baru ditolak `400`. Pemilik tetap melihatnya di `GET /api/jobs/my` beserta `moderation_status` dan `moderation_reason`, tetapi tidak bisa membukanya lagi (`403 JOB_REMOVED_BY_ADMIN`) sampai admin memulihkannya.
+
+**Sinkron sumber lowongan:** `POST /api/aggregator/sync` dibatasi 6 kali per menit dan dicatat di log audit.
+
+**Data demo:** lowongan dianggap data demo bila `is_demo = true` atau `verification_status = demo_sample` (sama dengan lencana "Data Demo" di katalog). Saat `hide_demo_jobs` aktif, lowongan demo tidak tampil di `GET /api/jobs` dan `GET /api/jobs/{id}` mengembalikan `404`. Data tidak dihapus dan tetap terlihat di `GET /api/admin/jobs`.
+
+**Pengumuman situs:** `GET /api/announcements/active` (publik, tanpa token) mengembalikan maksimal 3 pengumuman yang sedang berlaku. Penyaringan `audience` dilakukan di frontend karena isinya memang publik.
 
 ---
 

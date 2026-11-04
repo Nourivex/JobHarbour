@@ -30,6 +30,7 @@
     <!-- Navbar: transparan di atas hero beranda, navy di halaman lain dan saat di-scroll -->
     @php $heroNav = $heroNav ?? false; @endphp
     <header id="site-nav" data-hero-nav="{{ $heroNav ? '1' : '0' }}" class="site-nav {{ $heroNav ? 'fixed is-hero' : 'sticky is-solid' }} top-0 inset-x-0 z-40 text-white">
+        <div id="jh-announcement"></div>
         <div class="max-w-[1240px] mx-auto px-4 sm:px-8 h-[72px] flex items-center gap-3 sm:gap-6">
 
             <!-- Brand -->
@@ -66,7 +67,8 @@
                     </a>
                 </div>
 
-                <!-- Sudah login -->
+                <!-- Sudah login: lonceng pemberitahuan lalu menu profil -->
+                <div data-jh-auth-only data-notif="nav" style="display:none;"></div>
                 <div data-jh-auth-only style="display:none;" class="relative">
                     <button
                         id="user-menu-button"

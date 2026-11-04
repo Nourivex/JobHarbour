@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\AdminAuditLog;
 use App\Models\Company;
 use App\Models\CompanyVerification;
+use App\Models\JobVacancy;
+use App\Models\UserNotification;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -121,6 +124,18 @@ class AdminVerificationController extends Controller
             }
         });
 
+        AdminAuditLog::record($request, match ($decision) {
+            'approve' => 'company.verification_approved',
+            'revision' => 'company.verification_revision',
+            default => 'company.verification_rejected',
+        }, $submission->company, $submission->company->name, $request->admin_notes, ['verification_id' => $submission->id]);
+
+        UserNotification::send($submission->company->owner_id, 'company.verification_'.$decision, match ($decision) {
+            'approve' => 'Perusahaanmu terverifikasi',
+            'revision' => 'Admin meminta perbaikan verifikasi',
+            default => 'Pengajuan verifikasi ditolak',
+        }, $approved ? "{$submission->company->name} sekarang bisa mempublikasikan lowongan tanpa batas." : $request->admin_notes, '/recruiter/verification');
+
         return $this->successResponse($submission->fresh(['reviewer'])->toApiArray(), $message);
     }
 
@@ -163,8 +178,126 @@ class AdminVerificationController extends Controller
             'verification_note' => $request->status === 'suspended' ? $request->note : null,
         ]);
 
+        AdminAuditLog::record($request, $request->status === 'suspended' ? 'company.suspended' : 'company.reinstated', $company, $company->name, $request->note);
+
+        UserNotification::send($company->owner_id, $request->status === 'suspended' ? 'company.suspended' : 'company.reinstated',
+            $request->status === 'suspended' ? 'Perusahaanmu ditangguhkan admin' : 'Penangguhan perusahaanmu dicabut',
+            $request->status === 'suspended' ? $request->note : "{$company->name} kembali bisa mempublikasikan lowongan.",
+            '/recruiter/verification');
+
         return $this->successResponse($company->fresh(), $request->status === 'suspended'
             ? 'Perusahaan ditangguhkan. Lowongan barunya tidak dapat dipublikasikan.'
             : 'Penangguhan perusahaan dicabut.');
+    }
+
+    /**
+     * Daftar semua perusahaan untuk admin (halaman di server).
+     *
+     * Method  : GET
+     * Endpoint: /api/admin/companies?q=&status=&page=&per_page=
+     */
+    public function companies(Request $request): JsonResponse
+    {
+        $perPage = min(max((int) $request->input('per_page', 20), 5), 100);
+        $q = trim((string) $request->input('q'));
+
+        $page = Company::with('owner:id,name,email')
+            ->withCount('verifications')
+            ->when($q !== '', fn ($query) => $query->where(fn ($w) => $w->where('name', 'like', "%{$q}%")->orWhere('city', 'like', "%{$q}%")))
+            ->when(in_array($request->input('status'), Company::STATUSES, true), fn ($query) => $query->where('verification_status', $request->input('status')))
+            ->orderByRaw("CASE verification_status WHEN 'pending' THEN 0 WHEN 'revision_required' THEN 1 WHEN 'suspended' THEN 2 ELSE 3 END")
+            ->latest('id')
+            ->paginate($perPage);
+
+        $ownerIds = $page->getCollection()->pluck('owner_id')->filter()->all();
+        $jobCounts = JobVacancy::whereIn('posted_by', $ownerIds)
+            ->select('posted_by', DB::raw('count(*) as total'), DB::raw("sum(case when status = 'open' then 1 else 0 end) as open_total"))
+            ->groupBy('posted_by')->get()->keyBy('posted_by');
+
+        $items = $page->getCollection()->map(fn (Company $c) => [
+            'id' => $c->id,
+            'name' => $c->name,
+            'industry' => $c->industry,
+            'city' => $c->city,
+            'logo_url' => $c->logo_url,
+            'verification_status' => $c->verification_status,
+            'verified_at' => $c->verified_at?->toIso8601String(),
+            'created_at' => $c->created_at?->toIso8601String(),
+            'owner' => $c->owner?->only(['id', 'name', 'email']),
+            'jobs_total' => (int) ($jobCounts[$c->owner_id]->total ?? 0),
+            'jobs_open' => (int) ($jobCounts[$c->owner_id]->open_total ?? 0),
+            'verifications_count' => $c->verifications_count,
+        ])->values();
+
+        return $this->successResponse($items, 'Daftar perusahaan berhasil dimuat.', 200, [
+            'pagination' => $this->paginationMeta($page),
+            'counts' => Company::query()->select('verification_status', DB::raw('count(*) as total'))->groupBy('verification_status')->pluck('total', 'verification_status'),
+        ]);
+    }
+
+    /**
+     * Detail satu perusahaan: profil, pemilik, riwayat verifikasi, dan lowongannya.
+     *
+     * Method  : GET
+     * Endpoint: /api/admin/companies/{id}
+     */
+    public function company(int $id): JsonResponse
+    {
+        $company = Company::with(['owner', 'verifications.reviewer:id,name'])->find($id);
+
+        if (! $company) {
+            return $this->notFoundResponse('Perusahaan tidak ditemukan.');
+        }
+
+        $jobs = $company->owner_id
+            ? JobVacancy::where('posted_by', $company->owner_id)->withCount('applications')->latest('id')->get()
+                ->map(fn (JobVacancy $j) => [
+                    'id' => $j->id,
+                    'title' => $j->title,
+                    'status' => $j->status,
+                    'moderation_status' => $j->moderation_status,
+                    'location' => $j->location,
+                    'applications_count' => $j->applications_count,
+                    'created_at' => $j->created_at?->toIso8601String(),
+                ])
+            : collect();
+
+        return $this->successResponse([
+            'id' => $company->id,
+            'name' => $company->name,
+            'industry' => $company->industry,
+            'size' => $company->size,
+            'founded_year' => $company->founded_year,
+            'description' => $company->description,
+            'address' => $company->address,
+            'city' => $company->city,
+            'website' => $company->website,
+            'email' => $company->email,
+            'phone' => $company->phone,
+            'logo_url' => $company->logo_url,
+            'verification_status' => $company->verification_status,
+            'verification_note' => $company->verification_note,
+            'verified_at' => $company->verified_at?->toIso8601String(),
+            'created_at' => $company->created_at?->toIso8601String(),
+            'owner' => $company->owner ? [
+                'id' => $company->owner->id,
+                'name' => $company->owner->name,
+                'email' => $company->owner->email,
+                'status' => $company->owner->status,
+                'created_at' => $company->owner->created_at?->toIso8601String(),
+            ] : null,
+            'verifications' => $company->verifications->sortByDesc('id')->values()->map(fn (CompanyVerification $v) => $v->toApiArray()),
+            'jobs' => $jobs,
+        ], 'Detail perusahaan berhasil dimuat.');
+    }
+
+    private function paginationMeta($page): array
+    {
+        return [
+            'current_page' => $page->currentPage(),
+            'per_page' => $page->perPage(),
+            'total' => $page->total(),
+            'last_page' => $page->lastPage(),
+        ];
     }
 }

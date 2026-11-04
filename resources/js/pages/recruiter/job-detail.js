@@ -1,11 +1,11 @@
 import { jobs as jobsApi, toast, confirm, util } from '../../api.js';
-import { bootShell, canPublish } from '../../recruiter/shell.js';
+import { bootShell, publishRule } from '../../recruiter/shell.js';
 import { data, jobById, appsOfJob, stageCounts, averageScore } from '../../recruiter/data.js';
-import { initMenus } from '../../recruiter/components.js';
+import { initMenus, openDialog, setBusy } from '../../recruiter/components.js';
 import { initJobForm, openJobForm, skillSuggestions } from '../../recruiter/job-form.js';
 import { mountCandidateWorkspace } from '../../recruiter/candidate-workspace.js';
 import {
-    esc, icon, hydrateIcons, LEVEL, jobStatusBadge, scoreInfo, formatDate, relativeTime, emptyState, errorMessage,
+    esc, icon, hydrateIcons, LEVEL, jobStatusBadge, moderationPill, scoreInfo, formatDate, relativeTime, emptyState, errorMessage,
 } from '../../recruiter/ui.js';
 import { EMPLOYMENT_SHORT, salaryRange } from '../../job-ui.js';
 
@@ -18,18 +18,66 @@ function renderHeader() {
     document.title = `${j.title} - Portal Recruiter JobHarbour`;
     $('ws-crumb').textContent = j.title;
     $('jd-title').textContent = j.title;
-    $('jd-badges').innerHTML = jobStatusBadge(j.status) + (j.status === 'open' ? `<a href="/jobs/${j.id}" target="_blank" rel="noopener" class="ws-pill ws-pill-neutral hover:underline">${icon('external-link', 'w-3.5 h-3.5')}Lihat di katalog</a>` : '');
+    const removed = j.moderation_status === 'removed';
+    $('jd-badges').innerHTML = jobStatusBadge(j.status) + moderationPill(j)
+        + (j.status === 'open' && !removed ? `<a href="/jobs/${j.id}" target="_blank" rel="noopener" class="ws-pill ws-pill-neutral hover:underline">${icon('external-link', 'w-3.5 h-3.5')}Lihat di katalog</a>` : '')
+        + (removed ? `<span class="ws-meta">Tidak tampil di katalog. Alasan: ${esc(j.moderation_reason || '-')}</span>` : '');
     $('jd-sub').textContent = [j.company, j.location, EMPLOYMENT_SHORT[j.employment_type] || j.employment_type].filter(Boolean).join(' · ');
 
-    const ok = canPublish(state.ctx);
+    const rule = publishRule(state.ctx, state.jobs, j.id);
+    const ok = rule.ok;
     const btns = [`<button type="button" class="ws-btn ws-btn-secondary" data-act="edit">${icon('pencil')}Edit</button>`];
     if (j.status === 'draft' || j.status === 'closed') {
-        btns.push(`<span ${ok ? '' : 'data-tip="Perusahaan harus terverifikasi terlebih dahulu"'}><button type="button" class="ws-btn ws-btn-primary" data-act="publish" ${ok ? '' : 'disabled'}>${icon('send')}${j.status === 'draft' ? 'Publikasikan' : 'Buka lagi'}</button></span>`);
+        btns.push(`<span ${ok ? '' : `data-tip="${esc(rule.reason)}"`}><button type="button" class="ws-btn ws-btn-primary" data-act="publish" ${ok ? '' : 'disabled'}>${icon('send')}${j.status === 'draft' ? 'Publikasikan' : 'Buka lagi'}</button></span>`);
     }
     if (j.status === 'open') btns.push(`<button type="button" class="ws-btn ws-btn-secondary" data-act="close">${icon('lock')}Tutup lowongan</button>`);
     if (j.status === 'closed' || j.status === 'draft') btns.push(`<button type="button" class="ws-btn ws-btn-ghost" data-act="archive">${icon('archive')}Arsipkan</button>`);
     if (j.status === 'archived') btns.push(`<button type="button" class="ws-btn ws-btn-secondary" data-act="restore">${icon('rotate-ccw')}Pulihkan</button>`);
+    // Lowongan yang diturunkan admin: recruiter bisa mengajukan pemulihan setelah memperbaiki isinya
+    if (removed) {
+        btns.unshift(j.has_open_appeal
+            ? `<span class="ws-pill ws-pill-info">${icon('hourglass', 'w-3.5 h-3.5')}Pemulihan sedang ditinjau admin</span>`
+            : `<button type="button" class="ws-btn ws-btn-primary" data-act="appeal">${icon('send')}Ajukan pemulihan</button>`);
+    }
     $('jd-actions').innerHTML = btns.join('');
+}
+
+/** Dialog banding: recruiter menjelaskan perbaikan, lalu admin meninjaunya di antrean Laporan. */
+function openAppeal() {
+    const dialog = $('jd-appeal');
+    const form = dialog.querySelector('form');
+    const text = form.elements.description;
+    const error = form.querySelector('[data-error-for="description"]');
+    $('jd-appeal-reason').textContent = state.job.moderation_reason || 'tanpa keterangan';
+    form.reset();
+    error.textContent = '';
+    openDialog(dialog);
+    setTimeout(() => text.focus(), 30);
+    form.onsubmit = async (e) => {
+        e.preventDefault();
+        const value = text.value.trim();
+        if (value.length < 20) {
+            error.textContent = 'Jelaskan minimal 20 karakter apa yang sudah diperbaiki.';
+            text.focus();
+            return;
+        }
+        const btn = form.querySelector('[type="submit"]');
+        setBusy(btn, true, 'Mengirim...');
+        try {
+            await jobsApi.appeal(state.job.id, { description: value });
+            setBusy(btn, false);
+            dialog.close();
+            toast('Pengajuan pemulihan terkirim. Admin akan meninjaunya.', 'success');
+            data.invalidate('jobs');
+            state.jobs = await data.jobs();
+            state.job = jobById(state.jobs, state.job.id);
+            renderHeader();
+            hydrateIcons($('jd-actions'));
+        } catch (err) {
+            setBusy(btn, false);
+            error.textContent = errorMessage(err, 'Pengajuan gagal dikirim.');
+        }
+    };
 }
 
 /** Satu baris konteks lowongan. Sebaran per tahap ditampilkan oleh strip di ruang kerja kandidat. */
@@ -110,6 +158,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     state.ctx = ctx;
     initMenus();
     initJobForm(ctx, {
+        jobs: () => state.jobs,
         onSave: async () => {
             data.invalidate('jobs');
             state.jobs = await data.jobs();
@@ -129,6 +178,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (act === 'close') setStatus('closed', { title: 'Tutup lowongan ini?', message: 'Lowongan berhenti menerima lamaran. Kandidat yang sudah melamar tetap bisa diproses.', confirmText: 'Tutup lowongan', cancelText: 'Batal', danger: true });
         if (act === 'archive') setStatus('archived', { title: 'Arsipkan lowongan?', message: 'Lowongan disembunyikan dari daftar utama dan bisa dipulihkan kapan saja.', confirmText: 'Arsipkan', cancelText: 'Batal' });
         if (act === 'restore') setStatus('closed');
+        if (act === 'appeal') openAppeal();
     });
 
     try {

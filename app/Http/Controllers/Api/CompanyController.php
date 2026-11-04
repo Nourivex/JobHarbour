@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\AdminAuditLog;
 use App\Models\Company;
 use App\Models\CompanyVerification;
 use App\Traits\ApiResponse;
@@ -295,6 +296,12 @@ class CompanyController extends Controller
         $doc = ($submission->documents ?? [])[$index] ?? null;
         if (! $doc || ! Storage::disk('local')->exists($doc['path'])) {
             return $this->notFoundResponse('Dokumen tidak ditemukan.');
+        }
+
+        // Akses admin ke dokumen legal perusahaan dicatat; isi dokumen tidak disimpan di log
+        if ($user->role === 'admin') {
+            AdminAuditLog::record($request, 'company.document_viewed', $submission->company, $submission->company?->name, null,
+                ['verification_id' => $submission->id, 'document' => $doc['name']]);
         }
 
         return Storage::disk('local')->download($doc['path'], $doc['name']);
