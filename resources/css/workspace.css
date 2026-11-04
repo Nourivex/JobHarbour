@@ -1005,9 +1005,6 @@ a.ws-menu-item { text-decoration: none; }
     .adm-hero-art { position: relative; display: block; width: 100%; height: 7.5rem; border-radius: 1rem; -webkit-mask-image: none; mask-image: none; }
     .adm-hero-body { padding-right: 0.5rem; }
 }
-html.dark .adm-hero { background: linear-gradient(90deg, var(--ws-bg) 35%, #18222F 100%); }
-html.dark .adm-hero-art { opacity: 0.45; filter: saturate(0.9) brightness(0.9); }
-@media (max-width: 767px) { html.dark .adm-hero-art { opacity: 0.55; } }
 .adm-dot { display: inline-block; width: 0.5rem; height: 0.5rem; margin-right: 0.45rem; border-radius: 9999px; background: #22A355; vertical-align: 1px; }
 .adm-dot.is-bad { background: #DC2626; }
 .adm-dot.is-idle { background: #98A2B3; }
@@ -1231,6 +1228,17 @@ html.dark .ws-seg input:checked + .ws-seg-opt { background: #E8EDF4; color: #0B1
     .adm-hero-art { width: 380px; object-position: right bottom; }
 }
 @media (max-width: 767px) { .adm-hero-art { height: 5.5rem; } }
+
+/* Mode malam memakai ilustrasi malam sendiri, bukan versi siang yang digelapkan */
+.adm-hero-art--night { display: none; }
+html.dark .adm-hero-art--day { display: none; }
+html.dark .adm-hero-art--night { display: block; object-position: right 43%; }
+html.dark .adm-hero { background: linear-gradient(90deg, var(--ws-bg) 25%, #08192E 100%); }
+@media (min-width: 768px) {
+    /* Lebih lebar dari versi siang agar gelombang malam mengalir ke arah teks; kapal tetap utuh */
+    html.dark .adm-hero-art--night { width: min(100%, 760px); -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 30%); mask-image: linear-gradient(to right, transparent 0%, #000 30%); }
+}
+@media (max-width: 767px) { html.dark .adm-hero { background: transparent; } }
 
 .adm-kpis { gap: 0.6rem; }
 @media (min-width: 1100px) { .adm-kpis { gap: 0.75rem; } }

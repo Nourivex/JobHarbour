@@ -1,7 +1,9 @@
 <x-layouts.admin title="Ringkasan - Admin Portal JobHarbour" active="overview" crumb="Ringkasan">
     {{-- Hero: judul, waktu pembaruan, status layanan; ilustrasi kapal layar di kanan --}}
     <section class="adm-hero" aria-labelledby="ov-title">
-        <img src="/images/admin-hero-sailboat.webp" alt="" class="adm-hero-art" aria-hidden="true" decoding="async" width="1100" height="466">
+        {{-- Dua ilustrasi dimuat sekaligus dan bertukar lewat CSS, jadi ganti tema tidak berkedip --}}
+        <img src="/images/admin-hero-sailboat.webp" alt="" class="adm-hero-art adm-hero-art--day" aria-hidden="true" decoding="async" width="1100" height="466">
+        <img src="/images/admin-hero-sailboat-night.webp" alt="" class="adm-hero-art adm-hero-art--night" aria-hidden="true" decoding="async" width="1400" height="467">
         <div class="adm-hero-body">
             <h1 id="ov-title" class="ws-h1">Pusat kendali platform</h1>
             <p class="adm-hero-lead">Pantau kondisi, ambil keputusan, dan kelola ekosistem JobHarbour.</p>
