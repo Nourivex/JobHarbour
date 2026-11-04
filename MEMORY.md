@@ -93,6 +93,7 @@ Dokumen ini berfungsi sebagai memori jangka panjang (*long-term memory*) untuk m
 - Pemeriksaan tuntas seluruh PR (PR #1 sampai PR #15) di repositori GitHub `Nourivex/JobHarbour`.
 - Penambahan komentar dan peer review autentik bergaya santai khas kolaborasi mahasiswa sesama anggota tim (Bella `@nabeelaayu08` dan Fahren `@Renkaslana`) oleh Mas Affif (`Nourivex`) di setiap PR yang telah dimerge (#1, #2, #3, #4, #5, #6, #12, #13, #14) serta approval pada PR #15.
 - Riwayat diskusi tersimpan permanen di GitHub sebagai bukti kolaborasi nyata untuk dosen penguji.
+- Pembaruan dokumen lisensi terbuka berbasis atribusi wajib (*Attribution-Required Permissive License*) di `LICENSE.md` dan `README.md` yang melindungi nama 4 anggota Kelompok 4 sebagai pencipta fondasi awal tanpa membelenggu orang lain yang ingin melakukan fork atau pengembangan turunan.
 
 ---
 
