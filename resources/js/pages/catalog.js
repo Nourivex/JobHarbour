@@ -21,7 +21,10 @@ const state = {
     match: new Set(),
     types: new Set(params.get('employment_type') ? [params.get('employment_type')] : []),
     cities: new Set(params.get('location') ? [params.get('location').toLowerCase()] : []),
+    cityQuery: '',
     salary: 0,
+    salaryMin: 0,
+    salaryMax: 0,
 };
 
 const el = (id) => document.getElementById(id);
@@ -99,9 +102,16 @@ function renderFilterOptions() {
     el('filter-types').innerHTML = [...typeCounts.entries()].map(([t, n]) => `
         <label class="filter-option"><input type="checkbox" name="type" value="${esc(t)}" ${state.types.has(t) ? 'checked' : ''}> <span>${esc(EMPLOYMENT_SHORT[t] || t)}</span><span class="filter-count">${n}</span></label>
     `).join('') || '<p class="text-sm text-[#627080]">-</p>';
-    el('filter-cities').innerHTML = [...cityCounts.entries()].map(([key, c]) => `
+
+    const filteredCities = [...cityCounts.entries()].filter(([key, c]) => {
+        if (!state.cityQuery) return true;
+        return c.name.toLowerCase().includes(state.cityQuery.toLowerCase());
+    });
+
+    el('filter-cities').innerHTML = filteredCities.map(([key, c]) => `
         <label class="filter-option"><input type="checkbox" name="city" value="${esc(key)}" ${state.cities.has(key) ? 'checked' : ''}> <span>${esc(c.name)}</span><span class="filter-count">${c.n}</span></label>
-    `).join('') || '<p class="text-sm text-[#627080]">-</p>';
+    `).join('') || '<p class="text-xs text-[#627080] py-1.5">Tidak ada kota yang cocok</p>';
+
     if (isApplicant) el('filter-match-group')?.classList.remove('hidden');
 }
 
@@ -111,6 +121,8 @@ function filtered() {
         if (state.types.size && !state.types.has(j.employment_type)) return false;
         if (state.cities.size && !state.cities.has((j.location || '').toLowerCase())) return false;
         if (state.salary && Number(j.salary_max || j.salary_min || 0) < state.salary) return false;
+        if (state.salaryMin && Number(j.salary_max || j.salary_min || 0) < state.salaryMin) return false;
+        if (state.salaryMax && Number(j.salary_min || j.salary_max || 0) > state.salaryMax) return false;
         if (state.match.size && j._match && !state.match.has(scoreCategory(j._match.score).key)) return false;
         return true;
     });
@@ -125,7 +137,7 @@ function renderList() {
     el('catalog-empty').classList.toggle('hidden', list.length > 0);
     listEl.innerHTML = list.map(card).join('');
     renderChips();
-    const activeCount = state.types.size + state.cities.size + state.match.size + (state.salary ? 1 : 0);
+    const activeCount = state.types.size + state.cities.size + state.match.size + (state.salary ? 1 : 0) + (state.salaryMin ? 1 : 0) + (state.salaryMax ? 1 : 0);
     const counter = el('filter-active-count');
     counter.textContent = `${activeCount} aktif`;
     counter.classList.toggle('hidden', !activeCount);
@@ -201,12 +213,48 @@ function renderChips() {
     const chips = [];
     if (state.search) chips.push({ label: `"${state.search}"`, clear: () => { state.search = ''; el('catalog-search').value = ''; return true; } });
     if (state.skill) chips.push({ label: `Skill: ${state.skill}`, clear: () => { state.skill = ''; return true; } });
+    if (state.salary) {
+        chips.push({ label: `>= Rp${(state.salary / 1000000).toLocaleString('id-ID')} jt`, clear: () => {
+            state.salary = 0;
+            const all = document.querySelector('#catalog-filters input[name="salary"][value="0"]');
+            if (all) all.checked = true;
+            return false;
+        } });
+    }
+    if (state.salaryMin) {
+        chips.push({ label: `Min Rp${(state.salaryMin / 1000000).toLocaleString('id-ID')} jt`, clear: () => {
+            state.salaryMin = 0;
+            const inp = el('filter-salary-min');
+            if (inp) inp.value = '';
+            return false;
+        } });
+    }
+    if (state.salaryMax) {
+        chips.push({ label: `Maks Rp${(state.salaryMax / 1000000).toLocaleString('id-ID')} jt`, clear: () => {
+            state.salaryMax = 0;
+            const inp = el('filter-salary-max');
+            if (inp) inp.value = '';
+            return false;
+        } });
+    }
+    state.cities.forEach((c) => {
+        chips.push({ label: `Kota: ${c.toUpperCase()}`, clear: () => {
+            state.cities.delete(c);
+            renderFilterOptions();
+            return false;
+        } });
+    });
+
     el('catalog-active-chips').innerHTML = chips.map((c, i) => `
         <button type="button" data-chip="${i}" class="inline-flex items-center gap-1.5 h-7 px-3 rounded-full text-xs font-semibold bg-[#0C2238] text-white cursor-pointer hover:bg-[#133150]">
             ${esc(c.label)} <span aria-hidden="true">&times;</span><span class="sr-only">hapus</span>
         </button>`).join('');
     el('catalog-active-chips').querySelectorAll('[data-chip]').forEach((b) => {
-        b.addEventListener('click', () => { if (chips[b.dataset.chip].clear()) reload(); });
+        b.addEventListener('click', () => {
+            const needsReload = chips[b.dataset.chip].clear();
+            if (needsReload) reload();
+            else renderList();
+        });
     });
 }
 
@@ -230,9 +278,19 @@ function resetFilters() {
     state.types.clear();
     state.cities.clear();
     state.salary = 0;
+    state.salaryMin = 0;
+    state.salaryMax = 0;
+    state.cityQuery = '';
+    const sMin = el('filter-salary-min');
+    if (sMin) sMin.value = '';
+    const sMax = el('filter-salary-max');
+    if (sMax) sMax.value = '';
+    const cSearch = el('filter-city-search');
+    if (cSearch) cSearch.value = '';
     document.querySelectorAll('#catalog-filters input[type="checkbox"]').forEach((i) => { i.checked = false; });
     const all = document.querySelector('#catalog-filters input[name="salary"][value="0"]');
     if (all) all.checked = true;
+    renderFilterOptions();
     renderList();
 }
 
@@ -288,6 +346,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (t.name === 'salary') state.salary = Number(t.value);
         renderList();
     });
+
+    el('filter-city-search')?.addEventListener('input', (e) => {
+        state.cityQuery = e.target.value.trim();
+        renderFilterOptions();
+    });
+
+    el('filter-salary-min')?.addEventListener('input', (e) => {
+        state.salaryMin = Number(e.target.value) || 0;
+        renderList();
+    });
+
+    el('filter-salary-max')?.addEventListener('input', (e) => {
+        state.salaryMax = Number(e.target.value) || 0;
+        renderList();
+    });
+
     el('filter-reset').addEventListener('click', resetFilters);
     document.querySelector('[data-reset-filters]')?.addEventListener('click', () => {
         state.search = '';
