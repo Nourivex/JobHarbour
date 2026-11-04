@@ -20,7 +20,7 @@
             </div>
 
             <!-- Ringkasan: isi diatur oleh catalog.js sesuai status login -->
-            <div id="catalog-summary" class="hero-in bg-white/95 backdrop-blur rounded-2xl border border-[#E2E7ED] shadow-[0_18px_40px_-24px_rgba(12,34,56,0.35)] px-4 py-3 sm:px-5 sm:py-4 flex flex-wrap items-center gap-x-6 gap-y-3 sm:gap-y-4" style="--d: 120ms">
+            <div id="catalog-summary" class="hero-in bg-white/95 dark:bg-[#121A28]/95 backdrop-blur rounded-2xl border border-[#E2E7ED] dark:border-[#243045] shadow-[0_18px_40px_-24px_rgba(12,34,56,0.35)] px-4 py-3 sm:px-5 sm:py-4 flex flex-wrap items-center gap-x-6 gap-y-3 sm:gap-y-4" style="--d: 120ms">
                 <div class="h-12 w-[420px] max-w-full rounded-xl animate-skeleton bg-[#F4F6F8]"></div>
             </div>
         </div>

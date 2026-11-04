@@ -904,9 +904,22 @@
 /* Mode malam: memetakan palet terang ke palet gelap.                  */
 /* Ditulis di luar @layer agar menang atas utilitas Tailwind.          */
 /* ------------------------------------------------------------------ */
-html.dark { color-scheme: dark; background-color: #0B111C; }
+html.dark {
+    color-scheme: dark;
+    background-color: #0B111C;
+    --color-text-primary: #E8EDF4;
+    --color-text-secondary: #B8C2CF;
+    --color-canvas: #0B111C;
+    --color-surface: #121A28;
+    --color-border: #243045;
+}
 html.dark body { background-color: #0B111C; color: #E8EDF4; }
 html.dark [class~="bg-white"], .dark [class~="bg-white"] { background-color: #121A28; }
+html.dark [class~="bg-white/95"], .dark [class~="bg-white/95"],
+html.dark [class*="bg-white/95"], .dark [class*="bg-white/95"],
+html.dark [class~="bg-white/90"], .dark [class~="bg-white/90"],
+html.dark [class~="bg-white/80"], .dark [class~="bg-white/80"],
+html.dark [class~="bg-white/60"], .dark [class~="bg-white/60"] { background-color: rgba(18, 26, 40, 0.95); }
 .dark [class~="bg-[#F4F6F8]"] { background-color: #0B111C; }
 .dark [class~="bg-[#F8F9FC]"] { background-color: #0E1522; }
 .dark [class~="bg-[#E8EDF2]"] { background-color: #1E2A3D; }
@@ -957,7 +970,10 @@ html.dark [class~="text-[#0B1B2B]"], .dark [class~="text-[#0B1B2B]"] { color: #E
 .dark .lift:hover { border-color: #31405A; box-shadow: 0 16px 32px -20px rgba(0, 0, 0, 0.8); }
 .dark .animate-skeleton { background-color: #182233; }
 .dark .catalog-banner-fade { background: linear-gradient(90deg, #0B111C 0%, #0B111C 38%, rgba(11, 17, 28, 0.85) 52%, rgba(11, 17, 28, 0.15) 78%); }
-.dark .filter-option:hover { background: #182233; }
+.dark .filter-summary { color: #E8EDF4; }
+.dark .filter-option { color: #B8C2CF; }
+.dark .filter-option:hover { background: #182233; color: #FFFFFF; }
+.dark select option { background-color: #121A28; color: #E8EDF4; }
 .dark .job-row:hover, .dark .job-row:focus-within { background: #1A1712; border-color: #8A4A22; }
 .dark .score-ring { background: conic-gradient(var(--ring, #5BCB82) var(--deg, 0deg), #243045 0); }
 .dark .score-ring::before { background: #121A28; }

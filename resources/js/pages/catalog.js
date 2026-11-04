@@ -55,27 +55,27 @@ function renderSummary() {
         const cat = scoreCategory(top);
         const deg = Math.round((top / 100) * 360);
         box.innerHTML = `
-            <div class="flex items-center gap-3 pr-6 sm:border-r sm:border-[#E2E7ED]">
+            <div class="flex items-center gap-3 pr-6 sm:border-r sm:border-[#E2E7ED] dark:sm:border-[#243045]">
                 <span class="score-ring w-14 h-14" style="--deg:${deg}deg;--ring:${cat.color}"><span class="text-sm font-extrabold text-[#0B1B2B] num-tabular">${top}%</span></span>
                 <span><b class="block text-sm text-[#0B1B2B]">Skor tertinggimu</b><span class="text-[13px] text-[#627080]">dari ${skills.length} skill di profil</span></span>
             </div>
-            ${statItem(excellent, 'Sangat Cocok', 'target', '#C8460B')}
-            ${statItem(good, 'Cukup Cocok', 'layers', '#1B65A6')}
-            ${statItem(total, 'Total Lowongan', 'briefcase', '#0C2238')}
+            ${statItem(excellent, 'Sangat Cocok', 'target', 'text-[#C8460B]')}
+            ${statItem(good, 'Cukup Cocok', 'layers', 'text-[#1B65A6]')}
+            ${statItem(total, 'Total Lowongan', 'briefcase', 'text-[#0C2238] dark:text-[#8CC8F2]')}
         `;
     } else {
         const companies = new Set(state.all.map((j) => j.company)).size;
         const cities = new Set(state.all.map((j) => (j.location || '').toLowerCase())).size;
         box.innerHTML = `
-            ${statItem(total, 'Total Lowongan', 'briefcase', '#0C2238')}
-            ${statItem(companies, 'Perusahaan', 'building', '#1B65A6')}
-            ${statItem(cities, 'Kota', 'pin', '#C8460B')}
+            ${statItem(total, 'Total Lowongan', 'briefcase', 'text-[#0C2238] dark:text-[#8CC8F2]')}
+            ${statItem(companies, 'Perusahaan', 'building', 'text-[#1B65A6]')}
+            ${statItem(cities, 'Kota', 'pin', 'text-[#C8460B]')}
             ${session.isLoggedIn() ? '' : `<a href="/login?next=${encodeURIComponent('/catalog')}" class="btn-press inline-flex items-center gap-1.5 h-10 px-4 rounded-lg bg-orange-harbour hover:bg-orange-harbour-hover text-white text-sm font-semibold">Masuk untuk lihat skor ${icon('arrow')}</a>`}
         `;
     }
 }
 
-function statItem(value, label, iconName, color) {
+function statItem(value, label, iconName, colorClass) {
     const paths = {
         target: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/>',
         layers: '<path d="m12 3 9 5-9 5-9-5 9-5z"/><path d="m3 13 9 5 9-5"/>',
@@ -85,7 +85,7 @@ function statItem(value, label, iconName, color) {
     };
     return `
         <div class="flex items-center gap-2.5">
-            <svg class="w-6 h-6 shrink-0" style="color:${color}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths[iconName]}</svg>
+            <svg class="w-6 h-6 shrink-0 ${colorClass}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths[iconName]}</svg>
             <span><b class="block text-xl leading-none font-extrabold font-heading text-[#0B1B2B] num-tabular">${value}</b><span class="text-[13px] text-[#627080]">${label}</span></span>
         </div>`;
 }
