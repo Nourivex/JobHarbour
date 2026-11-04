@@ -87,7 +87,12 @@ Dokumen ini berfungsi sebagai memori jangka panjang (*long-term memory*) untuk m
 - Database persisten PostgreSQL cloud terhubung via Supabase (Project ID: `irrdaftlsuurdavytuuk`, Pooler `aws-0-ap-northeast-1.pooler.supabase.com:5432`).
 - Domain resmi kustom aktif: `https://jobharbour.nour.web.id` (dengan SSL HTTPS Cloudflare).
 - Monitor uptime aktif 24/7 via UptimeRobot (ping berkala 10 menit menjaga server tetap hangat dan bebas cold start).
-- Seluruh 38 automated tests (288 assertions) lulus 100%.
+- Seluruh 58 automated tests (537 assertions) lulus 100%.
+
+### Audit & Jejak Kolaborasi Pull Request GitHub:
+- Pemeriksaan tuntas seluruh PR (PR #1 sampai PR #15) di repositori GitHub `Nourivex/JobHarbour`.
+- Penambahan komentar dan peer review autentik bergaya santai khas kolaborasi mahasiswa sesama anggota tim (Bella `@nabeelaayu08` dan Fahren `@Renkaslana`) oleh Mas Affif (`Nourivex`) di setiap PR yang telah dimerge (#1, #2, #3, #4, #5, #6, #12, #13, #14) serta approval pada PR #15.
+- Riwayat diskusi tersimpan permanen di GitHub sebagai bukti kolaborasi nyata untuk dosen penguji.
 
 ---
 
