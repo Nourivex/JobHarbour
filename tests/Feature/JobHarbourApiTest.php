@@ -92,6 +92,27 @@ class JobHarbourApiTest extends TestCase
             ->assertJsonPath('data.skills_count', 4);
     }
 
+    public function test_auth_service_update_profile_biodata(): void
+    {
+        $token = $this->test_auth_service_login_and_token_generation();
+
+        $response = $this->withHeaders([
+            'Authorization' => "Bearer {$token}",
+        ])->putJson('/api/profile', [
+            'name' => 'Budi Santoso Updated',
+            'phone' => '081299998888',
+            'location' => 'Tegal, Jawa Tengah',
+            'bio' => 'Senior Backend Developer dengan pengalaman microservices.',
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJsonPath('status', 'success')
+            ->assertJsonPath('data.name', 'Budi Santoso Updated')
+            ->assertJsonPath('data.phone', '081299998888')
+            ->assertJsonPath('data.location', 'Tegal, Jawa Tengah')
+            ->assertJsonPath('data.bio', 'Senior Backend Developer dengan pengalaman microservices.');
+    }
+
     public function test_job_catalog_jobs_list_and_filter(): void
     {
         JobVacancy::create([

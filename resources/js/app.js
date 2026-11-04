@@ -67,6 +67,8 @@ function bindSessionUI(root = document) {
     });
 }
 
+JH.bindSessionUI = bindSessionUI;
+
 /**
  * Inisialisasi dropdown profil pengguna di navbar atas.
  */
