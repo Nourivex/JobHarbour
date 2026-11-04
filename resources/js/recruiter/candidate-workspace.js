@@ -34,7 +34,7 @@ const SORTS = {
     waiting: ['Terlama di tahap', (a, b) => new Date(stageEnteredAt(a)) - new Date(stageEnteredAt(b))],
     name: ['Nama (A sampai Z)', (a, b) => String(a.applicant?.name || '').localeCompare(String(b.applicant?.name || ''), 'id')],
 };
-const SCORE_BANDS = { excellent: '80% ke atas', good: '50 sampai 79%', under: 'Di bawah 50%' };
+const SCORE_BANDS = { excellent: '≥ 80% (Sangat Cocok)', good: '50% - 79% (Cukup Cocok)', under: '< 50% (Belum Cocok)' };
 const APPLIED = { 7: '7 hari terakhir', 30: '30 hari terakhir' };
 
 function readView() {
@@ -86,6 +86,13 @@ export function mountCandidateWorkspace({ root, jobs, apps, jobId = null, navApp
                 <label for="cw-search" class="sr-only">Cari kandidat</label>
                 <input id="cw-search" type="search" class="ws-input" placeholder="Cari nama atau skill" autocomplete="off">
             </div>
+            <label for="cw-score-filter" class="sr-only">Filter Skor Kecocokan</label>
+            <select id="cw-score-filter" class="ws-input w-auto" title="Filter skor kecocokan matchmaking">
+                <option value="all">Semua Skor</option>
+                <option value="excellent">≥ 80% (Sangat Cocok)</option>
+                <option value="good">50% - 79% (Cukup Cocok)</option>
+                <option value="under">&lt; 50% (Belum Cocok)</option>
+            </select>
             <div class="ws-pop-wrap" id="cw-filter-wrap">
                 <button type="button" id="cw-filter-btn" class="ws-btn ws-btn-secondary" aria-expanded="false" aria-controls="cw-filter-pop">${icon('list-filter')}Filter<span id="cw-filter-count" class="ws-count hidden"></span></button>
                 <div id="cw-filter-pop" class="ws-pop hidden" role="dialog" aria-label="Saring kandidat"></div>
@@ -284,6 +291,7 @@ export function mountCandidateWorkspace({ root, jobs, apps, jobId = null, navApp
         const n = activeFilterCount();
         $('#cw-filter-count').textContent = n;
         $('#cw-filter-count').classList.toggle('hidden', !n);
+        if ($('#cw-score-filter')) $('#cw-score-filter').value = state.cat;
     }
 
     // ------------------------------------------------------------------ render utama
@@ -729,6 +737,16 @@ export function mountCandidateWorkspace({ root, jobs, apps, jobId = null, navApp
 
     $('#cw-search').value = state.q;
     $('#cw-sort').value = state.sort;
+    if ($('#cw-score-filter')) {
+        $('#cw-score-filter').value = state.cat;
+        $('#cw-score-filter').addEventListener('change', (e) => {
+            state.cat = e.target.value;
+            state.page = 1;
+            if (state.filterOpen) renderFilterPop();
+            syncUrl();
+            render();
+        });
+    }
     $('#cw-search').addEventListener('input', debounce((e) => { state.q = e.target.value; state.page = 1; syncUrl(); render(); }, 180));
     $('#cw-sort').addEventListener('change', (e) => { state.sort = e.target.value; syncUrl(); render(); });
 
@@ -738,6 +756,7 @@ export function mountCandidateWorkspace({ root, jobs, apps, jobId = null, navApp
         state.skills.clear();
         state.q = '';
         $('#cw-search').value = '';
+        if ($('#cw-score-filter')) $('#cw-score-filter').value = 'all';
         state.page = 1;
         if (state.filterOpen) renderFilterPop();
         syncUrl();
@@ -746,7 +765,10 @@ export function mountCandidateWorkspace({ root, jobs, apps, jobId = null, navApp
 
     $('#cw-filter-btn').addEventListener('click', () => setFilterOpen(!state.filterOpen));
     $('#cw-filter-pop').addEventListener('change', (e) => {
-        if (e.target.name === 'cw-cat') state.cat = e.target.value;
+        if (e.target.name === 'cw-cat') {
+            state.cat = e.target.value;
+            if ($('#cw-score-filter')) $('#cw-score-filter').value = state.cat;
+        }
         if (e.target.name === 'cw-applied') state.applied = e.target.value;
         state.page = 1;
         syncUrl();

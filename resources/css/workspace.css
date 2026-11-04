@@ -735,6 +735,7 @@ html.dark .ws-bar { background: #3B5C80; }
     /* HP: pencarian + filter di satu baris, urutan + pilihan tampilan di baris berikutnya */
     .ws-wbar #cw-job { flex: 1 1 100%; }
     .ws-wbar .ws-search { flex: 1 1 55%; min-width: 0; max-width: none; }
+    .ws-wbar #cw-score-filter { flex: 1 1 auto; min-width: 0; }
     .ws-wbar #cw-sort { flex: 1 1 auto; min-width: 0; }
     .ws-wbar .ws-seg { flex: none; margin-left: 0; }
     .ws-wbar .ws-seg button { padding: 0 0.7rem; }
