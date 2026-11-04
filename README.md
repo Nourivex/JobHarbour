@@ -315,7 +315,7 @@ Kalau kamu mau ikut menambahkan fitur atau memperbaiki bug di proyek ini, perhat
 
 ## 📄 Lisensi dan Atribusi
 
-Proyek **JobHarbour** dirilis di bawah lisensi terbuka berbasis atribusi.
+Proyek **JobHarbour** dirilis di bawah lisensi terbuka berbasis atribusi. Dokumen lisensi resmi dan lengkap dapat dilihat pada berkas [LICENSE.md](LICENSE.md).
 
 Hak Cipta © 2026 **Kelompok 4 - Pemrograman Web Service, Universitas Harkat Negeri Tegal**.
 
