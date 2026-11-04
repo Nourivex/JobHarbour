@@ -30,4 +30,13 @@ Thumbs.db
 /scratch
 file.env
 
+# Agentic & AI Configuration
+/AGENTS.md
+/CLAUDE.md
+/MEMORY.md
+/RULES.md
+/.gemini
+/.agent
+/.agents
+
 

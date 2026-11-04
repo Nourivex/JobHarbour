@@ -313,9 +313,23 @@ Kalau kamu mau ikut menambahkan fitur atau memperbaiki bug di proyek ini, perhat
 
 ---
 
-## 📄 Lisensi
+## 📄 Lisensi dan Atribusi
 
-Proyek ini dirilis di bawah lisensi terbuka [MIT License](LICENSE).
+Proyek **JobHarbour** dirilis di bawah lisensi terbuka berbasis atribusi. Dokumen lisensi resmi dan lengkap dapat dilihat pada berkas [LICENSE.md](LICENSE.md).
+
+Hak Cipta © 2026 **Kelompok 4 - Pemrograman Web Service, Universitas Harkat Negeri Tegal**.
+
+### Ketentuan Lisensi:
+1. **Kebebasan Penggunaan:** Siapa pun diizinkan secara bebas untuk melihat, menggunakan, melakukan *fork*, memodifikasi, menggabungkan, mempublikasikan pembaruan, dan mengembangkan karya turunan (*derivative work*) dari proyek ini, baik untuk tujuan akademik, riset, maupun pengembangan portofolio profesional.
+2. **Kewajiban Atribusi (Credit Wajib):** Setiap salinan, repositori hasil *fork*, atau karya turunan yang dikembangkan dari basis kode ini **wajib mempertahankan pemberitahuan hak cipta asli dan mencantumkan tautan ke repositori sumber ini** ([https://github.com/Nourivex/JobHarbour](https://github.com/Nourivex/JobHarbour)) serta mencantumkan nama anggota Kelompok 4 sebagai pencipta fondasi awal.
+3. **Pemberitahuan Akademik:** Kode sumber ini awalnya dibangun sebagai pemenuhan proyek mata kuliah Pemrograman Web Service (5537344 / 3 SKS), Fakultas Sains dan Teknologi, Universitas Harkat Negeri Tegal, di bawah bimbingan dosen pengampu Zaenul Arif, S.Kom., M.Kom.
+4. **Tanpa Jaminan:** Perangkat lunak ini disediakan apa adanya (*as-is*), tanpa jaminan apa pun terkait keandalan atau kesesuaian untuk tujuan tertentu.
+
+**Pencipta Fondasi Awal (Kelompok 4):**
+- Nabe'ela Ayu Ning Tyas Zahra (NIM: 23215052)
+- M. Fahren Andrean Rangkuti (NIM: 23215030)
+- Muhammad Yasir Ilham Nabil (NIM: 23215040)
+- Muhammad Affif (NIM: 24225046)
 
 ---
 
