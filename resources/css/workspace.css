@@ -968,7 +968,6 @@ html.dark .ws-body.ws-admin {
 .adm-side-art { position: absolute; left: 1.75rem; bottom: 0; z-index: -2; width: 135%; max-width: none; height: auto; pointer-events: none; }
 /* Tepi atas menyatu dengan navy sidebar, bagian bawah digelapkan agar tautan tetap terbaca */
 .ws-admin .ws-sidebar-foot::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; background: linear-gradient(to bottom, var(--ws-navy) 0%, rgba(13, 33, 59, 0) 38%), linear-gradient(to top, rgba(13, 33, 59, 0.8) 0%, rgba(13, 33, 59, 0) 46%); }
-@media (max-height: 700px) { .ws-admin .ws-sidebar-foot { padding-top: 0.75rem; border-top: 1px solid rgba(255, 255, 255, 0.08); } .adm-side-art, .ws-admin .ws-sidebar-foot::before { display: none; } }
 @media (min-width: 1024px) { .ws-collapsed .ws-admin .ws-sidebar-foot { padding-top: 0.6rem; } .ws-collapsed .adm-side-art, .ws-collapsed .ws-admin .ws-sidebar-foot::before { display: none; } }
 .ws-admin-tag { display: inline-flex; align-items: center; margin-top: 0.15rem; padding: 0.05rem 0.45rem; border-radius: 0.35rem; background: rgba(244, 91, 11, 0.18); color: #FFB48A; font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
 
@@ -1202,6 +1201,21 @@ html.dark .ws-seg input:checked + .ws-seg-opt { background: #E8EDF4; color: #0B1
     .ws-admin .ws-btn { height: 2.4rem; padding: 0 0.95rem; font-size: 13.5px; }
     .ws-admin .ws-btn-sm { height: 2rem; padding: 0 0.7rem; font-size: 12.5px; }
     .ws-admin .ws-input { min-height: 2.4rem; font-size: 13.5px; }
+}
+
+/* Kaki sidebar selalu terlihat; hanya daftar menu yang menggulir saat layar pendek */
+.ws-admin .ws-sidebar { overflow: hidden; }
+.ws-admin .ws-nav { flex: 1 1 auto; min-height: 0; overflow-y: auto; align-content: start; scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, 0.22) transparent; }
+.ws-admin .ws-sidebar-foot { flex: none; }
+/* Layar laptop pendek: mercusuar diperkecil, bukan dihilangkan */
+@media (max-height: 700px) {
+    .ws-admin .ws-sidebar-foot { padding-top: 4.75rem; }
+    .adm-side-art { left: 5rem; width: 90%; }
+}
+/* Sangat pendek (misalnya HP mendatar): ruang lebih penting untuk menu */
+@media (max-height: 480px) {
+    .ws-admin .ws-sidebar-foot { padding-top: 0.6rem; border-top: 1px solid rgba(255, 255, 255, 0.08); }
+    .adm-side-art, .ws-admin .ws-sidebar-foot::before { display: none; }
 }
 
 /* Ringkasan */
