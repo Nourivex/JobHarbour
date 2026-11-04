@@ -141,3 +141,12 @@ export function jobSourceBadge(job) {
 
     return '<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700"><svg class="w-3 h-3 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>Dipublikasikan Perusahaan</span>';
 }
+
+/**
+ * Lencana Status Lamaran Pelamar ("Sudah Dilamar").
+ * Menandakan pelamar sudah pernah mengajukan berkas ke lowongan ini.
+ */
+export function jobAppliedBadge(applied = false) {
+    if (!applied) return '';
+    return '<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60" title="Anda telah mengajukan lamaran untuk posisi ini"><svg class="w-3 h-3 text-emerald-600 dark:text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg>Sudah Dilamar</span>';
+}

@@ -1,5 +1,5 @@
-import { jobs, matchmaking, session, util } from '../api.js';
-import { companyTile, icon, rupiah, salaryRange, savedJobs, jobSourceBadge, EMPLOYMENT_SHORT, scoreCategory } from '../job-ui.js';
+import { jobs, applications, matchmaking, session, util } from '../api.js';
+import { companyTile, icon, rupiah, salaryRange, savedJobs, jobSourceBadge, jobAppliedBadge, EMPLOYMENT_SHORT, scoreCategory } from '../job-ui.js';
 
 const esc = util.escapeHtml;
 
@@ -15,6 +15,7 @@ const params = new URLSearchParams(location.search);
 const state = {
     all: [],                 // semua lowongan terbuka (untuk opsi filter & ringkasan)
     results: [],             // hasil pencarian API saat ini
+    appliedJobIds: new Set(),// ID lowongan yang sudah pernah diajukan pelamar
     search: params.get('search') || '',
     skill: params.get('skill') || '',
     sort: isApplicant ? 'match' : 'latest',
@@ -159,6 +160,7 @@ function card(job) {
     const salary = salaryRange(job);
     const reqs = job.requirements || [];
     const saved = savedJobs.has(job.id);
+    const applied = state.appliedJobIds.has(Number(job.id));
     let badge = '';
     if (job._match && job._match.score === 0) {
         badge = '<span class="inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-semibold bg-[#F4F6F8] text-[#627080]">Belum cocok</span>';
@@ -175,6 +177,7 @@ function card(job) {
                 <div class="flex-1 min-w-0">
                     <div class="flex flex-wrap items-center gap-2 mb-2">
                         ${jobSourceBadge(job)}
+                        ${jobAppliedBadge(applied)}
                         ${badge || ''}
                     </div>
                     <h3 class="text-base sm:text-lg font-extrabold font-heading leading-snug text-[#0B1B2B]">
@@ -329,7 +332,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     el('catalog-search').value = state.search;
 
     try {
-        state.all = await fetchJobs({ sort: 'latest' });
+        const [jobsList, appRes] = await Promise.all([
+            fetchJobs({ sort: 'latest' }),
+            isApplicant ? applications.list().catch(() => ({ data: [] })) : Promise.resolve({ data: [] }),
+        ]);
+        state.all = jobsList;
+        const appList = Array.isArray(appRes?.data) ? appRes.data : [];
+        state.appliedJobIds = new Set(
+            appList.filter((a) => a.status !== 'canceled').map((a) => Number(a.job_vacancy_id || a.job_id))
+        );
         renderSummary();
         renderFilterOptions();
     } catch (err) {
