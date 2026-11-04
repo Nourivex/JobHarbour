@@ -15,7 +15,7 @@
 
     <section id="ov-kpis" class="adm-kpis" aria-label="Isi platform"></section>
 
-    <div class="adm-main mt-5">
+    <div class="adm-main">
         <section class="ws-card" aria-labelledby="ov-queue-title">
             <div class="adm-card-head">
                 <span class="adm-card-icon is-orange"><i data-lucide="triangle-alert"></i></span>
@@ -35,14 +35,14 @@
                     <p class="ws-meta" id="ov-market-sub">Lowongan terbuka yang tidak diturunkan.</p>
                 </div>
             </div>
-            <div class="px-5 pb-5">
+            <div class="px-4 pb-4">
                 <div id="ov-market-note"></div>
                 <div id="ov-market" class="adm-metrics"></div>
             </div>
         </section>
     </div>
 
-    <div class="adm-split mt-5">
+    <div class="adm-split mt-3">
         <section class="ws-card" aria-labelledby="ov-growth-title">
             <div class="adm-card-head">
                 <span class="adm-card-icon"><i data-lucide="chart-column"></i></span>
@@ -51,7 +51,7 @@
                     <p class="ws-meta">8 minggu terakhir, Senin sampai Minggu.</p>
                 </div>
             </div>
-            <div id="ov-growth" class="px-5 pb-5"></div>
+            <div id="ov-growth" class="px-4 pb-4"></div>
         </section>
 
         <section class="ws-card" aria-labelledby="ov-skills-title">
@@ -68,11 +68,11 @@
                     </div>
                 </div>
             </div>
-            <div id="ov-skills" class="px-5 pb-5"></div>
+            <div id="ov-skills" class="px-4 pb-4"></div>
         </section>
     </div>
 
-    <section class="ws-card mt-5" aria-labelledby="ov-audit-title">
+    <section class="ws-card mt-3" aria-labelledby="ov-audit-title">
         <div class="adm-card-head">
             <span class="adm-card-icon"><i data-lucide="scroll-text"></i></span>
             <div class="min-w-0 flex-1">

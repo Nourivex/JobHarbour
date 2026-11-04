@@ -139,7 +139,7 @@ function renderGrowth(g) {
         hydrateIcons($('ov-growth'));
         return;
     }
-    const W = 520; const H = 190; const pad = { l: 28, r: 8, t: 10, b: 26 };
+    const W = 520; const H = 205; const pad = { l: 28, r: 8, t: 10, b: 26 };
     const max = Math.max(1, ...g.users, ...g.jobs);
     const step = (W - pad.l - pad.r) / n;
     const y = (v) => pad.t + (H - pad.t - pad.b) * (1 - v / max);

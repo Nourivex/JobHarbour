@@ -1161,3 +1161,105 @@ a.adm-tile:focus-visible { outline: none; box-shadow: var(--ws-focus); }
 .ws-seg input:checked + .ws-seg-opt { background: var(--ws-navy); color: #FFFFFF; font-weight: 600; }
 .ws-seg input:focus-visible + .ws-seg-opt { box-shadow: var(--ws-focus); }
 html.dark .ws-seg input:checked + .ws-seg-opt { background: #E8EDF4; color: #0B111C; }
+
+/* ==================================================================== */
+/* Kepadatan Admin Portal: admin bekerja lama dan memindai banyak data,  */
+/* jadi ukuran lebih rapat dari portal recruiter. Kontrol hanya          */
+/* dirapatkan di desktop; di layar sentuh target tetap minimal 40px.     */
+/* ==================================================================== */
+.ws-body.ws-admin { font-size: 14px; }
+/* Latar html abu-abu kebiruan; tanpa ini warna berubah setelah layar pertama */
+.ws-admin .ws-content { background: var(--ws-bg); }
+.ws-admin .ws-main { max-width: 1240px; padding: 1rem 1rem 2.5rem; }
+@media (min-width: 640px) { .ws-admin .ws-main { padding: 1.25rem 1.5rem 3rem; } }
+@media (min-width: 1280px) { .ws-admin .ws-main { padding: 1.25rem 2rem 3rem; } }
+
+.ws-admin .ws-topbar { height: 3.25rem; }
+.ws-admin .ws-avatar { width: 2rem; height: 2rem; font-size: 12px; }
+.ws-admin .ws-page-head { margin-bottom: 1rem; }
+.ws-admin .ws-h1 { font-size: 1.4rem; line-height: 1.2; }
+.ws-admin .ws-lead { margin-top: 0.2rem; font-size: 13.5px; }
+.ws-admin .ws-h2 { font-size: 14.5px; }
+.ws-admin .ws-meta { font-size: 12.5px; }
+.ws-admin .ws-card-head { padding: 0.85rem 1rem 0; }
+.ws-admin .ws-card-body { padding: 0.85rem 1rem 1rem; }
+.ws-admin .ws-card { border-radius: 0.85rem; }
+.ws-admin .ws-table { font-size: 13.5px; }
+.ws-admin .ws-table th { padding: 0.55rem 0.85rem; }
+.ws-admin .ws-table td { padding: 0.55rem 0.85rem; }
+
+@media (min-width: 1024px) {
+    .ws-body.ws-admin { --ws-sidebar-w: 232px; }
+    .ws-collapsed .ws-body.ws-admin { --ws-sidebar-w: 76px; }
+    .ws-admin .ws-brand { padding: 0.9rem 0.9rem 0.7rem; }
+    .ws-admin .ws-nav { padding: 0.15rem 0.6rem 0.75rem; }
+    .ws-admin .ws-nav-label { padding: 0.75rem 0.6rem 0.3rem; font-size: 10.5px; }
+    .ws-admin .ws-nav-link { min-height: 2.2rem; gap: 0.6rem; padding: 0 0.6rem; font-size: 13.5px; border-radius: 0.55rem; }
+    .ws-admin .ws-nav-link svg { width: 1.05rem; height: 1.05rem; }
+    .ws-admin .ws-sidebar-foot { padding: 7.5rem 0.6rem 0.6rem; }
+    .ws-collapsed .ws-admin .ws-sidebar-foot { padding-top: 0.6rem; }
+    .ws-admin .ws-icon-btn { width: 2.25rem; height: 2.25rem; }
+    .ws-admin .ws-btn { height: 2.4rem; padding: 0 0.95rem; font-size: 13.5px; }
+    .ws-admin .ws-btn-sm { height: 2rem; padding: 0 0.7rem; font-size: 12.5px; }
+    .ws-admin .ws-input { min-height: 2.4rem; font-size: 13.5px; }
+}
+
+/* Ringkasan */
+.adm-hero { margin-bottom: 0.85rem; border-radius: 1rem; }
+.adm-hero-body { max-width: 40rem; padding: 0.85rem 0 0.95rem; }
+.adm-hero-lead { margin-top: 0.15rem; font-size: 13.5px; }
+.adm-hero-meta { margin-top: 0.55rem; font-size: 12.5px; }
+.adm-hero-status { margin-top: 0.45rem; gap: 0.25rem 1rem; font-size: 12.5px; }
+@media (min-width: 768px) {
+    /* Sisakan ruang untuk kapal: teks status membungkus, tidak menimpa ilustrasi */
+    .adm-hero-body { max-width: min(40rem, calc(100% - 15rem)); padding: 0.9rem 0 1rem 0.25rem; }
+    /* Lebar tetap dan rata bawah: kapal utuh walau hero lebih pendek */
+    .adm-hero-art { width: 380px; object-position: right bottom; }
+}
+@media (max-width: 767px) { .adm-hero-art { height: 5.5rem; } }
+
+.adm-kpis { gap: 0.6rem; }
+@media (min-width: 1100px) { .adm-kpis { gap: 0.75rem; } }
+.adm-kpi { gap: 0.7rem; padding: 0.75rem 0.85rem; border-radius: 0.85rem; }
+.adm-kpi-icon { width: 2.25rem; height: 2.25rem; }
+.adm-kpi-icon svg { width: 1.1rem; height: 1.1rem; }
+.adm-kpi-label { font-size: 13px; font-weight: 600; }
+.adm-kpi-num { margin-top: 0; font-size: 1.5rem; }
+.adm-kpi-sub { margin-top: 0.1rem; font-size: 12px; }
+.adm-kpi-trend { margin-top: 0.1rem; font-size: 12px; }
+@media (max-width: 639px) {
+    .adm-kpi { gap: 0.45rem; padding: 0.75rem; }
+    .adm-kpi-icon { width: 2.1rem; height: 2.1rem; }
+    .adm-kpi-icon svg { width: 1.05rem; height: 1.05rem; }
+    .adm-kpi-num { font-size: 1.4rem; }
+}
+
+.adm-card-head { gap: 0.6rem; padding: 0.8rem 1rem 0.6rem; }
+.adm-card-icon { width: 1.75rem; height: 1.75rem; }
+.adm-card-icon svg { width: 1rem; height: 1rem; }
+.adm-card-title { font-size: 14.5px; }
+.adm-main { gap: 0.75rem; margin-top: 0.85rem; }
+.adm-main > .ws-card { display: flex; flex-direction: column; }
+/* Baris antrean membagi tinggi kartu agar tidak ada ruang kosong di bawahnya */
+.adm-queue { flex: 1; }
+.adm-queue-item { flex: 1; gap: 0.7rem; padding: 0.55rem 1rem; }
+.adm-queue-icon { width: 1.8rem; height: 1.8rem; border-radius: 0.5rem; }
+.adm-queue-icon svg { width: 0.95rem; height: 0.95rem; }
+.adm-queue-label { font-size: 13.5px; }
+.adm-queue-sub { font-size: 12px; }
+.adm-queue-num { min-width: 1.75rem; font-size: 15px; }
+.adm-allclear { margin: 0 1rem 0.35rem; padding: 0.5rem 0.75rem; font-size: 13px; }
+
+.adm-metric { padding: 0.6rem 0.8rem 0.7rem; }
+.adm-metric-label { font-size: 13px; font-weight: 600; }
+.adm-metric-num { font-size: 1.3rem; }
+.adm-metric-na { margin-top: 0.25rem; font-size: 13.5px; }
+.adm-metric-def { margin-top: 0.15rem; font-size: 12px; line-height: 1.4; }
+.adm-split { gap: 0.75rem; }
+
+.adm-skill { grid-template-columns: minmax(0, 5rem) minmax(0, 1fr) 2.25rem 2.25rem; gap: 0.6rem; padding: 0.38rem 0; }
+.adm-skill-name { font-size: 13px; font-weight: 600; }
+.adm-skill-bars { gap: 3px; }
+.adm-skill-track { height: 6px; }
+.adm-skill-pct { font-size: 12.5px; }
+.adm-legend { font-size: 12px; }
