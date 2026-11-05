@@ -1,5 +1,5 @@
-import { jobs, matchmaking, session, util } from '../api.js';
-import { companyTile, icon, rupiah, salaryRange, savedJobs, jobSourceBadge, EMPLOYMENT_SHORT, scoreCategory } from '../job-ui.js';
+import { jobs, applications, matchmaking, session, util } from '../api.js';
+import { companyTile, icon, rupiah, salaryRange, savedJobs, jobSourceBadge, jobAppliedBadge, EMPLOYMENT_SHORT, scoreCategory } from '../job-ui.js';
 
 const esc = util.escapeHtml;
 
@@ -15,13 +15,17 @@ const params = new URLSearchParams(location.search);
 const state = {
     all: [],                 // semua lowongan terbuka (untuk opsi filter & ringkasan)
     results: [],             // hasil pencarian API saat ini
+    appliedJobIds: new Set(),// ID lowongan yang sudah pernah diajukan pelamar
     search: params.get('search') || '',
     skill: params.get('skill') || '',
     sort: isApplicant ? 'match' : 'latest',
     match: new Set(),
     types: new Set(params.get('employment_type') ? [params.get('employment_type')] : []),
     cities: new Set(params.get('location') ? [params.get('location').toLowerCase()] : []),
+    cityQuery: '',
     salary: 0,
+    salaryMin: 0,
+    salaryMax: 0,
 };
 
 const el = (id) => document.getElementById(id);
@@ -52,27 +56,27 @@ function renderSummary() {
         const cat = scoreCategory(top);
         const deg = Math.round((top / 100) * 360);
         box.innerHTML = `
-            <div class="flex items-center gap-3 pr-6 sm:border-r sm:border-[#E2E7ED]">
+            <div class="flex items-center gap-3 pr-6 sm:border-r sm:border-[#E2E7ED] dark:sm:border-[#243045]">
                 <span class="score-ring w-14 h-14" style="--deg:${deg}deg;--ring:${cat.color}"><span class="text-sm font-extrabold text-[#0B1B2B] num-tabular">${top}%</span></span>
                 <span><b class="block text-sm text-[#0B1B2B]">Skor tertinggimu</b><span class="text-[13px] text-[#627080]">dari ${skills.length} skill di profil</span></span>
             </div>
-            ${statItem(excellent, 'Sangat Cocok', 'target', '#C8460B')}
-            ${statItem(good, 'Cukup Cocok', 'layers', '#1B65A6')}
-            ${statItem(total, 'Total Lowongan', 'briefcase', '#0C2238')}
+            ${statItem(excellent, 'Sangat Cocok', 'target', 'text-[#C8460B]')}
+            ${statItem(good, 'Cukup Cocok', 'layers', 'text-[#1B65A6]')}
+            ${statItem(total, 'Total Lowongan', 'briefcase', 'text-[#0C2238] dark:text-[#8CC8F2]')}
         `;
     } else {
         const companies = new Set(state.all.map((j) => j.company)).size;
         const cities = new Set(state.all.map((j) => (j.location || '').toLowerCase())).size;
         box.innerHTML = `
-            ${statItem(total, 'Total Lowongan', 'briefcase', '#0C2238')}
-            ${statItem(companies, 'Perusahaan', 'building', '#1B65A6')}
-            ${statItem(cities, 'Kota', 'pin', '#C8460B')}
+            ${statItem(total, 'Total Lowongan', 'briefcase', 'text-[#0C2238] dark:text-[#8CC8F2]')}
+            ${statItem(companies, 'Perusahaan', 'building', 'text-[#1B65A6]')}
+            ${statItem(cities, 'Kota', 'pin', 'text-[#C8460B]')}
             ${session.isLoggedIn() ? '' : `<a href="/login?next=${encodeURIComponent('/catalog')}" class="btn-press inline-flex items-center gap-1.5 h-10 px-4 rounded-lg bg-orange-harbour hover:bg-orange-harbour-hover text-white text-sm font-semibold">Masuk untuk lihat skor ${icon('arrow')}</a>`}
         `;
     }
 }
 
-function statItem(value, label, iconName, color) {
+function statItem(value, label, iconName, colorClass) {
     const paths = {
         target: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/>',
         layers: '<path d="m12 3 9 5-9 5-9-5 9-5z"/><path d="m3 13 9 5 9-5"/>',
@@ -82,7 +86,7 @@ function statItem(value, label, iconName, color) {
     };
     return `
         <div class="flex items-center gap-2.5">
-            <svg class="w-6 h-6 shrink-0" style="color:${color}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths[iconName]}</svg>
+            <svg class="w-6 h-6 shrink-0 ${colorClass}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths[iconName]}</svg>
             <span><b class="block text-xl leading-none font-extrabold font-heading text-[#0B1B2B] num-tabular">${value}</b><span class="text-[13px] text-[#627080]">${label}</span></span>
         </div>`;
 }
@@ -99,9 +103,16 @@ function renderFilterOptions() {
     el('filter-types').innerHTML = [...typeCounts.entries()].map(([t, n]) => `
         <label class="filter-option"><input type="checkbox" name="type" value="${esc(t)}" ${state.types.has(t) ? 'checked' : ''}> <span>${esc(EMPLOYMENT_SHORT[t] || t)}</span><span class="filter-count">${n}</span></label>
     `).join('') || '<p class="text-sm text-[#627080]">-</p>';
-    el('filter-cities').innerHTML = [...cityCounts.entries()].map(([key, c]) => `
+
+    const filteredCities = [...cityCounts.entries()].filter(([key, c]) => {
+        if (!state.cityQuery) return true;
+        return c.name.toLowerCase().includes(state.cityQuery.toLowerCase());
+    });
+
+    el('filter-cities').innerHTML = filteredCities.map(([key, c]) => `
         <label class="filter-option"><input type="checkbox" name="city" value="${esc(key)}" ${state.cities.has(key) ? 'checked' : ''}> <span>${esc(c.name)}</span><span class="filter-count">${c.n}</span></label>
-    `).join('') || '<p class="text-sm text-[#627080]">-</p>';
+    `).join('') || '<p class="text-xs text-[#627080] py-1.5">Tidak ada kota yang cocok</p>';
+
     if (isApplicant) el('filter-match-group')?.classList.remove('hidden');
 }
 
@@ -111,6 +122,8 @@ function filtered() {
         if (state.types.size && !state.types.has(j.employment_type)) return false;
         if (state.cities.size && !state.cities.has((j.location || '').toLowerCase())) return false;
         if (state.salary && Number(j.salary_max || j.salary_min || 0) < state.salary) return false;
+        if (state.salaryMin && Number(j.salary_max || j.salary_min || 0) < state.salaryMin) return false;
+        if (state.salaryMax && Number(j.salary_min || j.salary_max || 0) > state.salaryMax) return false;
         if (state.match.size && j._match && !state.match.has(scoreCategory(j._match.score).key)) return false;
         return true;
     });
@@ -125,7 +138,7 @@ function renderList() {
     el('catalog-empty').classList.toggle('hidden', list.length > 0);
     listEl.innerHTML = list.map(card).join('');
     renderChips();
-    const activeCount = state.types.size + state.cities.size + state.match.size + (state.salary ? 1 : 0);
+    const activeCount = state.types.size + state.cities.size + state.match.size + (state.salary ? 1 : 0) + (state.salaryMin ? 1 : 0) + (state.salaryMax ? 1 : 0);
     const counter = el('filter-active-count');
     counter.textContent = `${activeCount} aktif`;
     counter.classList.toggle('hidden', !activeCount);
@@ -147,6 +160,7 @@ function card(job) {
     const salary = salaryRange(job);
     const reqs = job.requirements || [];
     const saved = savedJobs.has(job.id);
+    const applied = state.appliedJobIds.has(Number(job.id));
     let badge = '';
     if (job._match && job._match.score === 0) {
         badge = '<span class="inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-semibold bg-[#F4F6F8] text-[#627080]">Belum cocok</span>';
@@ -163,6 +177,7 @@ function card(job) {
                 <div class="flex-1 min-w-0">
                     <div class="flex flex-wrap items-center gap-2 mb-2">
                         ${jobSourceBadge(job)}
+                        ${jobAppliedBadge(applied)}
                         ${badge || ''}
                     </div>
                     <h3 class="text-base sm:text-lg font-extrabold font-heading leading-snug text-[#0B1B2B]">
@@ -201,12 +216,48 @@ function renderChips() {
     const chips = [];
     if (state.search) chips.push({ label: `"${state.search}"`, clear: () => { state.search = ''; el('catalog-search').value = ''; return true; } });
     if (state.skill) chips.push({ label: `Skill: ${state.skill}`, clear: () => { state.skill = ''; return true; } });
+    if (state.salary) {
+        chips.push({ label: `>= Rp${(state.salary / 1000000).toLocaleString('id-ID')} jt`, clear: () => {
+            state.salary = 0;
+            const all = document.querySelector('#catalog-filters input[name="salary"][value="0"]');
+            if (all) all.checked = true;
+            return false;
+        } });
+    }
+    if (state.salaryMin) {
+        chips.push({ label: `Min Rp${(state.salaryMin / 1000000).toLocaleString('id-ID')} jt`, clear: () => {
+            state.salaryMin = 0;
+            const inp = el('filter-salary-min');
+            if (inp) inp.value = '';
+            return false;
+        } });
+    }
+    if (state.salaryMax) {
+        chips.push({ label: `Maks Rp${(state.salaryMax / 1000000).toLocaleString('id-ID')} jt`, clear: () => {
+            state.salaryMax = 0;
+            const inp = el('filter-salary-max');
+            if (inp) inp.value = '';
+            return false;
+        } });
+    }
+    state.cities.forEach((c) => {
+        chips.push({ label: `Kota: ${c.toUpperCase()}`, clear: () => {
+            state.cities.delete(c);
+            renderFilterOptions();
+            return false;
+        } });
+    });
+
     el('catalog-active-chips').innerHTML = chips.map((c, i) => `
         <button type="button" data-chip="${i}" class="inline-flex items-center gap-1.5 h-7 px-3 rounded-full text-xs font-semibold bg-[#0C2238] text-white cursor-pointer hover:bg-[#133150]">
             ${esc(c.label)} <span aria-hidden="true">&times;</span><span class="sr-only">hapus</span>
         </button>`).join('');
     el('catalog-active-chips').querySelectorAll('[data-chip]').forEach((b) => {
-        b.addEventListener('click', () => { if (chips[b.dataset.chip].clear()) reload(); });
+        b.addEventListener('click', () => {
+            const needsReload = chips[b.dataset.chip].clear();
+            if (needsReload) reload();
+            else renderList();
+        });
     });
 }
 
@@ -230,9 +281,19 @@ function resetFilters() {
     state.types.clear();
     state.cities.clear();
     state.salary = 0;
+    state.salaryMin = 0;
+    state.salaryMax = 0;
+    state.cityQuery = '';
+    const sMin = el('filter-salary-min');
+    if (sMin) sMin.value = '';
+    const sMax = el('filter-salary-max');
+    if (sMax) sMax.value = '';
+    const cSearch = el('filter-city-search');
+    if (cSearch) cSearch.value = '';
     document.querySelectorAll('#catalog-filters input[type="checkbox"]').forEach((i) => { i.checked = false; });
     const all = document.querySelector('#catalog-filters input[name="salary"][value="0"]');
     if (all) all.checked = true;
+    renderFilterOptions();
     renderList();
 }
 
@@ -271,7 +332,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     el('catalog-search').value = state.search;
 
     try {
-        state.all = await fetchJobs({ sort: 'latest' });
+        const [jobsList, appRes] = await Promise.all([
+            fetchJobs({ sort: 'latest' }),
+            isApplicant ? applications.list().catch(() => ({ data: [] })) : Promise.resolve({ data: [] }),
+        ]);
+        state.all = jobsList;
+        const appList = Array.isArray(appRes?.data) ? appRes.data : [];
+        state.appliedJobIds = new Set(
+            appList.filter((a) => a.status !== 'canceled').map((a) => Number(a.job_vacancy_id || a.job_id))
+        );
         renderSummary();
         renderFilterOptions();
     } catch (err) {
@@ -288,6 +357,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (t.name === 'salary') state.salary = Number(t.value);
         renderList();
     });
+
+    el('filter-city-search')?.addEventListener('input', (e) => {
+        state.cityQuery = e.target.value.trim();
+        renderFilterOptions();
+    });
+
+    el('filter-salary-min')?.addEventListener('input', (e) => {
+        state.salaryMin = Number(e.target.value) || 0;
+        renderList();
+    });
+
+    el('filter-salary-max')?.addEventListener('input', (e) => {
+        state.salaryMax = Number(e.target.value) || 0;
+        renderList();
+    });
+
     el('filter-reset').addEventListener('click', resetFilters);
     document.querySelector('[data-reset-filters]')?.addEventListener('click', () => {
         state.search = '';

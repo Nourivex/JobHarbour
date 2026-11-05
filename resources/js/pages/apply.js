@@ -1,6 +1,6 @@
 import JH, { jobs, applications, matchmaking, session, util, toast, showError, setLoading } from '../api.js';
 
-document.addEventListener('DOMContentLoaded', async () => {
+async function initApplyPage() {
     // 1. Guard Autentikasi
     const currentUser = JH.requireAuth('applicant');
     if (!currentUser) return;
@@ -14,47 +14,65 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
+    function normalizeSkills(skills) {
+        if (!Array.isArray(skills)) return [];
+        return skills.map((s) => {
+            if (typeof s === 'string') return s.trim();
+            if (s && typeof s === 'object' && s.name) return String(s.name).trim();
+            return '';
+        }).filter(Boolean);
+    }
+
     // State Halaman Apply
     const state = {
         user: currentUser,
         job: null,
-        candidateSkills: Array.isArray(currentUser.skills) ? [...currentUser.skills] : [],
+        candidateSkills: normalizeSkills(currentUser.skills),
         cvFile: null,
         submitting: false,
     };
 
-    // 2. Prefill info profil pelamar
+    // DOM Elements diinisialisasi di awal untuk mencegah Temporal Dead Zone (TDZ)
     const applicantName = document.getElementById('applicant-name');
     const applicantEmail = document.getElementById('applicant-email');
     const applicantLocation = document.getElementById('applicant-location');
 
+    const titleEl = document.getElementById('summary-job-title');
+    const companyEl = document.getElementById('summary-job-company');
+    const locationEl = document.getElementById('summary-job-location');
+    const salaryEl = document.getElementById('summary-job-salary');
+    const typeEl = document.getElementById('summary-job-type');
+    const reqsList = document.getElementById('summary-requirements-list');
+
+    const scoreNumEl = document.getElementById('live-score-num');
+    const scoreBarEl = document.getElementById('live-score-bar');
+    const scoreCatEl = document.getElementById('live-score-category');
+    const scoreDescEl = document.getElementById('live-score-desc');
+
+    const skillsChips = document.getElementById('apply-skills-chips');
+    const skillInput = document.getElementById('apply-skill-input');
+    const btnAddSkill = document.getElementById('apply-btn-add-skill');
+
+    const dropZone = document.getElementById('cv-dropzone');
+    const fileInput = document.getElementById('cv-file-input');
+    const filePreview = document.getElementById('cv-file-preview');
+    const fileNameEl = document.getElementById('cv-filename');
+    const fileSizeEl = document.getElementById('cv-filesize');
+    const btnRemoveCv = document.getElementById('cv-remove-btn');
+    const cvErrorEl = document.querySelector('[data-field-error="cv_file"]');
+
+    const applyForm = document.getElementById('apply-form');
+    const btnSubmit = document.getElementById('apply-submit-btn');
+    const coverLetterInput = document.getElementById('apply-cover-letter');
+
+    // 2. Prefill info profil pelamar
     if (applicantName) applicantName.textContent = currentUser.name || '-';
     if (applicantEmail) applicantEmail.textContent = currentUser.email || '-';
     if (applicantLocation) applicantLocation.textContent = currentUser.location || 'Indonesia';
 
-    // 3. Muat Detail Lowongan dari API
-    try {
-        const res = await jobs.show(jobId);
-        state.job = res.data;
-        if (!state.job) {
-            throw new Error('Lowongan tidak ditemukan');
-        }
-        renderJobSummary(state.job);
-        renderSkillsEditor();
-        recalculateMatch();
-    } catch (err) {
-        showError(err, 'Gagal memuat informasi lowongan.');
-        setTimeout(() => { window.location.href = '/catalog'; }, 1500);
-        return;
-    }
-
+    // 3. Ringkasan Info Lowongan
     function renderJobSummary(job) {
         const esc = util.escapeHtml;
-        const titleEl = document.getElementById('summary-job-title');
-        const companyEl = document.getElementById('summary-job-company');
-        const locationEl = document.getElementById('summary-job-location');
-        const salaryEl = document.getElementById('summary-job-salary');
-        const typeEl = document.getElementById('summary-job-type');
 
         if (titleEl) titleEl.textContent = job.title;
         if (companyEl) companyEl.textContent = job.company;
@@ -62,8 +80,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (salaryEl) salaryEl.textContent = util.formatSalaryRange(job.salary_min, job.salary_max);
         if (typeEl) typeEl.textContent = util.EMPLOYMENT_LABELS[job.employment_type] || job.employment_type || 'Full-time';
 
-        // Render daftar syarat lowongan di kartu ringkasan
-        const reqsList = document.getElementById('summary-requirements-list');
         if (reqsList) {
             reqsList.innerHTML = (job.requirements || []).map((r) => {
                 const name = util.skillName(r);
@@ -92,11 +108,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         const score = Math.round(match.score);
         const tone = util.scoreTone(score);
 
-        const scoreNumEl = document.getElementById('live-score-num');
-        const scoreBarEl = document.getElementById('live-score-bar');
-        const scoreCatEl = document.getElementById('live-score-category');
-        const scoreDescEl = document.getElementById('live-score-desc');
-
         if (scoreNumEl) scoreNumEl.textContent = `${score}%`;
         if (scoreBarEl) {
             scoreBarEl.style.width = `${score}%`;
@@ -118,10 +129,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // 5. Kelola Tag Keahlian Pelamar (Editor Skills)
-    const skillsChips = document.getElementById('apply-skills-chips');
-    const skillInput = document.getElementById('apply-skill-input');
-    const btnAddSkill = document.getElementById('apply-btn-add-skill');
-
     function renderSkillsEditor() {
         if (!skillsChips) return;
         if (!state.candidateSkills.length) {
@@ -180,14 +187,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     // 6. Unggah CV PDF Drag & Drop
-    const dropZone = document.getElementById('cv-dropzone');
-    const fileInput = document.getElementById('cv-file-input');
-    const filePreview = document.getElementById('cv-file-preview');
-    const fileNameEl = document.getElementById('cv-filename');
-    const fileSizeEl = document.getElementById('cv-filesize');
-    const btnRemoveCv = document.getElementById('cv-remove-btn');
-    const cvErrorEl = document.querySelector('[data-field-error="cv_file"]');
-
     function handleFile(file) {
         if (cvErrorEl) cvErrorEl.classList.add('hidden');
         if (!file) return;
@@ -261,49 +260,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // 7. Submit Form Lamaran
-    const applyForm = document.getElementById('apply-form');
-    applyForm?.addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        const btnSubmit = document.getElementById('apply-submit-btn');
-        const coverLetter = document.getElementById('apply-cover-letter')?.value.trim();
-
-        const payload = {
-            job_vacancy_id: Number(jobId),
-            job_id: Number(jobId),
-            cover_letter: coverLetter || null,
-            candidate_skills: state.candidateSkills,
-            cv_file: state.cvFile,
-        };
-
-        setLoading(btnSubmit, true, 'Mengirimkan Berkas...');
-        try {
-            const res = await applications.submit(payload);
-            const appData = res.data;
-
-            // Tampilkan Layar Sukses
-            showSuccessScreen(appData);
-        } catch (err) {
-            setLoading(btnSubmit, false);
-            if (err.status === 409) {
-                // Konflik duplikasi lamaran
-                toast('Kamu sudah melamar lowongan ini sebelumnya.', 'warning', 4500);
-                showConflictBanner();
-            } else if (err.errors) {
-                Object.entries(err.errors).forEach(([field, msgs]) => {
-                    const el = document.querySelector(`[data-field-error="${field}"]`);
-                    if (el) {
-                        el.textContent = Array.isArray(msgs) ? msgs[0] : String(msgs);
-                        el.classList.remove('hidden');
-                    }
-                });
-            } else {
-                showError(err, 'Gagal mengirimkan berkas lamaran.');
-            }
-        }
-    });
-
+    // 7. Layar Sukses & Konflik
     function showSuccessScreen(appData) {
         const formContainer = document.getElementById('apply-form-container');
         const successContainer = document.getElementById('apply-success-container');
@@ -313,10 +270,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         successContainer.classList.remove('hidden');
 
         const score = appData?.matchmaking_result?.match_score || 0;
-        const scoreEl = document.getElementById('success-score-label');
+        const scoreLabel = document.getElementById('success-score-label');
         const statusEl = document.getElementById('success-status-message');
 
-        if (scoreEl) scoreEl.textContent = `${Math.round(score)}%`;
+        if (scoreLabel) scoreLabel.textContent = `${Math.round(score)}%`;
 
         if (statusEl) {
             if (score >= 80) {
@@ -346,4 +303,64 @@ document.addEventListener('DOMContentLoaded', async () => {
             window.scrollTo({ top: conflictBox.offsetTop - 80, behavior: 'smooth' });
         }
     }
-});
+
+    // 8. Submit Form Lamaran
+    applyForm?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const btn = btnSubmit || document.getElementById('apply-submit-btn');
+        const coverLetter = coverLetterInput?.value.trim() || document.getElementById('apply-cover-letter')?.value.trim();
+
+        const payload = {
+            job_vacancy_id: Number(jobId),
+            job_id: Number(jobId),
+            cover_letter: coverLetter || null,
+            candidate_skills: state.candidateSkills,
+            cv_file: state.cvFile,
+        };
+
+        setLoading(btn, true, 'Mengirimkan Berkas...');
+        try {
+            const res = await applications.submit(payload);
+            const appData = res.data;
+            showSuccessScreen(appData);
+        } catch (err) {
+            setLoading(btn, false);
+            if (err.status === 409) {
+                toast('Kamu sudah melamar lowongan ini sebelumnya.', 'warning', 4500);
+                showConflictBanner();
+            } else if (err.errors) {
+                Object.entries(err.errors).forEach(([field, msgs]) => {
+                    const el = document.querySelector(`[data-field-error="${field}"]`);
+                    if (el) {
+                        el.textContent = Array.isArray(msgs) ? msgs[0] : String(msgs);
+                        el.classList.remove('hidden');
+                    }
+                });
+            } else {
+                showError(err, 'Gagal mengirimkan berkas lamaran.');
+            }
+        }
+    });
+
+    // 9. Muat Detail Lowongan dari API
+    try {
+        const res = await jobs.show(jobId);
+        state.job = res.data;
+        if (!state.job) {
+            throw new Error('Lowongan tidak ditemukan');
+        }
+        renderJobSummary(state.job);
+        renderSkillsEditor();
+        recalculateMatch();
+    } catch (err) {
+        showError(err, 'Gagal memuat informasi lowongan.');
+        setTimeout(() => { window.location.href = '/catalog'; }, 1500);
+    }
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initApplyPage);
+} else {
+    initApplyPage();
+}

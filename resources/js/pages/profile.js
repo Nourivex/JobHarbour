@@ -1,109 +1,45 @@
 import JH, { auth, profile, jobs, matchmaking, session, util, toast, showError, setLoading } from '../api.js';
 
-document.addEventListener('DOMContentLoaded', async () => {
+async function initProfilePage() {
     // 1. Guard Autentikasi
     const sessionUser = JH.requireAuth();
     if (!sessionUser) return;
 
-    let currentUser = { ...sessionUser };
-    let currentSkills = Array.isArray(currentUser.skills) ? [...currentUser.skills] : [];
-    let savedSkillsSnapshot = JSON.stringify(currentSkills);
-    let allOpenJobs = [];
-
-    // 2. Muat Profil Segar dari Server
-    try {
-        const freshUser = await auth.me();
-        currentUser = freshUser;
-        currentSkills = Array.isArray(freshUser.skills) ? [...freshUser.skills] : [];
-        savedSkillsSnapshot = JSON.stringify(currentSkills);
-        populateBiodataForm(currentUser);
-        renderSkillsChips();
-        updateSkillsDirtyUI();
-    } catch (e) {
-        console.error('Gagal memuat profil auth me:', e);
-        populateBiodataForm(currentUser);
-        renderSkillsChips();
-    }
-
-    // 3. Muat Data Lowongan untuk Analisis Rekomendasi Keahlian
-    try {
-        const jobsRes = await jobs.list({ per_page: 50, status: 'open' });
-        allOpenJobs = Array.isArray(jobsRes.data) ? jobsRes.data : [];
-        analyzeSkillRecommendations();
-    } catch (e) {
-        console.error('Gagal memuat lowongan untuk rekomendasi:', e);
-    }
-
-    // 4. Prefill Form Biodata
-    function populateBiodataForm(user) {
-        const inputName = document.getElementById('bio-name');
-        const inputEmail = document.getElementById('bio-email');
-        const inputPhone = document.getElementById('bio-phone');
-        const inputLocation = document.getElementById('bio-location');
-        const inputBio = document.getElementById('bio-bio');
-
-        const headerName = document.getElementById('profile-header-name');
-        const headerEmail = document.getElementById('profile-header-email');
-        const headerRole = document.getElementById('profile-header-role');
-        const headerInitials = document.getElementById('profile-header-initials');
-
-        if (inputName) inputName.value = user.name || '';
-        if (inputEmail) inputEmail.value = user.email || '';
-        if (inputPhone) inputPhone.value = user.phone || '';
-        if (inputLocation) inputLocation.value = user.location || '';
-        if (inputBio) inputBio.value = user.bio || '';
-
-        if (headerName) headerName.textContent = user.name || '-';
-        if (headerEmail) headerEmail.textContent = user.email || '-';
-        if (headerInitials) headerInitials.textContent = util.initials(user.name);
-        if (headerRole) {
-            const roleLabels = { applicant: 'Pelamar Kerja', recruiter: 'Recruiter', admin: 'Administrator' };
-            headerRole.textContent = roleLabels[user.role] || user.role;
-        }
-
-        const countBadge = document.getElementById('profile-skills-count-badge');
-        if (countBadge) countBadge.textContent = `${currentSkills.length} Keahlian`;
-    }
-
-    // 5. Submit Form Biodata (PUT /api/profile)
+    // DOM Elements diinisialisasi di awal agar tidak memicu Temporal Dead Zone (TDZ) ReferenceError
     const biodataForm = document.getElementById('profile-biodata-form');
-    biodataForm?.addEventListener('submit', async (e) => {
-        e.preventDefault();
+    const inputName = document.getElementById('bio-name');
+    const inputEmail = document.getElementById('bio-email');
+    const inputPhone = document.getElementById('bio-phone');
+    const inputLocation = document.getElementById('bio-location');
+    const inputBio = document.getElementById('bio-bio');
+    const btnSaveBiodata = document.getElementById('btn-save-biodata');
 
-        const btn = document.getElementById('btn-save-biodata');
-        const name = document.getElementById('bio-name')?.value.trim();
-        const phone = document.getElementById('bio-phone')?.value.trim();
-        const location = document.getElementById('bio-location')?.value.trim();
-        const bio = document.getElementById('bio-bio')?.value.trim();
+    const headerName = document.getElementById('profile-header-name');
+    const headerEmail = document.getElementById('profile-header-email');
+    const headerRole = document.getElementById('profile-header-role');
+    const headerInitials = document.getElementById('profile-header-initials');
+    const countBadge = document.getElementById('profile-skills-count-badge');
 
-        const payload = {
-            name,
-            phone: phone || null,
-            location: location || null,
-            bio: bio || null,
-        };
-
-        setLoading(btn, true, 'Menyimpan Biodata...');
-        try {
-            const res = await profile.update(payload);
-            currentUser = { ...currentUser, ...res.data };
-            session.setUser(currentUser);
-            JH.bindSessionUI(document);
-            populateBiodataForm(currentUser);
-            setLoading(btn, false);
-            toast('Biodata profil berhasil diperbarui!', 'success');
-        } catch (err) {
-            setLoading(btn, false);
-            showError(err, 'Gagal memperbarui biodata.');
-        }
-    });
-
-    // 6. Kelola Keahlian (Skills Tag Input)
     const skillInput = document.getElementById('profile-skill-input');
     const btnAddSkill = document.getElementById('btn-add-profile-skill');
     const skillsContainer = document.getElementById('profile-skills-chips-container');
     const btnSaveSkills = document.getElementById('btn-save-skills');
     const dirtyBanner = document.getElementById('skills-dirty-banner');
+    const recoContainer = document.getElementById('profile-skill-recommendations');
+
+    function normalizeSkills(skills) {
+        if (!Array.isArray(skills)) return [];
+        return skills.map((s) => {
+            if (typeof s === 'string') return s.trim();
+            if (s && typeof s === 'object' && s.name) return String(s.name).trim();
+            return '';
+        }).filter(Boolean);
+    }
+
+    let currentUser = { ...sessionUser };
+    let currentSkills = normalizeSkills(currentUser.skills);
+    let savedSkillsSnapshot = JSON.stringify(currentSkills);
+    let allOpenJobs = [];
 
     function isSkillsDirty() {
         return JSON.stringify(currentSkills) !== savedSkillsSnapshot;
@@ -118,10 +54,31 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    // Prefill Form Biodata & Header
+    function populateBiodataForm(user) {
+        if (inputName) inputName.value = user.name || '';
+        if (inputEmail) inputEmail.value = user.email || '';
+        if (inputPhone) inputPhone.value = user.phone || '';
+        if (inputLocation) inputLocation.value = user.location || '';
+        if (inputBio) inputBio.value = user.bio || '';
+
+        if (headerName) headerName.textContent = user.name || '-';
+        if (headerEmail) headerEmail.textContent = user.email || '-';
+        if (headerInitials) headerInitials.textContent = util.initials(user.name);
+        if (headerRole) {
+            const roleLabels = { applicant: 'Pelamar Kerja', recruiter: 'Recruiter', admin: 'Administrator' };
+            headerRole.textContent = roleLabels[user.role] || user.role;
+        }
+
+        if (countBadge) countBadge.textContent = `${currentSkills.length} Keahlian`;
+    }
+
+    // Render Chip Keahlian
     function renderSkillsChips() {
         if (!skillsContainer) return;
         if (!currentSkills.length) {
             skillsContainer.innerHTML = '<span class="text-xs text-[#627080]">Belum ada keahlian ditambahkan. Tambahkan minimal satu keahlian.</span>';
+            if (countBadge) countBadge.textContent = '0 Keahlian';
             updateSkillsDirtyUI();
             return;
         }
@@ -150,12 +107,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
         });
 
-        const countBadge = document.getElementById('profile-skills-count-badge');
         if (countBadge) countBadge.textContent = `${currentSkills.length} Keahlian`;
-
         updateSkillsDirtyUI();
     }
 
+    // Tambah Keahlian Baru dari Input
     function addSkill() {
         if (!skillInput) return;
         const val = skillInput.value.trim();
@@ -178,7 +134,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    btnSaveSkills?.addEventListener('click', async () => {
+    // Simpan Perubahan Keahlian ke Server (PUT /api/profile/skills)
+    btnSaveSkills?.addEventListener('click', async (e) => {
+        e?.preventDefault();
         if (!currentSkills.length) {
             toast('Daftar keahlian tidak boleh kosong (minimal 1 keahlian).', 'warning');
             return;
@@ -188,10 +146,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             const res = await profile.updateSkills(currentSkills);
             currentUser.skills = res.data.skills;
-            savedSkillsSnapshot = JSON.stringify(currentUser.skills);
+            currentSkills = normalizeSkills(res.data.skills);
+            savedSkillsSnapshot = JSON.stringify(currentSkills);
             session.setUser(currentUser);
-            JH.bindSessionUI(document);
+            if (typeof JH.bindSessionUI === 'function') {
+                JH.bindSessionUI(document);
+            }
             setLoading(btnSaveSkills, false);
+            renderSkillsChips();
             updateSkillsDirtyUI();
             toast('Daftar keahlian berhasil disimpan ke server!', 'success');
             analyzeSkillRecommendations();
@@ -201,15 +163,51 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // 7. Analisis Rekomendasi Keahlian dari Pasar Lowongan Aktif
+    // Simpan Perubahan Biodata ke Server (PUT /api/profile)
+    biodataForm?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const btn = btnSaveBiodata || document.getElementById('btn-save-biodata');
+        const name = inputName?.value.trim();
+        const phone = inputPhone?.value.trim();
+        const location = inputLocation?.value.trim();
+        const bio = inputBio?.value.trim();
+
+        if (!name) {
+            toast('Nama lengkap wajib diisi.', 'warning');
+            return;
+        }
+
+        const payload = {
+            name,
+            phone: phone || null,
+            location: location || null,
+            bio: bio || null,
+        };
+
+        setLoading(btn, true, 'Menyimpan Biodata...');
+        try {
+            const res = await profile.update(payload);
+            currentUser = { ...currentUser, ...res.data };
+            session.setUser(currentUser);
+            if (typeof JH.bindSessionUI === 'function') {
+                JH.bindSessionUI(document);
+            }
+            populateBiodataForm(currentUser);
+            setLoading(btn, false);
+            toast('Biodata profil berhasil diperbarui!', 'success');
+        } catch (err) {
+            setLoading(btn, false);
+            showError(err, 'Gagal memperbarui biodata.');
+        }
+    });
+
+    // Analisis Rekomendasi Keahlian dari Pasar Lowongan Aktif
     function analyzeSkillRecommendations() {
-        const recoContainer = document.getElementById('profile-skill-recommendations');
         if (!recoContainer || !allOpenJobs.length) return;
 
         const normUserSkills = currentSkills.map((s) => s.toLowerCase().trim());
-
-        // Hitung frekuensi syarat skill di seluruh lowongan aktif yang belum dimiliki pengguna
-        const skillDemandMap = new Map(); // skillName -> { count, totalWeight }
+        const skillDemandMap = new Map();
 
         allOpenJobs.forEach((job) => {
             (job.requirements || []).forEach((req) => {
@@ -240,7 +238,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         recoContainer.innerHTML = sortedDemands.map((item) => {
-            // Simulasi dampak kenaikan rata-rata skor jika menambahkan skill ini
             const jobsDemanding = allOpenJobs.filter((j) => (j.requirements || []).some((r) => util.skillName(r).toLowerCase().trim() === item.originalName.toLowerCase().trim()));
             let totalGain = 0;
             jobsDemanding.forEach((j) => {
@@ -275,7 +272,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             `;
         }).join('');
 
-        // Pasang event listener tombol tambah cepat
         recoContainer.querySelectorAll('[data-quick-add-skill]').forEach((btn) => {
             btn.addEventListener('click', () => {
                 const sName = btn.getAttribute('data-quick-add-skill');
@@ -288,4 +284,35 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
         });
     }
-});
+
+    // 2. Muat Profil Segar dari Server
+    try {
+        const freshUser = await auth.me();
+        currentUser = freshUser;
+        currentSkills = normalizeSkills(freshUser.skills);
+        savedSkillsSnapshot = JSON.stringify(currentSkills);
+        populateBiodataForm(currentUser);
+        renderSkillsChips();
+        updateSkillsDirtyUI();
+    } catch (e) {
+        console.error('Gagal memuat profil auth me:', e);
+        populateBiodataForm(currentUser);
+        renderSkillsChips();
+        updateSkillsDirtyUI();
+    }
+
+    // 3. Muat Data Lowongan untuk Analisis Rekomendasi Keahlian
+    try {
+        const jobsRes = await jobs.list({ per_page: 50, status: 'open' });
+        allOpenJobs = Array.isArray(jobsRes.data) ? jobsRes.data : [];
+        analyzeSkillRecommendations();
+    } catch (e) {
+        console.error('Gagal memuat lowongan untuk rekomendasi:', e);
+    }
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initProfilePage);
+} else {
+    initProfilePage();
+}

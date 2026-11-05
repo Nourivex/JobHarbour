@@ -138,7 +138,7 @@
                     </h2>
                 </div>
 
-                <form id="profile-biodata-form" class="space-y-4">
+                <form id="profile-biodata-form" action="javascript:void(0);" method="POST" class="space-y-4">
                     <!-- Nama Lengkap -->
                     <div>
                         <label for="bio-name" class="block text-xs font-semibold text-[#0B1B2B] mb-1">

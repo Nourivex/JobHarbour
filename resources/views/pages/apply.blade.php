@@ -47,7 +47,7 @@
                     </p>
                 </div>
 
-                <form id="apply-form" class="space-y-6">
+                <form id="apply-form" action="javascript:void(0);" method="POST" class="space-y-6">
                     
                     <!-- 1. Ringkasan Data Diri Terverifikasi -->
                     <div class="p-4 rounded-xl bg-[#F4F6F8] border border-[#E2E7ED] space-y-2">

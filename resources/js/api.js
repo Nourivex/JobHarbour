@@ -311,11 +311,75 @@ export const admin = {
     sourceLogs: (id) => api.get('/admin/sources/' + id + '/logs'),
 };
 
+const SKILL_ALIASES = {
+    js: 'javascript',
+    ts: 'typescript',
+    golang: 'go',
+    postgres: 'postgresql',
+    reactjs: 'react',
+    'react.js': 'react',
+    vuejs: 'vue',
+    'vue.js': 'vue',
+    nodejs: 'node',
+    'node.js': 'node',
+    nextjs: 'next',
+    'next.js': 'next',
+    nuxtjs: 'nuxt',
+    'nuxt.js': 'nuxt',
+    k8s: 'kubernetes',
+    aws: 'amazon web services',
+    gcp: 'google cloud platform',
+    'restful api': 'rest api',
+    restful: 'rest api',
+    rest: 'rest api',
+    'ui/ux': 'ui ux',
+    'ui ux': 'ui ux',
+};
+
+const SKILL_STOP_WORDS = [
+    'framework', 'library', 'development', 'developer', 'programming',
+    'language', 'database', 'db', 'technologies', 'technology', 'service', 'services',
+];
+
+function normalizeSkillStr(str) {
+    let s = String(str || '').toLowerCase().trim();
+    s = s.replace(/\.([a-z]+)/gi, '$1');
+    s = s.replace(/[^a-z0-9\s]/gi, ' ');
+    s = s.replace(/\s+/g, ' ').trim();
+    return SKILL_ALIASES[s] || s;
+}
+
+function tokenizeSkillStr(cleanStr) {
+    const words = cleanStr.split(' ').filter(Boolean);
+    const filtered = words.filter((w) => !SKILL_STOP_WORDS.includes(w));
+    return filtered.length > 0 ? filtered : words;
+}
+
+function matchSkill(reqStr, candidates) {
+    const reqClean = normalizeSkillStr(reqStr);
+    if (!reqClean) return null;
+    const reqTokens = tokenizeSkillStr(reqClean);
+
+    for (const cand of candidates) {
+        if (reqClean === cand.clean) return cand.original;
+
+        const isSubset1 = reqTokens.every((t) => cand.tokens.includes(t));
+        const isSubset2 = cand.tokens.every((t) => reqTokens.includes(t));
+        if (isSubset1 || isSubset2) return cand.original;
+
+        const reqBound = new RegExp('\\b' + reqClean.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'i');
+        const candBound = new RegExp('\\b' + cand.clean.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'i');
+        if (reqBound.test(cand.clean) || candBound.test(reqClean)) return cand.original;
+    }
+    return null;
+}
+
 export const matchmaking = {
     calculate(candidateSkills = [], jobRequirements = []) {
         const normalizedCandidate = (candidateSkills || []).map((s) => {
-            if (s && typeof s === 'object') return String(s.name || s.skill || '').toLowerCase().trim();
-            return String(s || '').toLowerCase().trim();
+            const raw = s && typeof s === 'object' ? String(s.name || s.skill || '') : String(s || '');
+            const clean = normalizeSkillStr(raw);
+            return clean ? { original: raw, clean, tokens: tokenizeSkillStr(clean) } : null;
         }).filter(Boolean);
 
         if (!Array.isArray(jobRequirements) || jobRequirements.length === 0) {
@@ -350,7 +414,8 @@ export const matchmaking = {
 
             totalRequiredWeight += weight;
 
-            if (normalizedCandidate.includes(reqSkill.toLowerCase().trim())) {
+            const matched = matchSkill(reqSkill, normalizedCandidate);
+            if (matched !== null) {
                 matchedWeight += weight;
                 matchedSkills.push(reqSkill);
             } else {

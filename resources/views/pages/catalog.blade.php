@@ -20,7 +20,7 @@
             </div>
 
             <!-- Ringkasan: isi diatur oleh catalog.js sesuai status login -->
-            <div id="catalog-summary" class="hero-in bg-white/95 backdrop-blur rounded-2xl border border-[#E2E7ED] shadow-[0_18px_40px_-24px_rgba(12,34,56,0.35)] px-4 py-3 sm:px-5 sm:py-4 flex flex-wrap items-center gap-x-6 gap-y-3 sm:gap-y-4" style="--d: 120ms">
+            <div id="catalog-summary" class="hero-in bg-white/95 dark:bg-[#121A28]/95 backdrop-blur rounded-2xl border border-[#E2E7ED] dark:border-[#243045] shadow-[0_18px_40px_-24px_rgba(12,34,56,0.35)] px-4 py-3 sm:px-5 sm:py-4 flex flex-wrap items-center gap-x-6 gap-y-3 sm:gap-y-4" style="--d: 120ms">
                 <div class="h-12 w-[420px] max-w-full rounded-xl animate-skeleton bg-[#F4F6F8]"></div>
             </div>
         </div>
@@ -65,16 +65,32 @@
 
                     <details class="filter-group" open>
                         <summary class="filter-summary">Rentang Gaji</summary>
-                        <div class="filter-body">
-                            @foreach ([0 => 'Semua gaji', 5000000 => 'Sampai Rp5 jt ke atas', 10000000 => 'Sampai Rp10 jt ke atas', 15000000 => 'Sampai Rp15 jt ke atas'] as $value => $label)
-                                <label class="filter-option"><input type="radio" name="salary" value="{{ $value }}" @checked($value === 0)> <span>{{ $label }}</span></label>
-                            @endforeach
+                        <div class="filter-body space-y-2">
+                            <label class="filter-option"><input type="radio" name="salary" value="0" checked> <span>Semua gaji</span></label>
+                            <label class="filter-option"><input type="radio" name="salary" value="5000000"> <span>Mulai Rp5.000.000 / bln</span></label>
+                            <label class="filter-option"><input type="radio" name="salary" value="10000000"> <span>Mulai Rp10.000.000 / bln</span></label>
+                            <label class="filter-option"><input type="radio" name="salary" value="15000000"> <span>Mulai Rp15.000.000 / bln</span></label>
+                            <label class="filter-option"><input type="radio" name="salary" value="20000000"> <span>Mulai Rp20.000.000 / bln</span></label>
+
+                            <div class="pt-2 mt-2 border-t border-[#E2E7ED] space-y-1.5">
+                                <span class="text-[11px] font-bold text-[#627080] uppercase tracking-wider block">Batas Kustom (Rp)</span>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <input type="number" id="filter-salary-min" placeholder="Min" min="0" step="500000" class="w-full text-xs px-2.5 py-1.5 rounded-lg border border-[#C5CFDA] bg-[#F4F6F8] focus:bg-white focus:border-[#0C2238] outline-none">
+                                    <input type="number" id="filter-salary-max" placeholder="Maks" min="0" step="500000" class="w-full text-xs px-2.5 py-1.5 rounded-lg border border-[#C5CFDA] bg-[#F4F6F8] focus:bg-white focus:border-[#0C2238] outline-none">
+                                </div>
+                            </div>
                         </div>
                     </details>
 
                     <details class="filter-group" open>
-                        <summary class="filter-summary">Lokasi</summary>
-                        <div id="filter-cities" class="filter-body"></div>
+                        <summary class="filter-summary">Lokasi Kota & Wilayah</summary>
+                        <div class="filter-body space-y-2 pt-1">
+                            <div class="relative">
+                                <input type="text" id="filter-city-search" placeholder="Cari kota..." class="w-full text-xs pl-7 pr-2.5 py-1.5 rounded-lg border border-[#C5CFDA] bg-[#F4F6F8] focus:bg-white focus:border-[#0C2238] outline-none">
+                                <svg class="w-3.5 h-3.5 text-[#8C98A8] absolute left-2 top-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                            </div>
+                            <div id="filter-cities" class="space-y-1.5 max-h-52 overflow-y-auto pr-1"></div>
+                        </div>
                     </details>
                 </div>
 

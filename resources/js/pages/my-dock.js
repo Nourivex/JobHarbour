@@ -9,20 +9,95 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
+    // 2. State Dasbor Lamaran
     const state = {
         applications: [],
         filterTab: 'all', // all | in_progress | completed
+        searchQuery: '',
+        sortBy: 'newest', // newest | score_desc | score_asc | oldest
         selectedAppId: null,
     };
 
-    // 2. Muat Daftar Lamaran dari API
+    // 3. Elemen DOM Utama
+    const loadingEl = document.getElementById('dock-loading');
+    const emptyEl = document.getElementById('dock-empty');
+    const listEl = document.getElementById('dock-applications-list');
+
+    const statTotal = document.getElementById('stat-total-apps');
+    const statProcess = document.getElementById('stat-in-progress');
+    const statOffering = document.getElementById('stat-offering');
+    const statDone = document.getElementById('stat-completed');
+
+    const agendaCard = document.getElementById('dock-next-agenda-card');
+    const agendaTitle = document.getElementById('agenda-job-title');
+    const agendaDate = document.getElementById('agenda-datetime');
+    const agendaInterviewer = document.getElementById('agenda-interviewer');
+    const agendaMeetingLink = document.getElementById('agenda-meeting-link');
+
+    const tabAll = document.getElementById('dock-tab-all');
+    const tabProcess = document.getElementById('dock-tab-process');
+    const tabDone = document.getElementById('dock-tab-done');
+
+    const searchInput = document.getElementById('dock-search-input');
+    const searchClearBtn = document.getElementById('dock-search-clear');
+    const sortSelect = document.getElementById('dock-sort-select');
+    const filterStatusEl = document.getElementById('dock-filter-status');
+    const filterCountText = document.getElementById('dock-filter-count-text');
+    const filterResetBtn = document.getElementById('dock-filter-reset-btn');
+
+    const timelineDrawer = document.getElementById('timeline-drawer');
+    const closeDrawerBtn = document.getElementById('close-timeline-drawer');
+
+    // 4. Sinkronisasi Nilai Awal dari Form / Input
+    if (searchInput && searchInput.value) {
+        state.searchQuery = searchInput.value.trim();
+        searchClearBtn?.classList.remove('hidden');
+    }
+    if (sortSelect && sortSelect.value) {
+        state.sortBy = sortSelect.value;
+    }
+
+    // 5. Pasang Event Listener Toolbar & Kontrol
+    tabAll?.addEventListener('click', () => setActiveTab('all'));
+    tabProcess?.addEventListener('click', () => setActiveTab('in_progress'));
+    tabDone?.addEventListener('click', () => setActiveTab('completed'));
+
+    searchInput?.addEventListener('input', (e) => {
+        state.searchQuery = (e.target.value || '').trim();
+        if (searchClearBtn) {
+            searchClearBtn.classList.toggle('hidden', !state.searchQuery);
+        }
+        applyFilterAndRender();
+    });
+
+    searchClearBtn?.addEventListener('click', () => {
+        if (searchInput) searchInput.value = '';
+        state.searchQuery = '';
+        searchClearBtn.classList.add('hidden');
+        searchInput?.focus();
+        applyFilterAndRender();
+    });
+
+    sortSelect?.addEventListener('change', (e) => {
+        state.sortBy = e.target.value;
+        applyFilterAndRender();
+    });
+
+    filterResetBtn?.addEventListener('click', () => {
+        if (searchInput) searchInput.value = '';
+        state.searchQuery = '';
+        if (searchClearBtn) searchClearBtn.classList.add('hidden');
+        if (sortSelect) sortSelect.value = 'newest';
+        state.sortBy = 'newest';
+        applyFilterAndRender();
+    });
+
+    closeDrawerBtn?.addEventListener('click', closeTimelineDrawer);
+
+    // 6. Muat Data Lamaran Pertama Kali (setelah seluruh DOM & handler siap)
     await fetchApplications();
 
     async function fetchApplications() {
-        const loadingEl = document.getElementById('dock-loading');
-        const emptyEl = document.getElementById('dock-empty');
-        const listEl = document.getElementById('dock-applications-list');
-
         if (loadingEl) loadingEl.classList.remove('hidden');
         if (emptyEl) emptyEl.classList.add('hidden');
 
@@ -43,13 +118,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // 3. Ringkasan Angka Statistik
+    // 7. Ringkasan Angka Statistik
     function renderStats(apps) {
-        const statTotal = document.getElementById('stat-total-apps');
-        const statProcess = document.getElementById('stat-in-progress');
-        const statOffering = document.getElementById('stat-offering');
-        const statDone = document.getElementById('stat-completed');
-
         const activeCount = apps.filter((a) => !['rejected', 'canceled', 'offering'].includes(a.status)).length;
         const offeringCount = apps.filter((a) => a.status === 'offering').length;
         const doneCount = apps.filter((a) => ['rejected', 'canceled'].includes(a.status)).length;
@@ -60,17 +130,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (statDone) statDone.textContent = doneCount;
     }
 
-    // 4. Kartu Agenda Berikutnya (Wawancara Terdekat)
+    // 8. Kartu Agenda Berikutnya (Wawancara Terdekat)
     function renderNextAgenda(apps) {
-        const agendaCard = document.getElementById('dock-next-agenda-card');
-        const agendaTitle = document.getElementById('agenda-job-title');
-        const agendaDate = document.getElementById('agenda-datetime');
-        const agendaInterviewer = document.getElementById('agenda-interviewer');
-        const agendaMeetingLink = document.getElementById('agenda-meeting-link');
-
         if (!agendaCard) return;
 
-        // Cari interview terjadwal yang akan datang dari timeline stages
         let upcomingInterview = null;
         for (const app of apps) {
             const stages = app.pipeline_timeline?.stages || [];
@@ -107,51 +170,95 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // 5. Filter Tab: Semua, Diproses, Selesai
-    const tabAll = document.getElementById('dock-tab-all');
-    const tabProcess = document.getElementById('dock-tab-process');
-    const tabDone = document.getElementById('dock-tab-done');
-
     function setActiveTab(tab) {
         state.filterTab = tab;
         [tabAll, tabProcess, tabDone].forEach((t) => {
             t?.classList.remove('border-[#C8460B]', 'text-[#C8460B]');
-            t?.classList.add('border-transparent', 'text-[#627080]');
+            t?.classList.add('border-transparent', 'text-[#627080]', 'dark:text-slate-400');
         });
 
         if (tab === 'in_progress') {
             tabProcess?.classList.add('border-[#C8460B]', 'text-[#C8460B]');
-            tabProcess?.classList.remove('border-transparent', 'text-[#627080]');
+            tabProcess?.classList.remove('border-transparent', 'text-[#627080]', 'dark:text-slate-400');
         } else if (tab === 'completed') {
             tabDone?.classList.add('border-[#C8460B]', 'text-[#C8460B]');
-            tabDone?.classList.remove('border-transparent', 'text-[#627080]');
+            tabDone?.classList.remove('border-transparent', 'text-[#627080]', 'dark:text-slate-400');
         } else {
             tabAll?.classList.add('border-[#C8460B]', 'text-[#C8460B]');
-            tabAll?.classList.remove('border-transparent', 'text-[#627080]');
+            tabAll?.classList.remove('border-transparent', 'text-[#627080]', 'dark:text-slate-400');
         }
 
         applyFilterAndRender();
     }
 
-    tabAll?.addEventListener('click', () => setActiveTab('all'));
-    tabProcess?.addEventListener('click', () => setActiveTab('in_progress'));
-    tabDone?.addEventListener('click', () => setActiveTab('completed'));
-
     function applyFilterAndRender() {
-        const listEl = document.getElementById('dock-applications-list');
-        const emptyEl = document.getElementById('dock-empty');
         if (!listEl) return;
 
+        // 1. Saring berdasarkan Tab
         let filtered = state.applications;
         if (state.filterTab === 'in_progress') {
             filtered = state.applications.filter((a) => !['rejected', 'canceled'].includes(a.status));
         } else if (state.filterTab === 'completed') {
             filtered = state.applications.filter((a) => ['rejected', 'canceled', 'offering'].includes(a.status));
         }
+        const totalInTab = filtered.length;
 
+        // 2. Saring berdasarkan Kata Kunci Pencarian (posisi, perusahaan, lokasi, status)
+        if (state.searchQuery) {
+            const q = state.searchQuery.toLowerCase();
+            filtered = filtered.filter((app) => {
+                const job = app.job_vacancy || {};
+                const title = (job.title || '').toLowerCase();
+                const company = (job.company || '').toLowerCase();
+                const location = (job.location || '').toLowerCase();
+                const stageLabel = util.stageLabel(app.pipeline_timeline?.current_stage || app.status || '').toLowerCase();
+                return title.includes(q) || company.includes(q) || location.includes(q) || stageLabel.includes(q);
+            });
+        }
+
+        // 3. Urutkan Data
+        filtered = [...filtered].sort((a, b) => {
+            if (state.sortBy === 'score_desc') {
+                return (Number(b.match_score) || 0) - (Number(a.match_score) || 0);
+            }
+            if (state.sortBy === 'score_asc') {
+                return (Number(a.match_score) || 0) - (Number(b.match_score) || 0);
+            }
+            if (state.sortBy === 'oldest') {
+                return new Date(a.created_at) - new Date(b.created_at);
+            }
+            // newest (default)
+            return new Date(b.created_at) - new Date(a.created_at);
+        });
+
+        // 4. Perbarui Indikator Bar Status Filter
+        if (filterStatusEl) {
+            if (state.searchQuery || state.sortBy !== 'newest') {
+                filterStatusEl.classList.remove('hidden');
+                if (filterCountText) {
+                    const searchPart = state.searchQuery ? ` untuk pencarian "${state.searchQuery}"` : '';
+                    filterCountText.textContent = `Menampilkan ${filtered.length} dari ${totalInTab} lamaran${searchPart}`;
+                }
+            } else {
+                filterStatusEl.classList.add('hidden');
+            }
+        }
+
+        // 5. Tampilkan Daftar Kartu atau State Kosong
         if (!filtered.length) {
             listEl.innerHTML = '';
-            if (emptyEl) emptyEl.classList.remove('hidden');
+            if (emptyEl) {
+                emptyEl.classList.remove('hidden');
+                const emptyTitle = emptyEl.querySelector('h3') || emptyEl.querySelector('.text-base');
+                const emptyDesc = emptyEl.querySelector('p');
+                if (state.searchQuery) {
+                    if (emptyTitle) emptyTitle.textContent = 'Tidak ada lamaran yang cocok';
+                    if (emptyDesc) emptyDesc.textContent = `Tidak ditemukan lamaran dengan kata kunci "${state.searchQuery}". Silakan coba kata kunci lain atau hapus filter pencarian.`;
+                } else {
+                    if (emptyTitle) emptyTitle.textContent = 'Belum ada riwayat lamaran';
+                    if (emptyDesc) emptyDesc.textContent = 'Anda belum mengajukan lamaran pekerjaan untuk kategori ini. Buka katalog lowongan untuk menemukan posisi yang sesuai dengan keahlian Anda.';
+                }
+            }
             return;
         }
 
@@ -174,39 +281,39 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Stage label badge
         let stageBadgeHtml = '';
         if (app.status === 'canceled') {
-            stageBadgeHtml = `<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-[#F4F6F8] text-[#627080] border border-[#C5CFDA]">Dibatalkan</span>`;
+            stageBadgeHtml = `<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-[#F4F6F8] dark:bg-slate-700 text-[#627080] dark:text-slate-300 border border-[#C5CFDA] dark:border-slate-600">Dibatalkan</span>`;
         } else if (app.status === 'rejected' || currentStage === 'rejected') {
-            stageBadgeHtml = `<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-[#FDEEEC] text-[#B42318] border border-[#B42318]/20">Tidak Lolos Seleksi</span>`;
+            stageBadgeHtml = `<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-[#FDEEEC] dark:bg-red-950/40 text-[#B42318] dark:text-red-400 border border-[#B42318]/20 dark:border-red-500/20">Tidak Lolos Seleksi</span>`;
         } else if (currentStage === 'offering' || app.status === 'offering') {
-            stageBadgeHtml = `<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-[#E7F5EC] text-[#157F3B] border border-[#157F3B]/30">Tahap Penawaran (Offering)</span>`;
+            stageBadgeHtml = `<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-[#E7F5EC] dark:bg-emerald-950/40 text-[#157F3B] dark:text-emerald-400 border border-[#157F3B]/30 dark:border-emerald-500/30">Tahap Penawaran (Offering)</span>`;
         } else {
-            stageBadgeHtml = `<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-[#FFF3EA] text-[#8A2E05] border border-[#C8460B]/20">Tahap: ${util.stageLabel(currentStage)}</span>`;
+            stageBadgeHtml = `<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-[#FFF3EA] dark:bg-[#C8460B]/10 text-[#8A2E05] dark:text-amber-400 border border-[#C8460B]/20 dark:border-[#C8460B]/30">Tahap: ${util.stageLabel(currentStage)}</span>`;
         }
 
         // Stepper Visual 4 Tahap
         const stepperHtml = createStepperHtml(currentStage, app.status);
 
         return `
-            <div class="bg-white rounded-2xl border border-[#E2E7ED] p-5 sm:p-6 shadow-xs space-y-4 text-left">
+            <div class="bg-white dark:bg-slate-800 rounded-2xl border border-[#E2E7ED] dark:border-slate-700/60 p-5 sm:p-6 shadow-xs space-y-4 text-left">
                 <!-- Header Kartu -->
-                <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3 pb-3 border-b border-[#E2E7ED]">
+                <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3 pb-3 border-b border-[#E2E7ED] dark:border-slate-700/60">
                     <div>
                         <div class="flex items-center gap-2 mb-1">
                             ${stageBadgeHtml}
-                            <span class="text-xs text-[#627080]">Diajukan: ${util.formatDate(app.created_at)}</span>
+                            <span class="text-xs text-[#627080] dark:text-slate-400">Diajukan: ${util.formatDate(app.created_at)}</span>
                         </div>
-                        <h3 class="text-lg font-bold text-[#0B1B2B] font-heading leading-snug">
+                        <h3 class="text-lg font-bold text-[#0B1B2B] dark:text-white font-heading leading-snug">
                             ${esc(job.title || 'Posisi Pekerjaan')}
                         </h3>
-                        <p class="text-sm font-semibold text-[#3D4B5C]">
-                            ${esc(job.company || 'Nama Perusahaan')} • <span class="font-normal text-[#627080]">${esc(job.location || 'Indonesia')}</span>
+                        <p class="text-sm font-semibold text-[#3D4B5C] dark:text-slate-300">
+                            ${esc(job.company || 'Nama Perusahaan')} • <span class="font-normal text-[#627080] dark:text-slate-400">${esc(job.location || 'Indonesia')}</span>
                         </p>
                     </div>
 
                     <!-- Skor Matchmaking Badge -->
                     <div class="flex items-center gap-2 self-start sm:self-auto">
                         <div class="px-3 py-1.5 rounded-xl border ${tone.border} ${tone.bg} text-right">
-                            <span class="text-[10px] uppercase font-bold text-[#627080] block">Skor Kecocokan</span>
+                            <span class="text-[10px] uppercase font-bold text-[#627080] dark:text-slate-400 block">Skor Kecocokan</span>
                             <span class="text-lg font-extrabold font-heading ${tone.text} num-tabular">${score}%</span>
                         </div>
                     </div>
@@ -216,12 +323,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                 ${stepperHtml}
 
                 <!-- Aksi Tombol -->
-                <div class="pt-3 border-t border-[#E2E7ED] flex flex-wrap items-center justify-between gap-2">
+                <div class="pt-3 border-t border-[#E2E7ED] dark:border-slate-700/60 flex flex-wrap items-center justify-between gap-2">
                     <div class="flex items-center gap-2">
                         <button
                             type="button"
                             data-view-timeline="${app.id}"
-                            class="px-4 py-2 rounded-lg text-xs font-bold text-white bg-[#0C2238] hover:bg-[#133150] transition-colors btn-press flex items-center gap-1.5 cursor-pointer"
+                            class="px-4 py-2 rounded-lg text-xs font-bold text-white bg-[#0C2238] dark:bg-[#1E3A5F] hover:bg-[#133150] dark:hover:bg-[#254877] transition-colors btn-press flex items-center gap-1.5 cursor-pointer shadow-2xs"
                         >
                             <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                             <span>Pantau Linimasa</span>
@@ -231,9 +338,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                             <button
                                 type="button"
                                 data-download-cv="${app.id}"
-                                class="px-3 py-2 rounded-lg text-xs font-semibold text-[#3D4B5C] bg-[#F4F6F8] hover:bg-[#E2E7ED] transition-colors flex items-center gap-1.5 cursor-pointer"
+                                class="px-3 py-2 rounded-lg text-xs font-semibold text-[#3D4B5C] dark:text-slate-200 bg-[#F4F6F8] dark:bg-slate-700 hover:bg-[#E2E7ED] dark:hover:bg-slate-600 transition-colors flex items-center gap-1.5 cursor-pointer"
                             >
-                                <svg class="w-3.5 h-3.5 text-[#1B65A6]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                <svg class="w-3.5 h-3.5 text-[#1B65A6] dark:text-sky-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                                 <span>Unduh CV</span>
                             </button>
                         ` : ''}
@@ -244,7 +351,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                             type="button"
                             data-cancel-app="${app.id}"
                             data-job-name="${esc(job.title || 'posisi ini')}"
-                            class="px-3 py-2 rounded-lg text-xs font-semibold text-[#B42318] hover:bg-[#FDEEEC] transition-colors cursor-pointer"
+                            class="px-3 py-2 rounded-lg text-xs font-semibold text-[#B42318] dark:text-red-400 hover:bg-[#FDEEEC] dark:hover:bg-red-950/40 transition-colors cursor-pointer"
                         >
                             Batalkan Lamaran
                         </button>
@@ -266,7 +373,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const isRejected = status === 'rejected' || currentStage === 'rejected';
 
         if (isCanceled) {
-            return `<div class="p-2.5 rounded-lg bg-[#F4F6F8] text-xs text-[#627080]">Lamaran ini telah dibatalkan oleh pelamar.</div>`;
+            return `<div class="p-2.5 rounded-lg bg-[#F4F6F8] dark:bg-slate-700/50 text-xs text-[#627080] dark:text-slate-400">Lamaran ini telah dibatalkan oleh pelamar.</div>`;
         }
 
         const stageIndex = stages.findIndex((s) => s.key === currentStage);
@@ -274,20 +381,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         return `
             <div class="py-2">
                 <div class="flex items-center justify-between relative">
-                    <div class="absolute top-1/2 left-4 right-4 -translate-y-1/2 h-0.5 bg-[#E2E7ED] z-0"></div>
+                    <div class="absolute top-1/2 left-4 right-4 -translate-y-1/2 h-0.5 bg-[#E2E7ED] dark:bg-slate-700 z-0"></div>
                     ${stages.map((stg, idx) => {
                         const isPassed = !isRejected && (idx < stageIndex || (idx === stageIndex && status === 'passed'));
                         const isCurrent = !isRejected && (idx === stageIndex && status !== 'passed');
                         
-                        let dotCls = 'bg-white text-[#627080] border-2 border-[#E2E7ED]';
-                        let textCls = 'text-[#627080]';
+                        let dotCls = 'bg-white dark:bg-slate-800 text-[#627080] dark:text-slate-400 border-2 border-[#E2E7ED] dark:border-slate-700';
+                        let textCls = 'text-[#627080] dark:text-slate-400';
 
                         if (isPassed) {
                             dotCls = 'bg-[#157F3B] text-white shadow-xs';
-                            textCls = 'text-[#157F3B] font-semibold';
+                            textCls = 'text-[#157F3B] dark:text-emerald-400 font-semibold';
                         } else if (isCurrent) {
-                            dotCls = 'bg-[#C8460B] text-white ring-4 ring-[#FFF3EA] shadow-xs';
-                            textCls = 'text-[#C8460B] font-bold';
+                            dotCls = 'bg-[#C8460B] text-white ring-4 ring-[#FFF3EA] dark:ring-[#C8460B]/20 shadow-xs';
+                            textCls = 'text-[#C8460B] dark:text-orange-400 font-bold';
                         }
 
                         return `
@@ -354,9 +461,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // 8. Drawer Linimasa Rinci
-    const timelineDrawer = document.getElementById('timeline-drawer');
-    const closeDrawerBtn = document.getElementById('close-timeline-drawer');
-
     async function openTimelineDrawer(appId) {
         if (!timelineDrawer) return;
         state.selectedAppId = appId;
@@ -409,26 +513,26 @@ document.addEventListener('DOMContentLoaded', async () => {
                 return `
                     <div class="relative pl-6 pb-6 last:pb-0">
                         <!-- Vertical line -->
-                        ${idx < stages.length - 1 ? '<div class="absolute left-2.5 top-3 bottom-0 w-0.5 bg-[#E2E7ED]"></div>' : ''}
+                        ${idx < stages.length - 1 ? '<div class="absolute left-2.5 top-3 bottom-0 w-0.5 bg-[#E2E7ED] dark:bg-slate-700"></div>' : ''}
                         
                         <!-- Dot -->
                         <div class="absolute left-1 top-1.5 w-3.5 h-3.5 rounded-full ${dotColor}"></div>
 
                         <div class="space-y-1">
                             <div class="flex items-center justify-between text-xs">
-                                <span class="font-bold text-[#0B1B2B] font-heading text-sm uppercase tracking-wide">
+                                <span class="font-bold text-[#0B1B2B] dark:text-white font-heading text-sm uppercase tracking-wide">
                                     Tahap: ${util.stageLabel(stg.stage)}
                                 </span>
-                                <span class="text-[#627080] text-[11px]">${util.formatDate(stg.entered_at, true)}</span>
+                                <span class="text-[#627080] dark:text-slate-400 text-[11px]">${util.formatDate(stg.entered_at, true)}</span>
                             </div>
 
-                            <p class="text-xs text-[#3D4B5C] leading-relaxed">
+                            <p class="text-xs text-[#3D4B5C] dark:text-slate-300 leading-relaxed">
                                 ${esc(stg.notes || 'Dalam proses peninjauan berkas.')}
                             </p>
 
                             ${stg.interview_schedule ? `
-                                <div class="mt-2 p-3 rounded-xl bg-[#EBF3FB] border border-[#1B65A6]/30 text-xs text-[#0B1B2B] space-y-1">
-                                    <div class="font-bold text-[#1B65A6] flex items-center gap-1.5">
+                                <div class="mt-2 p-3 rounded-xl bg-[#EBF3FB] dark:bg-slate-900/60 border border-[#1B65A6]/30 dark:border-blue-500/30 text-xs text-[#0B1B2B] dark:text-blue-100 space-y-1">
+                                    <div class="font-bold text-[#1B65A6] dark:text-sky-400 flex items-center gap-1.5">
                                         <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                                         <span>Jadwal Wawancara Resmi</span>
                                     </div>
@@ -437,7 +541,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                                     ${stg.interview_schedule.interviewer ? `<div><strong>Pewawancara:</strong> ${esc(stg.interview_schedule.interviewer)}</div>` : ''}
                                     ${stg.interview_schedule.meeting_url ? `
                                         <div class="pt-1.5">
-                                            <a href="${esc(stg.interview_schedule.meeting_url)}" target="_blank" class="inline-flex items-center gap-1 font-bold text-[#1B65A6] hover:underline">
+                                            <a href="${esc(stg.interview_schedule.meeting_url)}" target="_blank" class="inline-flex items-center gap-1 font-bold text-[#1B65A6] dark:text-sky-400 hover:underline">
                                                 <span>Buka Tautan Pertemuan</span>
                                                 <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
                                             </a>
@@ -457,6 +561,4 @@ document.addEventListener('DOMContentLoaded', async () => {
         timelineDrawer.classList.add('hidden');
         document.body.classList.remove('overflow-hidden');
     }
-
-    closeDrawerBtn?.addEventListener('click', closeTimelineDrawer);
 });
