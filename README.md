@@ -1,12 +1,12 @@
 <p align="center">
-  <img src="public/logo.png" width="96" alt="JobHarbour Logo">
+  <img src="public/images/logo-jobharbour.png" width="120" alt="Logo JobHarbour">
 </p>
 
 <h1 align="center">JobHarbour</h1>
 
 <p align="center">
-  <strong>Platform Rekrutmen Terintegrasi Berbasis Microservice</strong><br>
-  <em>Automated Skill-Matchmaking Engine & Multi-Stage Pipeline Tracker</em><br>
+  <strong>Platform Rekrutmen dengan Pencocokan Keahlian Otomatis</strong><br>
+  <em>REST API Laravel, Skill-Matchmaking Engine, dan Multi-Stage Pipeline Tracker</em><br>
   <strong>"Pelabuhan Para Pekerja Sebelum Keberangkatan Menuju Dunia Karier"</strong>
 </p>
 
@@ -14,7 +14,7 @@
 
 ![Laravel](https://img.shields.io/badge/Laravel-13.x-FF2D20?style=flat-square&logo=laravel&logoColor=white)
 ![PHP](https://img.shields.io/badge/PHP-8.4%2B-777BB4?style=flat-square&logo=php&logoColor=white)
-![Architecture](https://img.shields.io/badge/Architecture-Microservices-0D1117?style=flat-square)
+![Architecture](https://img.shields.io/badge/Architecture-Modular%20Monolith-0D1117?style=flat-square)
 ![API](https://img.shields.io/badge/API-REST%20JSON-blue?style=flat-square)
 ![OpenAPI](https://img.shields.io/badge/OpenAPI-3.1.0-49cc90?style=flat-square&logo=openapiinitiative&logoColor=white)
 ![DDEV](https://img.shields.io/badge/DDEV-supported-0D1117?style=flat-square)
@@ -31,7 +31,7 @@
 | Layanan / Halaman | Tautan Akses Live | Keterangan & Demonstrasi |
 |---|---|---|
 | **Portal Publik JobHarbour** | [https://jobharbour.nour.web.id](https://jobharbour.nour.web.id) | Antarmuka utama pencari kerja, katalog, dan lamaran |
-| **Postman API Client** | [https://jobharbour.nour.web.id/postman](https://jobharbour.nour.web.id/postman) | Konsol interaktif pengujian 18 endpoint microservices & rubrik UTS |
+| **Postman API Client** | [https://jobharbour.nour.web.id/postman](https://jobharbour.nour.web.id/postman) | Konsol interaktif pengujian endpoint REST API & rubrik UTS |
 | **OpenAPI Swagger UI** | [https://jobharbour.nour.web.id/docs](https://jobharbour.nour.web.id/docs) | Dokumentasi resmi REST API OpenAPI v3.1.0 |
 | **Portal Recruiter & Kanban** | [https://jobharbour.nour.web.id/recruiter](https://jobharbour.nour.web.id/recruiter) | Workspace rekruter, profil perusahaan, dan linimasa pelamar |
 | **Status Pemantauan Server** | [UptimeRobot Monitor](https://dashboard.uptimerobot.com/monitors/804528529) | Health check otomatis 24/7 (interval 10 menit) |
@@ -52,7 +52,9 @@
 
 ## ⚓ Kenalan sama JobHarbour (Buat Pemula)
 
-Sederhananya, **JobHarbour** adalah proyek web service platform lowongan kerja dan rekrutmen. Berbeda dari job portal konvensional, JobHarbour dibangun dengan arsitektur **microservices** yang saling berkomunikasi melalui **REST API JSON**, bukan aplikasi monolitik yang semua kodenya menumpuk di satu tempat.
+Sederhananya, **JobHarbour** adalah proyek web service platform lowongan kerja dan rekrutmen. Seluruh fitur disediakan lewat **REST API JSON** yang dipakai oleh halaman web JobHarbour sendiri maupun klien lain seperti Postman.
+
+Secara arsitektur, JobHarbour adalah **satu aplikasi Laravel dengan satu database (monolit modular)**. Kodenya dibagi per domain, yaitu Auth & Profile, Job Catalog, Application & Matchmaking, serta Recruitment Pipeline, sehingga tiap bagian punya controller, model, dan pengujian sendiri tanpa perlu dijalankan sebagai layanan terpisah.
 
 ### 🌊 Filosofi Nama "JobHarbour"
 
@@ -73,6 +75,19 @@ Pernah melamar kerja lalu merasa CV seperti masuk ke "lubang hitam" tanpa kepast
 
 ---
 
+## 🖼️ Cuplikan Tampilan
+
+<p align="center"><strong>Landing Page</strong></p>
+<p align="center"><img src="docs/screenshots/landing.webp" width="860" alt="Landing page JobHarbour dengan pencarian lowongan dan statistik katalog"></p>
+
+<p align="center"><strong>Halaman Masuk & Daftar</strong></p>
+<p align="center"><img src="docs/screenshots/login.webp" width="860" alt="Halaman masuk JobHarbour dengan pilihan akun demo"></p>
+
+<p align="center"><strong>Admin Portal - Ringkasan</strong></p>
+<p align="center"><img src="docs/screenshots/admin.webp" width="860" alt="Ringkasan Admin Portal JobHarbour berisi statistik platform dan tindakan yang perlu diperhatikan"></p>
+
+---
+
 ## 🚀 Fitur Unggulan
 
 - **🎯 Mesin Pemadanan Keahlian Otomatis (Skill-Matchmaking Engine):** Menghitung skor kecocokan antara profil pelamar dan kualifikasi lowongan secara real-time menggunakan formula *Weighted Jaccard Similarity*.
@@ -80,21 +95,22 @@ Pernah melamar kerja lalu merasa CV seperti masuk ke "lubang hitam" tanpa kepast
   ```text
   Screening -> Assessment -> Interview -> Offering / Rejected
   ```
-- **🏗️ Arsitektur 4 Microservices Mandiri:** Setiap layanan memiliki database dan tanggung jawab mandiri (*database-per-service*), berkomunikasi secara terstruktur lewat kontrak REST API.
+- **🛡️ Tiga Peran Pengguna (JWT):** Pelamar, recruiter, dan admin masing-masing punya halaman dan hak akses sendiri, termasuk Admin Portal untuk verifikasi perusahaan, moderasi lowongan, dan log audit.
+- **🏗️ Monolit Modular yang Rapi:** Satu aplikasi Laravel dengan satu database, dibagi per domain dengan batas tanggung jawab yang jelas dan kontrak REST API yang seragam.
 - **📄 Kontrak OpenAPI 3.1 & Koleksi Pengujian Siap Pakai:** Lengkap dengan spesifikasi OpenAPI, koleksi Postman, dan Thunder Client yang bisa langsung di-import untuk mencoba endpoint.
 
 ---
 
-## 👥 Tim Pengembang & Pembagian Layanan
+## 👥 Tim Pengembang & Pembagian Domain
 
-Setiap anggota kelompok memegang satu layanan microservice secara penuh (mulai dari perancangan API, implementasi database dan controller, penulisan pengujian, hingga dokumentasi):
+Setiap anggota kelompok bertanggung jawab atas satu domain (mulai dari perancangan API, implementasi tabel dan controller, penulisan pengujian, hingga dokumentasi):
 
-| No | Layanan Microservice | Penanggung Jawab | NIM | Database & Port | Dokumentasi Detail |
+| No | Domain | Penanggung Jawab | NIM | Controller Utama | Dokumentasi Detail |
 |:---:|---|---|:---:|:---:|:---:|
-| 1 | **Auth & Profile Service** | **Nabe'ela Ayu Ning Tyas Zahra** | `23215052` | `db_auth` (:8001) | [Baca Modul Auth](docs/materi/minggu-2/auth-profile/README.md) |
-| 2 | **Job Catalog Service** | **M. Fahren Andrean Rangkuti** | `23215030` | `db_jobs` (:8002) | [Baca Modul Job Catalog](docs/materi/minggu-2/job-catalog/README.md) |
-| 3 | **Application & Matchmaking Service** | **Muhammad Yasir Ilham Nabil** | `23215040` | `db_applications` (:8003) | [Baca Modul Application](docs/materi/minggu-2/application-matchmaking/README.md) |
-| 4 | **Recruitment Pipeline Service** | **MUHAMMAD AFFIF** | `24225046` | `db_pipeline` (:8004) | [Baca Modul Pipeline](docs/materi/minggu-2/recruitment-pipeline/README.md) |
+| 1 | **Auth & Profile** | **Nabe'ela Ayu Ning Tyas Zahra** | `23215052` | `AuthController`, `ProfileSkillController` | [Baca Modul Auth](docs/materi/minggu-2/auth-profile/README.md) |
+| 2 | **Job Catalog** | **M. Fahren Andrean Rangkuti** | `23215030` | `JobVacancyController`, `CompanyController` | [Baca Modul Job Catalog](docs/materi/minggu-2/job-catalog/README.md) |
+| 3 | **Application & Matchmaking** | **Muhammad Yasir Ilham Nabil** | `23215040` | `ApplicationController`, `MatchmakingService` | [Baca Modul Application](docs/materi/minggu-2/application-matchmaking/README.md) |
+| 4 | **Recruitment Pipeline** | **MUHAMMAD AFFIF** | `24225046` | `PipelineController` | [Baca Modul Pipeline](docs/materi/minggu-2/recruitment-pipeline/README.md) |
 
 ---
 
@@ -104,7 +120,7 @@ Biar nggak bingung mencari berkas tugas, spesifikasi, atau panduan teknis, gunak
 
 ### 1. Dokumen Arsitektur & Spesifikasi Resmi
 
-- [📐 `docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) - Penjelasan arsitektur sistem, topologi jaringan, komunikasi antar service, dan formula kalkulasi matchmaking.
+- [📐 `docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) - Penjelasan arsitektur sistem, alur antardomain, dan formula kalkulasi matchmaking.
 - [📋 `docs/API_CONTRACT_STANDARDS.md`](docs/API_CONTRACT_STANDARDS.md) - Format standar JSON envelope, header HTTP, aturan status code, dan format penanganan error.
 - [📝 `docs/api-design.md`](docs/api-design.md) - Dokumen perancangan API resmi kelompok (API Design Document v1) yang mencakup 40 endpoint lengkap.
 - [🌐 `docs/openapi.yaml`](docs/openapi.yaml) - Spesifikasi formal kontrak OpenAPI 3.1.0 untuk seluruh endpoint JobHarbour (lolos Redocly lint dengan 0 error).
@@ -148,7 +164,7 @@ Setiap respon dari server selalu dibungkus dengan format berikut:
 
 Sistem JobHarbour mengimplementasikan endpoint REST API modular yang siap diakses:
 
-| Layanan Microservice | Method | Endpoint URI | Fungsi & Hak Akses |
+| Domain | Method | Endpoint URI | Fungsi & Hak Akses |
 |---|:---:|---|---|
 | **Auth & Profile** | `POST` | `/api/auth/login` | Login & terbitkan JWT token (Publik) |
 | | `POST` | `/api/auth/register` | Pendaftaran akun baru pelamar / recruiter (Publik) |
@@ -202,8 +218,8 @@ Kami sudah menyiapkan skrip otomatis (`./dev` untuk Linux/macOS atau `dev.bat` u
 ### 1. Clone Repositori
 
 ```bash
-git clone https://github.com/Nourivex/PaduKerja.git
-cd PaduKerja
+git clone https://github.com/Nourivex/JobHarbour.git
+cd JobHarbour
 ```
 
 ### 2. Jalankan Setup Otomatis
@@ -277,11 +293,11 @@ Tersedia file koleksi siap pakai di folder `docs/`:
 ```text
 JobHarbour/
 ├── app/
-│   ├── Http/Controllers/Api/   # Controller untuk setiap microservice
+│   ├── Http/Controllers/Api/   # Controller REST API per domain
 │   ├── Models/                 # Model Eloquent (User, JobVacancy, Application, dll)
 │   └── Services/               # Logika bisnis (MatchmakingService, JwtService)
 ├── database/
-│   ├── migrations/             # Skema tabel database per service
+│   ├── migrations/             # Skema tabel database per domain
 │   └── seeders/                # Data awal untuk pengujian
 ├── docs/                       # DOKUMENTASI LENGKAP PROYEK
 │   ├── ARCHITECTURE.md         # Arsitektur & alur matchmaking
