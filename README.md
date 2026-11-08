@@ -14,7 +14,8 @@
 
 ![Laravel](https://img.shields.io/badge/Laravel-13.x-FF2D20?style=flat-square&logo=laravel&logoColor=white)
 ![PHP](https://img.shields.io/badge/PHP-8.4%2B-777BB4?style=flat-square&logo=php&logoColor=white)
-![Architecture](https://img.shields.io/badge/Architecture-Microservices-0D1117?style=flat-square)
+![Architecture](https://img.shields.io/badge/Architecture-Modular%20SOA%20%2F%20Microservice--Ready-0D1117?style=flat-square)
+![Tests](https://img.shields.io/badge/Tests-63%20Passed%20(569%20Assertions)-10b981?style=flat-square&logo=githubactions&logoColor=white)
 ![API](https://img.shields.io/badge/API-REST%20JSON-blue?style=flat-square)
 ![OpenAPI](https://img.shields.io/badge/OpenAPI-3.1.0-49cc90?style=flat-square&logo=openapiinitiative&logoColor=white)
 ![DDEV](https://img.shields.io/badge/DDEV-supported-0D1117?style=flat-square)
@@ -31,9 +32,10 @@
 | Layanan / Halaman | Tautan Akses Live | Keterangan & Demonstrasi |
 |---|---|---|
 | **Portal Publik JobHarbour** | [https://jobharbour.nour.web.id](https://jobharbour.nour.web.id) | Antarmuka utama pencari kerja, katalog, dan lamaran |
-| **Postman API Client** | [https://jobharbour.nour.web.id/postman](https://jobharbour.nour.web.id/postman) | Konsol interaktif pengujian 18 endpoint microservices & rubrik UTS |
+| **Postman API Client** | [https://jobharbour.nour.web.id/postman](https://jobharbour.nour.web.id/postman) | Konsol interaktif pengujian 20 skenario endpoint microservices & rubrik UTS |
 | **OpenAPI Swagger UI** | [https://jobharbour.nour.web.id/docs](https://jobharbour.nour.web.id/docs) | Dokumentasi resmi REST API OpenAPI v3.1.0 |
 | **Portal Recruiter & Kanban** | [https://jobharbour.nour.web.id/recruiter](https://jobharbour.nour.web.id/recruiter) | Workspace rekruter, profil perusahaan, dan linimasa pelamar |
+| **Portal Admin Governance** | [https://jobharbour.nour.web.id/admin](https://jobharbour.nour.web.id/admin) | Tata kelola platform, verifikasi perusahaan, audit log, dan laporan |
 | **Status Pemantauan Server** | [UptimeRobot Monitor](https://dashboard.uptimerobot.com/monitors/804528529) | Health check otomatis 24/7 (interval 10 menit) |
 
 ---
@@ -52,7 +54,7 @@
 
 ## ⚓ Kenalan sama JobHarbour (Buat Pemula)
 
-Sederhananya, **JobHarbour** adalah proyek web service platform lowongan kerja dan rekrutmen. Berbeda dari job portal konvensional, JobHarbour dibangun dengan arsitektur **microservices** yang saling berkomunikasi melalui **REST API JSON**, bukan aplikasi monolitik yang semua kodenya menumpuk di satu tempat.
+Sederhananya, **JobHarbour** adalah platform web service lowongan kerja dan rekrutmen terpadu. JobHarbour dirancang dengan pendekatan **Modular Service-Oriented Architecture (Modular Monolith / Microservice-Ready)**: seluruh logika bisnis dibagi ke dalam 4 domain layanan independen yang berkomunikasi menggunakan standar **REST API JSON Envelope**, dengan pemisahan lingkup data (*logical database-per-service*) yang siap dipisahkan menjadi *container* fisik mandiri pada tahap pengembangan lanjutan.
 
 ### 🌊 Filosofi Nama "JobHarbour"
 
@@ -75,26 +77,30 @@ Pernah melamar kerja lalu merasa CV seperti masuk ke "lubang hitam" tanpa kepast
 
 ## 🚀 Fitur Unggulan
 
-- **🎯 Mesin Pemadanan Keahlian Otomatis (Skill-Matchmaking Engine):** Menghitung skor kecocokan antara profil pelamar dan kualifikasi lowongan secara real-time menggunakan formula *Weighted Jaccard Similarity*.
+- **🎯 Mesin Pemadanan Keahlian Otomatis (Smart Skill-Matchmaking Engine):** Menghitung skor kecocokan antara profil pelamar dan kualifikasi lowongan secara real-time menggunakan formula *Weighted Jaccard Similarity* dengan toleransi variasi penamaan keahlian (*fuzzy match*).
 - **📊 Pelacak Linimasa Seleksi Transparan (Multi-Stage Pipeline):** Tahapan rekrutmen yang jelas dan dapat dipantau langsung:
   ```text
   Screening -> Assessment -> Interview -> Offering / Rejected
   ```
-- **🏗️ Arsitektur 4 Microservices Mandiri:** Setiap layanan memiliki database dan tanggung jawab mandiri (*database-per-service*), berkomunikasi secara terstruktur lewat kontrak REST API.
-- **📄 Kontrak OpenAPI 3.1 & Koleksi Pengujian Siap Pakai:** Lengkap dengan spesifikasi OpenAPI, koleksi Postman, dan Thunder Client yang bisa langsung di-import untuk mencoba endpoint.
+- **🏗️ Arsitektur 4 Domain Layanan Terisolasi (Microservice-Ready):** Setiap modul memiliki model data dan tanggung jawab bisnis mandiri (*database-per-service logical isolation*), berkomunikasi terstandarisasi lewat kontrak REST API JSON.
+- **📄 Kontrak OpenAPI 3.1 & Koleksi Pengujian Siap Pakai:** Lengkap dengan spesifikasi OpenAPI v3.1.0, koleksi Postman, serta konsol interaktif Postman Web Studio di `/postman`.
+- **🛡️ Portal Tata Kelola & Keamanan Admin:** Dilengkapi verifikasi perusahaan, audit log, moderasi laporan lowongan, dan rate limiting adaptif.
 
 ---
 
 ## 👥 Tim Pengembang & Pembagian Layanan
 
-Setiap anggota kelompok memegang satu layanan microservice secara penuh (mulai dari perancangan API, implementasi database dan controller, penulisan pengujian, hingga dokumentasi):
+Setiap anggota kelompok bertanggung jawab penuh atas satu domain layanan (mulai dari perancangan kontrak API, implementasi database dan controller, penulisan pengujian otomatis, hingga dokumentasi):
 
-| No | Layanan Microservice | Penanggung Jawab | NIM | Database & Port | Dokumentasi Detail |
+| No | Domain Layanan | Penanggung Jawab | NIM | Ruang Lingkup Data (Logical DB) | Dokumentasi Detail |
 |:---:|---|---|:---:|:---:|:---:|
-| 1 | **Auth & Profile Service** | **Nabe'ela Ayu Ning Tyas Zahra** | `23215052` | `db_auth` (:8001) | [Baca Modul Auth](docs/materi/minggu-2/auth-profile/README.md) |
-| 2 | **Job Catalog Service** | **M. Fahren Andrean Rangkuti** | `23215030` | `db_jobs` (:8002) | [Baca Modul Job Catalog](docs/materi/minggu-2/job-catalog/README.md) |
-| 3 | **Application & Matchmaking Service** | **Muhammad Yasir Ilham Nabil** | `23215040` | `db_applications` (:8003) | [Baca Modul Application](docs/materi/minggu-2/application-matchmaking/README.md) |
-| 4 | **Recruitment Pipeline Service** | **MUHAMMAD AFFIF** | `24225046` | `db_pipeline` (:8004) | [Baca Modul Pipeline](docs/materi/minggu-2/recruitment-pipeline/README.md) |
+| 1 | **Auth & Profile Service** | **Nabe'ela Ayu Ning Tyas Zahra** | `23215052` | `db_auth` (Users, Skills, Auth Tokens) | [Baca Modul Auth](docs/materi/minggu-2/auth-profile/README.md) |
+| 2 | **Job Catalog Service** | **M. Fahren Andrean Rangkuti** | `23215030` | `db_jobs` (Jobs, Companies, Aggregator) | [Baca Modul Job Catalog](docs/materi/minggu-2/job-catalog/README.md) |
+| 3 | **Application & Matchmaking Service** | **Muhammad Yasir Ilham Nabil** | `23215040` | `db_applications` (Applications, Match Scores) | [Baca Modul Application](docs/materi/minggu-2/application-matchmaking/README.md) |
+| 4 | **Recruitment Pipeline Service** | **MUHAMMAD AFFIF** | `24225046` | `db_pipeline` (Pipelines, Interviews, Stages) | [Baca Modul Pipeline](docs/materi/minggu-2/recruitment-pipeline/README.md) |
+
+> 💡 **Catatan Arsitektur (Milestone M1-M3 / Fase UTS):**  
+> Pada fase UTS, keempat domain layanan dikompilasi dalam arsitektur **Monorepo Modular Monolith** untuk menjamin kestabilan pengujian otomatis (63 automated tests lulus 100%), eliminasi network latency saat live demo presentasi, serta efisiensi cloud deployment gratis di Render dan Supabase PostgreSQL Tokyo. Setiap domain terisolasi secara ketat di level Controller, Service, dan Model sehingga 100% siap di-split ke container fisik independen (*multi-service deployment*) pada Milestone M4-M5 (fase UAS).
 
 ---
 
@@ -202,8 +208,8 @@ Kami sudah menyiapkan skrip otomatis (`./dev` untuk Linux/macOS atau `dev.bat` u
 ### 1. Clone Repositori
 
 ```bash
-git clone https://github.com/Nourivex/PaduKerja.git
-cd PaduKerja
+git clone https://github.com/Nourivex/JobHarbour.git
+cd JobHarbour
 ```
 
 ### 2. Jalankan Setup Otomatis
@@ -256,7 +262,8 @@ Setelah menjalankan `migrate:fresh --seed`, kamu bisa langsung memakai akun ini:
 
 | Peran (Role) | Email | Password | Kegunaan |
 |---|---|---|---|
-| **Recruiter** | `recruiter@jobharbour.id` | `password123` | Buat lowongan baru & ubah status pelamar |
+| **Admin** | `admin@jobharbour.id` | `password123` | Tata kelola platform, verifikasi perusahaan & audit log |
+| **Recruiter** | `recruiter@jobharbour.id` | `password123` | Buat lowongan baru, kelola pipeline & ubah status pelamar |
 | **Pelamar (Budi)** | `budi@jobharbour.id` | `password123` | Pelamar dengan skill PHP, Laravel, MySQL, Git |
 | **Pelamar (Siti)** | `siti@jobharbour.id` | `password123` | Pelamar dengan skill Python, Django, PostgreSQL, Docker |
 
@@ -264,9 +271,10 @@ Setelah menjalankan `migrate:fresh --seed`, kamu bisa langsung memakai akun ini:
 
 ### 2. Import Koleksi Pengujian
 
-Tersedia file koleksi siap pakai di folder `docs/`:
+Tersedia opsi pengujian siap pakai:
+- **Postman Web Studio (Tanpa Install Aplikasi):** Buka langsung di browser melalui [https://jobharbour.nour.web.id/postman](https://jobharbour.nour.web.id/postman) lengkap dengan 1-click role switcher dan panduan rubrik UTS.
+- **Postman Desktop App:** Buka Postman -> klik tombol **Import** -> masukkan file [`docs/PaduKerja.postman_collection.json`](docs/PaduKerja.postman_collection.json).
 - **Thunder Client (VS Code):** Buka ekstensi Thunder Client -> klik menu `...` di tab Collections -> pilih **Import** -> pilih file [`docs/thunder-collection_padukerja.json`](docs/thunder-collection_padukerja.json).
-- **Postman:** Buka Postman -> klik tombol **Import** -> masukkan file [`docs/PaduKerja.postman_collection.json`](docs/PaduKerja.postman_collection.json).
 
 > 💡 Untuk panduan langkah demi langkah pengujian setiap endpoint, silakan buka dokumen [`docs/TESTING_GUIDE.md`](docs/TESTING_GUIDE.md).
 
