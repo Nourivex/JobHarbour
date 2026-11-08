@@ -16,7 +16,8 @@
 ![PHP](https://img.shields.io/badge/PHP-8.4-777BB4?style=flat-square&logo=php&logoColor=white)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-4-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-8-646CFF?style=flat-square&logo=vite&logoColor=white)
-![Architecture](https://img.shields.io/badge/Architecture-Modular%20Monolith-0D1117?style=flat-square)
+![Architecture](https://img.shields.io/badge/Architecture-Modular%20SOA%20%2F%20Microservice--Ready-0D1117?style=flat-square)
+![Tests](https://img.shields.io/badge/Tests-63%20Passed%20(569%20Assertions)-10b981?style=flat-square&logo=githubactions&logoColor=white)
 ![API](https://img.shields.io/badge/API-REST%20JSON-blue?style=flat-square)
 ![OpenAPI](https://img.shields.io/badge/OpenAPI-3.1.0-49cc90?style=flat-square&logo=openapiinitiative&logoColor=white)
 ![Team](https://img.shields.io/badge/Team-Kelompok%204%20UHN-orange?style=flat-square)
@@ -45,8 +46,9 @@ Ibarat pelabuhan (*harbour*) tempat kapal bersandar sebelum berlayar, JobHarbour
 |---|---|---|
 | **Portal Publik** | [jobharbour.nour.web.id](https://jobharbour.nour.web.id) | Landing page, katalog, dan lamaran pelamar |
 | **Portal Recruiter** | [/recruiter](https://jobharbour.nour.web.id/recruiter) | Lowongan, pipeline kandidat, wawancara, dan profil perusahaan |
+| **Admin Portal** | [/admin](https://jobharbour.nour.web.id/admin) | Tata kelola platform, verifikasi perusahaan, audit log, dan moderasi |
 | **Swagger UI** | [/docs](https://jobharbour.nour.web.id/docs) | Dokumentasi interaktif dari `docs/openapi.yaml` |
-| **API Studio** | [/postman](https://jobharbour.nour.web.id/postman) | Konsol uji endpoint REST API di browser |
+| **API Studio (Postman Web)** | [/postman](https://jobharbour.nour.web.id/postman) | Konsol uji 20 skenario endpoint REST API langsung di browser |
 | **Pemantauan Server** | [UptimeRobot](https://dashboard.uptimerobot.com/monitors/804528529) | Health check otomatis setiap 10 menit |
 
 ### 📌 Informasi Akademik
@@ -125,7 +127,10 @@ Ibarat pelabuhan (*harbour*) tempat kapal bersandar sebelum berlayar, JobHarbour
 
 ## 🏗️ Arsitektur Singkat
 
-JobHarbour adalah **monolit modular**: satu aplikasi Laravel dengan satu database, tetapi kodenya dibagi per domain dengan batas tanggung jawab yang jelas.
+JobHarbour dirancang dengan pendekatan **Modular Service-Oriented Architecture (Modular SOA / Microservice-Ready)**: sistem dibagi ke dalam 4 domain layanan independen dengan batas tanggung jawab bisnis dan isolasi data logis (*logical database-per-service*). Seluruh domain berkomunikasi melalui standar kontrak **REST API JSON**.
+
+> 💡 **Catatan Evaluasi Akademik (Milestone M1-M3 / Fase UTS):**
+> Pada fase UTS, keempat domain layanan dikompilasi dalam *Monorepo Modular SOA* untuk menjamin kestabilan pengujian otomatis (63 automated tests lulus 100%), eliminasi network latency saat sesi demo presentasi, serta efisiensi cloud deployment di Render. Setiap domain terisolasi secara ketat di level Controller, Service, dan Model sehingga 100% siap dipecah menjadi *container* fisik mandiri (*multi-service deployment*) pada fase berikutnya.
 
 ```text
 Browser (Blade + JS)  /  Postman  /  klien lain
@@ -341,7 +346,12 @@ Format kode dengan Pint sebelum commit:
 vendor/bin/pint
 ```
 
-**Mencoba API secara manual:** import [`docs/PaduKerja.postman_collection.json`](docs/PaduKerja.postman_collection.json) ke Postman atau [`docs/thunder-collection_padukerja.json`](docs/thunder-collection_padukerja.json) ke Thunder Client. Panduan langkah demi langkah ada di [`docs/TESTING_GUIDE.md`](docs/TESTING_GUIDE.md).
+- Suite pengujian otomatis mencakup **63 feature & unit test dengan 569 assertions** yang lulus 100% pada PHP 8.4 dan MySQL/SQLite.
+
+**Mencoba API secara mandiri:**
+- **Postman Web Studio (Tanpa Install Aplikasi):** Buka konsol interaktif di browser melalui [jobharbour.nour.web.id/postman](https://jobharbour.nour.web.id/postman) lengkap dengan 1-click role switcher dan panduan 20 skenario rubrik UTS.
+- **Postman Desktop:** Import koleksi [`docs/PaduKerja.postman_collection.json`](docs/PaduKerja.postman_collection.json).
+- **Thunder Client (VS Code):** Import koleksi [`docs/thunder-collection_padukerja.json`](docs/thunder-collection_padukerja.json). Panduan langkah demi langkah ada di [`docs/TESTING_GUIDE.md`](docs/TESTING_GUIDE.md).
 
 ---
 
@@ -427,12 +437,12 @@ Aplikasi bisa di-deploy sebagai container Docker (PHP 8.4 + Nginx) memakai `Dock
 
 ## 👥 Tim Pengembang
 
-| No | Domain | Penanggung Jawab | NIM | Controller Utama | Dokumentasi |
-|:---:|---|---|:---:|---|:---:|
-| 1 | **Auth & Profile** | **Nabe'ela Ayu Ning Tyas Zahra** | `23215052` | `AuthController`, `ProfileSkillController` | [Modul Auth](docs/materi/minggu-2/auth-profile/README.md) |
-| 2 | **Job Catalog** | **M. Fahren Andrean Rangkuti** | `23215030` | `JobVacancyController`, `CompanyController` | [Modul Job Catalog](docs/materi/minggu-2/job-catalog/README.md) |
-| 3 | **Application & Matchmaking** | **Muhammad Yasir Ilham Nabil** | `23215040` | `ApplicationController`, `MatchmakingService` | [Modul Application](docs/materi/minggu-2/application-matchmaking/README.md) |
-| 4 | **Recruitment Pipeline** | **Muhammad Affif** | `24225046` | `PipelineController` | [Modul Pipeline](docs/materi/minggu-2/recruitment-pipeline/README.md) |
+| No | Domain Layanan | Penanggung Jawab | NIM | Lingkup Data (Logical DB) | Controller Utama | Dokumentasi |
+|:---:|---|---|:---:|:---:|---|:---:|
+| 1 | **Auth & Profile** | **Nabe'ela Ayu Ning Tyas Zahra** | `23215052` | `db_auth` (Users, Skills, Auth) | `AuthController`, `ProfileSkillController` | [Modul Auth](docs/materi/minggu-2/auth-profile/README.md) |
+| 2 | **Job Catalog** | **M. Fahren Andrean Rangkuti** | `23215030` | `db_jobs` (Jobs, Company, Aggregator) | `JobVacancyController`, `CompanyController` | [Modul Job Catalog](docs/materi/minggu-2/job-catalog/README.md) |
+| 3 | **Application & Matchmaking** | **Muhammad Yasir Ilham Nabil** | `23215040` | `db_applications` (Applications, Scores) | `ApplicationController`, `MatchmakingService` | [Modul Application](docs/materi/minggu-2/application-matchmaking/README.md) |
+| 4 | **Recruitment Pipeline** | **Muhammad Affif** | `24225046` | `db_pipeline` (Pipelines, Stages) | `PipelineController` | [Modul Pipeline](docs/materi/minggu-2/recruitment-pipeline/README.md) |
 
 ---
 
